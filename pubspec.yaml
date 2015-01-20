@@ -1,0 +1,6 @@
+name: 1gam1
+description: Dart+WebGl game for one game a month
+dependencies:
+  browser: any
+  game_loop: any
+  vector_math: any
