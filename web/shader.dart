@@ -5,7 +5,7 @@ import 'dart:typed_data';
 
 import 'package:vector_math/vector_math.dart';
 
-class Shader
+abstract class Shader
 {
   webgl.Program shader_program_;
   int a_vertex_pos_;
@@ -79,11 +79,19 @@ class Shader
     gl_.uniformMatrix4fv(u_m_worldview_, false, tmpList);
   }
 
+  void makeCurrent();
+}
+
+class BasicShader extends Shader
+{
+  BasicShader(String vertex_source, String fragment_source, webgl.RenderingContext gl) : super(vertex_source, fragment_source, gl)
+  {
+  }
+
   void makeCurrent()
   {
     gl_.useProgram(shader_program_);
   }
-
 }
 
 String color_vs_source = """
@@ -110,7 +118,7 @@ void main(void) {
 }
     """;
 
-Shader createColorShader(webgl.RenderingContext gl) => new Shader(color_vs_source, color_fs_source, gl);
+Shader createColorShader(webgl.RenderingContext gl) => new BasicShader(color_vs_source, color_fs_source, gl);
 
 String texture_vs_source = """
 attribute vec3 aVertexPosition;
@@ -137,4 +145,21 @@ void main(void) {
 }
 """;
 
-Shader createTextureShader(webgl.RenderingContext gl) => new Shader(texture_vs_source, texture_fs_source, gl);
+Shader createTextureShader(webgl.RenderingContext gl) => new BasicShader(texture_vs_source, texture_fs_source, gl);
+
+class AtlasShader extends Shader
+{
+  int _num_images;
+  int _cur_image;
+  int _offset_size;
+
+  AtlasShader(String vertex_source, String fragment_source, webgl.RenderingContext gl) : super(vertex_source, fragment_source, gl)
+  {
+  }
+
+  void makeCurrent()
+  {
+
+    gl_.useProgram(shader_program_);
+  }
+}

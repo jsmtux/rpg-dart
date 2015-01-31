@@ -20,8 +20,10 @@ class GameState extends SimpleHtmlState
   EngineElement addElement(BaseGeometry geom, Behaviour behaviour)
   {
     Drawable drawable;
+    print("adding element");
     if (geom is TexturedGeometry)
     {
+      print("should be adding textured geometry");
       drawable = drawable_factory_.createTexturedDrawable(geom);
     }
     else if (geom is ColoredGeometry)
