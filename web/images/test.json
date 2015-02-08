@@ -67,6 +67,24 @@
          "tilewidth":8
         }],
  "tilewidth":8,
- "version":1,
- "width":10
+ "version":1.0,
+ "width":10,
+ "models":[
+ 	"images/boulder1.model",
+	"images/mushroom0.model",
+	"images/tree.model"
+ ],
+ "objects":[
+	{
+	 "id":0,
+	 "position":[1,1]
+	},
+	{
+	 "id":1,
+	 "position":[3,2]
+	},
+	{
+	 "id":2,
+	 "position":[4,4]
+	}]
 }

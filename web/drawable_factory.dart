@@ -6,16 +6,17 @@ import 'dart:typed_data';
 import 'drawable.dart';
 import 'renderer.dart';
 import 'base_geometry.dart';
-import 'texture_manager.dart';
+import 'texture.dart';
+import 'asset_manager.dart';
 
 class DrawableFactory
 {
   Renderer renderer_;
-  TextureManager texture_manager_;
+  AssetManager<Texture> texture_manager_;
 
-  Drawable createBaseDrawable(BaseGeometry geometry)
+  BaseDrawable createBaseDrawable(BaseGeometry geometry)
   {
-    Drawable ret = new Drawable();
+    BaseDrawable ret = new BaseDrawable();
     ret.pos_buffer_ = renderer_.gl_.createBuffer();
     renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, ret.pos_buffer_);
     renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER,
@@ -31,30 +32,16 @@ class DrawableFactory
     return ret;
   }
 
-  Drawable createColoredDrawable(ColoredGeometry geometry)
+  BaseDrawable createTexturedDrawable(TexturedGeometry geometry)
   {
-    Drawable ret = createBaseDrawable(geometry);
-
-    ret.color_buffer_ = renderer_.gl_.createBuffer();
-    renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, ret.color_buffer_);
-    renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER, new Float32List.fromList(geometry.colors_),
-      webgl.RenderingContext.STATIC_DRAW);
-
-    ret.shader_ = renderer_.color_shader_;
-
-    return ret;
-  }
-
-  Drawable createTexturedDrawable(TexturedGeometry geometry)
-  {
-    Drawable ret = createBaseDrawable(geometry);
+    BaseDrawable ret = createBaseDrawable(geometry);
 
     ret.tex_buffer_ = renderer_.gl_.createBuffer();
     renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, ret.tex_buffer_);
     renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER,
         new Float32List.fromList(geometry.text_coords_), webgl.RenderingContext.STATIC_DRAW);
 
-    ret.tex_ = texture_manager_.getTexture(geometry.image_);
+    ret.tex_ = texture_manager_.getAsset(geometry.image_);
 
     ret.shader_ = renderer_.texture_shader_;
 
@@ -63,6 +50,6 @@ class DrawableFactory
 
   DrawableFactory(this.renderer_)
   {
-    texture_manager_ = new TextureManager(renderer_.gl_);
+    texture_manager_ = new AssetManager((name) => new Texture(name, renderer_.gl_));
   }
 }

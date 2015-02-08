@@ -26,7 +26,7 @@ class Tile3dBehaviour extends Behaviour
   void init(EngineElement parent)
   {
     drawable_ = parent.drawable_;
-    drawable_.position_ = new Vector3(x_*1.0, y_*1.0, 0.0);
+    drawable_.setPosition(new Vector3(x_*1.0, y_*1.0, 0.0));
   }
   void update(GameState state)
   {

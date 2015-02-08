@@ -15,9 +15,7 @@ class SquareTerrain
   int num_images_;
   int map_scale_ = 5;
 
-  SquareTerrain(this.size_, this.heights_, this.image_, this.textures_, this.num_images_)
-  {
-  }
+  SquareTerrain(this.size_, this.heights_, this.image_, this.textures_, this.num_images_);
 
   BaseGeometry calculateBaseGeometry(double height)
   {

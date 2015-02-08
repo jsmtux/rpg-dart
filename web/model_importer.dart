@@ -1,27 +1,19 @@
 library model_importer;
 
 import "dart:convert";
-import "dart:html";
 
+import "async_importer.dart";
 import "base_geometry.dart";
 
-class ModelImporter
+class ModelImporter extends AsyncImporter<List<BaseGeometry>>
 {
-  Function callback_;
+  ModelImporter();
 
-  ModelImporter(){}
-  ModelImporter.Async(this.callback_){}
-
-  void RequestFile(String path)
-  {
-    HttpRequest.getString(path).then(getModel);
-  }
-
-  List<BaseGeometry> getModel(String data)
+  List<BaseGeometry> processFile(String path)
   {
     List<BaseGeometry> ret = new List<BaseGeometry>();
 
-    Map jsonData = JSON.decode(data);
+    Map jsonData = JSON.decode(path);
     List materials = jsonData["materials"];
 
     List meshes = jsonData["meshes"];
@@ -36,10 +28,6 @@ class ModelImporter
       ret.add(geom);
     }
 
-    if(callback_ != null)
-    {
-      callback_(ret);
-    }
     return ret;
   }
 }

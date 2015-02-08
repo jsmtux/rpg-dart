@@ -63,30 +63,7 @@ class Renderer
 
   void renderElement(Drawable d)
   {
-    d.shader_.makeCurrent();
-    m_modelview_ = new Matrix4.identity();
-    m_modelview_.translate(d.position_);
-    m_modelview_.setRotation(d.rotation_.asRotationMatrix());
-    m_modelview_.scale(d.size, d.size, d.size);
-
-    gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, d.pos_buffer_);
-    gl_.vertexAttribPointer(d.shader_.a_vertex_pos_, dimensions_, webgl.RenderingContext.FLOAT, false, 0, 0);
-    if(d.color_buffer_ != null)
-    {
-      gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, d.color_buffer_);
-      gl_.vertexAttribPointer(d.shader_.a_vertex_color_, 4, webgl.RenderingContext.FLOAT, false, 0, 0);
-    }
-    if(d.tex_buffer_ != null)
-    {
-      d.tex_.makeCurrent();
-      gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, d.tex_buffer_);
-      gl_.vertexAttribPointer(d.shader_.a_vertex_coord_, 2, webgl.RenderingContext.FLOAT, false, 0, 0);
-    }
-
-    gl_.bindBuffer(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, d.ind_buffer_);
-
-    d.shader_.setMatrixUniforms(m_perspective_, m_modelview_, m_worldview_);
-    gl_.drawElements(webgl.RenderingContext.TRIANGLES, d.vertices_, webgl.RenderingContext.UNSIGNED_SHORT, 0);
+    d.Draw(gl_, m_worldview_, m_perspective_, dimensions_);
   }
 
   void render()
@@ -99,7 +76,7 @@ class Renderer
     List<Drawable> sorted_drawables = new List<Drawable>();
     for(Drawable d in drawables_)
     {
-      if(!d.transparent_)
+      if(!d.isTransparent())
       {
         renderElement(d);
       }

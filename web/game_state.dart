@@ -4,33 +4,18 @@ import 'dart:html';
 
 import 'package:game_loop/game_loop_html.dart';
 
-import 'drawable_factory.dart';
 import 'drawable.dart';
 import 'renderer.dart';
 import 'element.dart';
-import 'base_geometry.dart';
 import 'behaviour.dart';
 
 class GameState extends SimpleHtmlState
 {
   Renderer renderer_;
   List<EngineElement> elements_ = new List<EngineElement>();
-  DrawableFactory drawable_factory_;
 
-  EngineElement addElement(BaseGeometry geom, Behaviour behaviour)
+  EngineElement addElement(Drawable drawable, Behaviour behaviour)
   {
-    Drawable drawable;
-    print("adding element");
-    if (geom is TexturedGeometry)
-    {
-      print("should be adding textured geometry");
-      drawable = drawable_factory_.createTexturedDrawable(geom);
-    }
-    else if (geom is ColoredGeometry)
-    {
-      drawable = drawable_factory_.createColoredDrawable(geom);
-    }
-
     EngineElement toAdd = new EngineElement(drawable, behaviour);
     if (behaviour != null)
     {
@@ -64,6 +49,5 @@ class GameState extends SimpleHtmlState
   GameState(Renderer renderer)
   {
     renderer_ = renderer;
-    drawable_factory_ = new DrawableFactory(renderer);
   }
 }
