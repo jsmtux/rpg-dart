@@ -13,6 +13,7 @@ abstract class Drawable
   bool isTransparent();
   void setPosition(Vector3 pos);
   void setScale(double scale);
+  void setRotation(Quaternion rot);
   void Rotate(Quaternion rot);
 }
 
@@ -29,7 +30,8 @@ class BaseDrawable implements Drawable
 
   Shader shader_;
 
-  Texture tex_;
+  List<Texture> tex_ = new List<Texture>();
+  int tex_cur_ind_ = 0;
   bool transparent_ = false;
 
   int vertices_;
@@ -51,7 +53,7 @@ class BaseDrawable implements Drawable
     }
     if(tex_buffer_ != null)
     {
-      tex_.makeCurrent();
+      tex_[tex_cur_ind_].makeCurrent();
       gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, tex_buffer_);
       gl_.vertexAttribPointer(shader_.a_vertex_coord_, 2, webgl.RenderingContext.FLOAT, false, 0, 0);
     }
@@ -77,8 +79,34 @@ class BaseDrawable implements Drawable
     rotation_ *= rot;
   }
 
+  void setRotation(Quaternion rot)
+  {
+    rotation_ = rot;
+  }
+
   void setPosition(Vector3 pos)
   {
     position_ = pos;
+  }
+}
+
+class AnimationSequence
+{
+  List<int> images;
+  double time;
+}
+
+class AnimatedDrawable
+{
+  int num_images_side_;
+  Map<String, AnimationSequence> sequences_;
+
+  void activateImage(int i)
+  {
+    int x = (i / num_images_side_).floor();
+    int y = num_images_side_ - x;
+
+    Vector2 offset = new Vector2(x/num_images_side_, y/num_images_side_);
+    Vector2 size = new Vector2(1/num_images_side_, 1/num_images_side_);
   }
 }

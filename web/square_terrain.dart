@@ -74,12 +74,19 @@ class SquareTerrain
           vc.position_.z = heights_[i+1][j] / map_scale_ + height;
           vd.position_.z = heights_[i+1][j] / map_scale_ + height;
         }
-        else
+        else if (heights_[i][j] == -3)
         {
           va.position_.z = heights_[i][j-1] / map_scale_ + height;
           vb.position_.z = heights_[i][j+1] / map_scale_ + height;
           vc.position_.z = heights_[i][j-1] / map_scale_ + height;
           vd.position_.z = heights_[i][j+1] / map_scale_ + height;
+        }
+        else if (heights_[i][j] < -3)
+        {
+          va.position_.z = heights_[i-1][j-1] / map_scale_ + height;
+          vb.position_.z = heights_[i-1][j+1] / map_scale_ + height;
+          vc.position_.z = heights_[i+1][j-1] / map_scale_ + height;
+          vd.position_.z = heights_[i+1][j+1] / map_scale_ + height;
         }
 
         int ia = ret.AddVertex(va);

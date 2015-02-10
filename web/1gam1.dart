@@ -2,13 +2,26 @@ import 'dart:html';
 import 'dart:async';
 
 import 'package:game_loop/game_loop_html.dart';
-import 'package:vector_math/vector_math.dart';
 
 import 'renderer.dart';
 import 'game_state.dart';
 import 'drawable_factory.dart';
 import 'level_importer.dart';
 import 'level_data.dart';
+import 'behaviour.dart';
+import 'geometry_data.dart';
+import 'base_geometry.dart';
+import 'element.dart';
+import 'camera.dart';
+
+void initGame (TerrainBehaviour terrain, GameState state, DrawableFactory drawable_factory, GameLoopHtml gameLoop, Camera cur_cam)
+{
+
+  BaseGeometry quad = new TexturedGeometry(quad_vertices, quad_indices, quad_coords, "images/pc.png");
+  EngineElement e2 = state.addElement(drawable_factory.createTexturedDrawable(quad) ,
+      new PCBehaviour(5.0, 5.0, terrain, gameLoop.keyboard, cur_cam));
+  gameLoop.start();
+}
 
 main() {
   CanvasElement canvas = querySelector(".game-element");
@@ -18,13 +31,13 @@ main() {
   DrawableFactory drawable_factory = new DrawableFactory(renderer);
   GameState draw_state = new GameState(renderer);
 
-  renderer.m_worldview_.translate(-5.0, -2.0, -45.0);
-  renderer.m_worldview_.rotate(new Vector3(-1.0,0.0,0.0), radians(45.0));
-
   LevelImporter level_importer = new LevelImporter();
-  Future<bool> import_res = level_importer.RequestFile("images/map_test.json").then((LevelData data) => (data.AddToGameState(draw_state, drawable_factory)));
+  Future<TerrainBehaviour> import_res =
+      level_importer.RequestFile("images/map_test.json").then((LevelData data) => (data.AddToGameState(draw_state, drawable_factory)));
+
+  Camera cur_cam = new Camera(renderer.m_worldview_);
 
   gameLoop.state = draw_state;
 
-  import_res.then((res) => gameLoop.start());
+  import_res.then((res) => initGame(res, draw_state, drawable_factory, gameLoop, cur_cam));
 }

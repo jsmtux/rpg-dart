@@ -41,9 +41,16 @@ class DrawableFactory
     renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER,
         new Float32List.fromList(geometry.text_coords_), webgl.RenderingContext.STATIC_DRAW);
 
-    ret.tex_ = texture_manager_.getAsset(geometry.image_);
+    ret.tex_.add(texture_manager_.getAsset(geometry.image_));
 
     ret.shader_ = renderer_.texture_shader_;
+
+    return ret;
+  }
+
+  AnimatedDrawable createAnimatedDrawable(TexturedGeometry geometry)
+  {
+    AnimatedDrawable ret = new AnimatedDrawable();
 
     return ret;
   }
