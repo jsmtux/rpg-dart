@@ -1,9 +1,11 @@
 library Drawable;
 
 import 'dart:web_gl' as webgl;
+import 'dart:async';
 
 import 'package:vector_math/vector_math.dart';
 
+import 'animation.dart';
 import 'texture.dart';
 import 'shader.dart';
 
@@ -90,23 +92,79 @@ class BaseDrawable implements Drawable
   }
 }
 
-class AnimationSequence
-{
-  List<int> images;
-  double time;
-}
-
-class AnimatedDrawable
+class AnimatedDrawable extends BaseDrawable
 {
   int num_images_side_;
   Map<String, AnimationSequence> sequences_;
+  AtlasShader shader_;
+  AnimationSequence current_sequence_;
+  String current_sequence_name_;
+  int current_in_sequence_;
+  Future update_timer;
 
-  void activateImage(int i)
+  void Draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions)
   {
-    int x = (i / num_images_side_).floor();
-    int y = num_images_side_ - x;
+    if (current_sequence_ != null)
+    {
+      ActivateImage(current_sequence_.images[current_in_sequence_]);
+    }
+    else
+    {
+      ActivateImage(0);
+    }
+    super.Draw(gl_, world_view, perspective, dimensions);
+  }
+
+  void SetSequence(String seq_name)
+  {
+    if (current_sequence_name_ != seq_name)
+    {
+      current_sequence_name_ = seq_name;
+      current_sequence_ = sequences_[seq_name];
+      current_in_sequence_ = null;
+      UpdateSequenceCounter();
+    }
+  }
+
+  void UpdateSequenceCounter()
+  {
+    if (current_sequence_ != null)
+    {
+      if (update_timer == null)
+      {
+        int millis = (current_sequence_.time * 1000).floor();
+        update_timer = new Future.delayed(new Duration(milliseconds : millis), finishUpdate);
+      }
+      if (current_in_sequence_ == null)
+      {
+        current_in_sequence_ = 0;
+      }
+      else
+      {
+        current_in_sequence_ = (current_in_sequence_ + 1) % current_sequence_.images.length;
+      }
+    }
+    else
+    {
+      update_timer = null;
+    }
+  }
+
+  void finishUpdate()
+  {
+    update_timer = null;
+    UpdateSequenceCounter();
+  }
+
+  void ActivateImage(int i)
+  {
+    int y = (i / num_images_side_).floor();
+    int x = i - y;
 
     Vector2 offset = new Vector2(x/num_images_side_, y/num_images_side_);
     Vector2 size = new Vector2(1/num_images_side_, 1/num_images_side_);
+
+    shader_.setOffset(offset);
+    shader_.setSize(size);
   }
 }

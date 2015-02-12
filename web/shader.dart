@@ -147,19 +147,66 @@ void main(void) {
 
 Shader createTextureShader(webgl.RenderingContext gl) => new BasicShader(texture_vs_source, texture_fs_source, gl);
 
+String texture_part_vs_source = """
+precision mediump float;
+
+attribute vec3 aVertexPosition;
+attribute vec2 aTextureCoord;
+
+uniform mat4 uMVMatrix;
+uniform mat4 uWVMatrix;
+uniform mat4 uPMatrix;
+
+uniform vec2 t_offset;
+uniform vec2 t_size;
+varying vec2 vTextureCoord;
+
+void main(void) {
+  gl_Position = uPMatrix * uWVMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+  vTextureCoord = aTextureCoord * t_size + t_offset;
+}
+""";
+
+String texture_part_fs_source = """
+precision mediump float;
+varying vec2 vTextureCoord;
+
+uniform sampler2D uSampler;
+void main(void) {
+  gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+}
+""";
+
 class AtlasShader extends Shader
 {
-  int _num_images;
-  int _cur_image;
-  int _offset_size;
+  webgl.UniformLocation size_p_;
+  webgl.UniformLocation offset_p_;
+
+  Vector2 size_;
+  Vector2 offset_;
 
   AtlasShader(String vertex_source, String fragment_source, webgl.RenderingContext gl) : super(vertex_source, fragment_source, gl)
   {
+    size_p_ = gl_.getUniformLocation(shader_program_, "t_size");
+    offset_p_ = gl_.getUniformLocation(shader_program_, "t_offset");
   }
 
   void makeCurrent()
   {
-
     gl_.useProgram(shader_program_);
+    gl_.uniform2f(size_p_, size_.x, size_.y);
+    gl_.uniform2f(offset_p_, offset_.x, offset_.y);
+  }
+
+  void setOffset(Vector2 offset)
+  {
+    offset_ = offset;
+  }
+
+  void setSize(Vector2 size)
+  {
+    size_ = size;
   }
 }
+
+Shader createAtlasShader(webgl.RenderingContext gl) => new AtlasShader(texture_part_vs_source, texture_part_fs_source, gl);

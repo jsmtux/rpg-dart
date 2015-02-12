@@ -8,49 +8,66 @@ import 'renderer.dart';
 import 'base_geometry.dart';
 import 'texture.dart';
 import 'asset_manager.dart';
+import 'animation.dart';
 
 class DrawableFactory
 {
   Renderer renderer_;
   AssetManager<Texture> texture_manager_;
 
-  BaseDrawable createBaseDrawable(BaseGeometry geometry)
+  void initGeometry(BaseGeometry geometry, BaseDrawable drawable)
   {
-    BaseDrawable ret = new BaseDrawable();
-    ret.pos_buffer_ = renderer_.gl_.createBuffer();
-    renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, ret.pos_buffer_);
+    drawable.pos_buffer_ = renderer_.gl_.createBuffer();
+    renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, drawable.pos_buffer_);
     renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER,
         new Float32List.fromList(geometry.vertices_), webgl.RenderingContext.STATIC_DRAW);
 
-    ret.ind_buffer_ = renderer_.gl_.createBuffer();
-    renderer_.gl_.bindBuffer(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, ret.ind_buffer_);
+    drawable.ind_buffer_ = renderer_.gl_.createBuffer();
+    renderer_.gl_.bindBuffer(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, drawable.ind_buffer_);
     renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, new Uint16List.fromList(geometry.indices_),
         webgl.RenderingContext.STATIC_DRAW);
 
-    ret.vertices_ = geometry.indices_.length;
+    drawable.vertices_ = geometry.indices_.length;
+  }
+
+  void initTexture(TexturedGeometry geometry, BaseDrawable drawable)
+  {
+    drawable.tex_buffer_ = renderer_.gl_.createBuffer();
+    renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, drawable.tex_buffer_);
+    renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER,
+        new Float32List.fromList(geometry.text_coords_), webgl.RenderingContext.STATIC_DRAW);
+
+    drawable.tex_.add(texture_manager_.getAsset(geometry.image_));
+  }
+
+  BaseDrawable createBaseDrawable(BaseGeometry geometry)
+  {
+    BaseDrawable ret = new BaseDrawable();
+    initGeometry(geometry, ret);
+    ret.shader_ = renderer_.texture_shader_;
 
     return ret;
   }
 
   BaseDrawable createTexturedDrawable(TexturedGeometry geometry)
   {
-    BaseDrawable ret = createBaseDrawable(geometry);
-
-    ret.tex_buffer_ = renderer_.gl_.createBuffer();
-    renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, ret.tex_buffer_);
-    renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER,
-        new Float32List.fromList(geometry.text_coords_), webgl.RenderingContext.STATIC_DRAW);
-
-    ret.tex_.add(texture_manager_.getAsset(geometry.image_));
-
+    BaseDrawable ret = new BaseDrawable();
+    initGeometry(geometry, ret);
+    initTexture(geometry, ret);
     ret.shader_ = renderer_.texture_shader_;
 
     return ret;
   }
 
-  AnimatedDrawable createAnimatedDrawable(TexturedGeometry geometry)
+  AnimatedDrawable createAnimatedDrawable(TexturedGeometry geometry, AnimationData animation)
   {
     AnimatedDrawable ret = new AnimatedDrawable();
+    initGeometry(geometry, ret);
+    initTexture(geometry, ret);
+
+    ret.sequences_ = animation.sequences_;
+    ret.num_images_side_ = animation.num_images_side_;
+    ret.shader_ = renderer_.atlas_shader_;
 
     return ret;
   }

@@ -24,14 +24,15 @@ class Renderer
 
   Shader color_shader_;
   Shader texture_shader_;
+  Shader atlas_shader_;
 
   List<Drawable> drawables_ = new List<Drawable>();
 
   Renderer(CanvasElement canvas)
   {
     canvas_ = canvas;
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight - 20;
+    canvas.width = window.innerWidth - 20;
     view_width_ = canvas.width;
     view_height_ = canvas.height;
     window.onResize.listen((event) {
@@ -43,6 +44,7 @@ class Renderer
     gl_ = canvas.getContext('experimental-webgl');
     color_shader_ = createColorShader(gl_);
     texture_shader_ = createTextureShader(gl_);
+    atlas_shader_ = createAtlasShader(gl_);
     m_worldview_ = new Matrix4.identity();
 
     gl_.clearColor(1.0, 1.0, 1.0, 1.0);

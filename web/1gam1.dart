@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:game_loop/game_loop_html.dart';
 
+import 'animation.dart';
 import 'renderer.dart';
 import 'game_state.dart';
 import 'drawable_factory.dart';
@@ -16,9 +17,15 @@ import 'camera.dart';
 
 void initGame (TerrainBehaviour terrain, GameState state, DrawableFactory drawable_factory, GameLoopHtml gameLoop, Camera cur_cam)
 {
-
+  AnimationData animation = new AnimationData();
+  animation.num_images_side_ = 8;
+  animation.sequences_ = new Map<String, AnimationSequence>();
+  animation.sequences_["walk_t"] = new AnimationSequence([0, 1, 2, 3, 4, 5, 6, 7], 0.1);
+  animation.sequences_["walk_l"] = new AnimationSequence([8, 9,10,11,12,13,14,15], 0.1);
+  animation.sequences_["walk_b"] = new AnimationSequence([16,16,18,19,20,21,22,23], 0.1);
+  animation.sequences_["walk_r"] = new AnimationSequence([24,25,26,27,28,29,30,31], 0.1);
   BaseGeometry quad = new TexturedGeometry(quad_vertices, quad_indices, quad_coords, "images/pc.png");
-  EngineElement e2 = state.addElement(drawable_factory.createTexturedDrawable(quad) ,
+  EngineElement e2 = state.addElement(drawable_factory.createAnimatedDrawable(quad, animation) ,
       new PCBehaviour(5.0, 5.0, terrain, gameLoop.keyboard, cur_cam));
   gameLoop.start();
 }

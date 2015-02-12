@@ -109,6 +109,8 @@ class Tile3dBehaviour extends TerrainElementBehaviour
 
 class PCBehaviour extends TerrainElementBehaviour
 {
+  AnimatedDrawable anim_drawable_;
+
   PCBehaviour(double x, double y, TerrainBehaviour terrain, this.keyboard_, this.camera_) : super(x, y, terrain)
   {
     Quaternion rot = new Quaternion.identity();
@@ -117,26 +119,41 @@ class PCBehaviour extends TerrainElementBehaviour
     z_ = 2.0;
   }
 
+  void init(EngineElement parent)
+  {
+    super.init(parent);
+    anim_drawable_ = drawable_;
+  }
+
   Keyboard keyboard_;
   Camera camera_;
 
   void update(GameState state)
   {
+    double vel = 0.05;
     if(keyboard_.isDown(Keyboard.UP))
     {
-      move(x_, y_+ 0.1);
+      move(x_, y_+ vel);
+      anim_drawable_.SetSequence("walk_t");
     }
-    if(keyboard_.isDown(Keyboard.DOWN))
+    else if(keyboard_.isDown(Keyboard.DOWN))
     {
-      move(x_, y_- 0.1);
+      move(x_, y_- vel);
+      anim_drawable_.SetSequence("walk_b");
     }
-    if(keyboard_.isDown(Keyboard.LEFT))
+    else if(keyboard_.isDown(Keyboard.LEFT))
     {
-      move(x_- 0.1, y_);
+      move(x_- vel, y_);
+      anim_drawable_.SetSequence("walk_l");
     }
-    if(keyboard_.isDown(Keyboard.RIGHT))
+    else if(keyboard_.isDown(Keyboard.RIGHT))
     {
-      move(x_+ 0.1, y_);
+      move(x_+ vel, y_);
+      anim_drawable_.SetSequence("walk_r");
+    }
+    else
+    {
+      anim_drawable_.SetSequence("");
     }
 
     camera_.SetPos(new Vector2(-x_, -y_));
