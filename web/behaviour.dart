@@ -110,6 +110,9 @@ class Tile3dBehaviour extends TerrainElementBehaviour
 class PCBehaviour extends TerrainElementBehaviour
 {
   AnimatedDrawable anim_drawable_;
+  int direction_key_;
+  bool attacking_;
+  bool attack_pressed;
 
   PCBehaviour(double x, double y, TerrainBehaviour terrain, this.keyboard_, this.camera_) : super(x, y, terrain)
   {
@@ -130,30 +133,68 @@ class PCBehaviour extends TerrainElementBehaviour
 
   void update(GameState state)
   {
-    double vel = 0.05;
-    if(keyboard_.isDown(Keyboard.UP))
+    double vel = 0.04;
+    if(attacking_)
     {
+      
+    }
+    else if(keyboard_.isDown(Keyboard.SPACE))
+    {
+      if (attacking_ == false)
+      {
+        attacking_ = true;
+        switch(direction_key_)
+        {
+          case Keyboard.UP:
+            anim_drawable_.SetSequence("stab_t");
+            break;
+          case Keyboard.LEFT:
+            anim_drawable_.SetSequence("stab_l");
+            break;
+          case Keyboard.DOWN:
+            anim_drawable_.SetSequence("stab_b");
+            break;
+          case Keyboard.RIGHT:
+            anim_drawable_.SetSequence("stab_r");
+            break;
+        }
+      }
+    }
+    else if(keyboard_.isDown(Keyboard.UP))
+    {
+      direction_key_ = Keyboard.UP;
       move(x_, y_+ vel);
       anim_drawable_.SetSequence("walk_t");
     }
     else if(keyboard_.isDown(Keyboard.DOWN))
     {
+      direction_key_ = Keyboard.DOWN;
       move(x_, y_- vel);
       anim_drawable_.SetSequence("walk_b");
     }
     else if(keyboard_.isDown(Keyboard.LEFT))
     {
+      direction_key_ = Keyboard.LEFT;
       move(x_- vel, y_);
       anim_drawable_.SetSequence("walk_l");
     }
     else if(keyboard_.isDown(Keyboard.RIGHT))
     {
+      direction_key_ = Keyboard.RIGHT;
       move(x_+ vel, y_);
       anim_drawable_.SetSequence("walk_r");
     }
     else
     {
-      anim_drawable_.SetSequence("");
+      if(anim_drawable_.current_sequence_name_ != null && anim_drawable_.current_sequence_name_.contains("walk"))
+      {
+        anim_drawable_.StopAnimation();
+      }
+    }
+    
+    if (anim_drawable_.current_sequence_ == null)
+    {
+      attacking_ = false;
     }
 
     camera_.SetPos(new Vector2(-x_, -y_));

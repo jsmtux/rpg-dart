@@ -24,6 +24,10 @@ void initGame (TerrainBehaviour terrain, GameState state, DrawableFactory drawab
   animation.sequences_["walk_l"] = new AnimationSequence([8, 9,10,11,12,13,14,15], 0.1);
   animation.sequences_["walk_b"] = new AnimationSequence([16,16,18,19,20,21,22,23], 0.1);
   animation.sequences_["walk_r"] = new AnimationSequence([24,25,26,27,28,29,30,31], 0.1);
+  animation.sequences_["stab_t"] = new AnimationSequence([32, 33, 34, 35, 36, 37], 0.05);
+  animation.sequences_["stab_l"] = new AnimationSequence([40, 41, 42, 43, 44, 45], 0.05);
+  animation.sequences_["stab_b"] = new AnimationSequence([48 ,49, 50, 51, 52, 53], 0.05);
+  animation.sequences_["stab_r"] = new AnimationSequence([56, 57, 58, 59, 60, 61], 0.05);
   BaseGeometry quad = new TexturedGeometry(quad_vertices, quad_indices, quad_coords, "images/pc.png");
   EngineElement e2 = state.addElement(drawable_factory.createAnimatedDrawable(quad, animation) ,
       new PCBehaviour(5.0, 5.0, terrain, gameLoop.keyboard, cur_cam));

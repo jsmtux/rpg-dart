@@ -101,6 +101,7 @@ class AnimatedDrawable extends BaseDrawable
   String current_sequence_name_;
   int current_in_sequence_;
   Future update_timer;
+  int idle_image = 0;
 
   void Draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions)
   {
@@ -110,7 +111,7 @@ class AnimatedDrawable extends BaseDrawable
     }
     else
     {
-      ActivateImage(0);
+      ActivateImage(idle_image);
     }
     super.Draw(gl_, world_view, perspective, dimensions);
   }
@@ -123,6 +124,16 @@ class AnimatedDrawable extends BaseDrawable
       current_sequence_ = sequences_[seq_name];
       current_in_sequence_ = null;
       UpdateSequenceCounter();
+    }
+  }
+  
+  void StopAnimation()
+  {
+    if (current_sequence_ != null)
+    {
+      idle_image = current_sequence_.images.first;
+      current_sequence_ = null;
+      current_sequence_name_ = null;
     }
   }
 
@@ -141,7 +152,11 @@ class AnimatedDrawable extends BaseDrawable
       }
       else
       {
-        current_in_sequence_ = (current_in_sequence_ + 1) % current_sequence_.images.length;
+        current_in_sequence_ = (current_in_sequence_ + 1);
+        if (current_in_sequence_ >= current_sequence_.images.length)
+        {
+          StopAnimation();
+        }
       }
     }
     else
@@ -159,7 +174,7 @@ class AnimatedDrawable extends BaseDrawable
   void ActivateImage(int i)
   {
     int y = (i / num_images_side_).floor();
-    int x = i - y;
+    int x = i - y * num_images_side_;
 
     Vector2 offset = new Vector2(x/num_images_side_, y/num_images_side_);
     Vector2 size = new Vector2(1/num_images_side_, 1/num_images_side_);
