@@ -88,11 +88,11 @@ class Renderer
       }
     }
     sorted_drawables.sort((x,y) => y.position_.y.compareTo(x.position_.y));
-    gl_.disable(webgl.RenderingContext.DEPTH_TEST);
+    gl_.depthMask(false);
     for(Drawable d in sorted_drawables)
     {
       renderElement(d);
     }
-    gl_.enable(webgl.RenderingContext.DEPTH_TEST);
+    gl_.depthMask(true);
   }
 }

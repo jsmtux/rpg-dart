@@ -13,6 +13,7 @@ abstract class Drawable
 {
   void Draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions);
   bool isTransparent();
+  void setTransparent(bool val);
   void setPosition(Vector3 pos);
   void setScale(double scale);
   void setRotation(Quaternion rot);
@@ -71,6 +72,11 @@ class BaseDrawable implements Drawable
     return transparent_;
   }
 
+  void setTransparent(bool val)
+  {
+    transparent_ = val;
+  }
+
   void setScale(double scale)
   {
     size_ = scale;
@@ -116,17 +122,17 @@ class AnimatedDrawable extends BaseDrawable
     super.Draw(gl_, world_view, perspective, dimensions);
   }
 
-  void SetSequence(String seq_name)
+  void SetSequence(String seq_name, [int initial])
   {
     if (current_sequence_name_ != seq_name)
     {
       current_sequence_name_ = seq_name;
       current_sequence_ = sequences_[seq_name];
-      current_in_sequence_ = null;
+      current_in_sequence_ = initial;
       UpdateSequenceCounter();
     }
   }
-  
+
   void StopAnimation()
   {
     if (current_sequence_ != null)
