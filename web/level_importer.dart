@@ -7,6 +7,7 @@ import 'package:vector_math/vector_math.dart';
 import "async_importer.dart";
 import "square_terrain.dart";
 import "level_data.dart";
+import "path.dart";
 
 class Tileset
 {
@@ -80,21 +81,24 @@ class LevelImporter extends AsyncImporter<LevelData>
     }
     for (Map layer in layers)
     {
-      List<int> data = layer["data"];
-
-      Tileset current_tileset = getTileset(parsed_tilesets, layer);
-
-      if (current_tileset.name == "models_layer")
+      if (layer.containsKey("data"))
       {
-        for (int i = 0; i < size.x; i++)
+        List<int> data = layer["data"];
+
+        Tileset current_tileset = getTileset(parsed_tilesets, layer);
+
+        if (current_tileset.name == "models_layer")
         {
-          for (int j = 0; j < size.y; j++)
+          for (int i = 0; i < size.x; i++)
           {
-            int texture = data[(i*size.x + j).floor()] - current_tileset.first_gid;
-            if (texture >= 0)
+            for (int j = 0; j < size.y; j++)
             {
-              Vector3 cur_model = new Vector3(j*1.0,size.y - i*1.0,texture*1.0);
-              model_data.add(cur_model);
+              int texture = data[(i*size.x + j).floor()] - current_tileset.first_gid;
+              if (texture >= 0)
+              {
+                Vector3 cur_model = new Vector3(j*1.0,size.y - i*1.0,texture*1.0);
+                model_data.add(cur_model);
+              }
             }
           }
         }
@@ -110,47 +114,50 @@ class LevelImporter extends AsyncImporter<LevelData>
 
     for (Map layer in layers)
     {
-      List<int> data = layer["data"];
-
-      Tileset current_tileset = getTileset(parsed_tilesets, layer);
-
-      if (current_tileset.name == "heights_layer")
+      if (layer.containsKey("data"))
       {
-        for (int i = 0; i < size.x; i++)
+        List<int> data = layer["data"];
+
+        Tileset current_tileset = getTileset(parsed_tilesets, layer);
+
+        if (current_tileset.name == "heights_layer")
         {
-          heights.add(new List<int>());
-          for (int j = 0; j < size.y; j++)
+          for (int i = 0; i < size.x; i++)
           {
-            int height = data[(i + j*size.x).floor()] - current_tileset.first_gid;
-            if (height < 0)
+            heights.add(new List<int>());
+            for (int j = 0; j < size.y; j++)
             {
-              height = 0;
-            }
-            else if (height > 11)
-            {
-              if (height == 12)
-              {
-                height = -2;
-              }
-              else if (height == 13)
-              {
-                height = -3;
-              }
-              else if (height == 14)
-              {
-                height = -4;
-              }
-              else if (height == 15)
-              {
-                height = -5;
-              }
-              else
+              int height = data[(i + j*size.x).floor()] - current_tileset.first_gid;
+              if (height < 0)
               {
                 height = 0;
               }
-            }
+              else if (height > 11)
+              {
+                if (height == 12)
+                {
+                  height = -2;
+                }
+                else if (height == 13)
+                {
+                  height = -3;
+                }
+                else if (height == 14)
+                {
+                  height = -4;
+                }
+                else if (height == 15)
+                {
+                  height = -5;
+                }
+                else
+                {
+                  height = 0;
+                }
+              }
 
-            heights[i].add(height);
+              heights[i].add(height);
+            }
           }
         }
       }
@@ -177,6 +184,8 @@ class LevelImporter extends AsyncImporter<LevelData>
 
     Map jsonData = JSON.decode(data);
 
+    List<Path> paths = new List<Path>();
+
     Vector2 size = new Vector2.zero();
     size.y = jsonData["height"] * 1.0;
     size.x = jsonData["width"] * 1.0;
@@ -193,31 +202,61 @@ class LevelImporter extends AsyncImporter<LevelData>
 
     for (Map layer in layers)
     {
-      List<int> data = layer["data"];
-
-      Tileset current_tileset = getTileset(parsed_tilesets, layer);
-
-      if (current_tileset.name == "models_layer" || current_tileset.name == "heights_layer")
+      if (layer.containsKey("data"))
       {
+        List<int> data = layer["data"];
 
+        Tileset current_tileset = getTileset(parsed_tilesets, layer);
+
+        if (current_tileset.name == "models_layer" || current_tileset.name == "heights_layer")
+        {
+
+        }
+        else
+        {
+          List<List<int>> textures = new List<List<int>>();
+
+          for (int i = 0; i < size.x; i++)
+          {
+            textures.add(new List<int>());
+            for (int j = 0; j < size.y; j++)
+            {
+              int texture = data[(i*size.x + j).floor()] - current_tileset.first_gid;
+              textures[i].add(texture);
+            }
+          }
+          ret_terrain.add(new SquareTerrain(size, heights, current_tileset.path, textures, current_tileset.root_size));
+        }
       }
       else
       {
-        List<List<int>> textures = new List<List<int>>();
-
-        for (int i = 0; i < size.x; i++)
+        if (layer.containsKey("objects") && layer["name"] == "paths")
         {
-          textures.add(new List<int>());
-          for (int j = 0; j < size.y; j++)
+          for (Map object in layer["objects"])
           {
-            int texture = data[(i*size.x + j).floor()] - current_tileset.first_gid;
-            textures[i].add(texture);
+            double path_scale = 0.06;
+            String name = object["name"];
+            Vector2 pos = new Vector2.zero();
+            pos.x = object["x"] * path_scale;
+            pos.y = size.y - object["y"] * path_scale;
+            pos.x = pos.x.ceilToDouble();
+            pos.y = pos.y.ceilToDouble();
+            List<Vector2> points = new List<Vector2>();
+            for(Map point in object["polyline"])
+            {
+              Vector2 p_pos = new Vector2.zero();
+              p_pos.x = point["x"] * path_scale;
+              p_pos.y = - point["y"] * path_scale;
+              p_pos.x = p_pos.x.ceilToDouble();
+              p_pos.y = p_pos.y.ceilToDouble();
+              points.add(p_pos);
+            }
+            paths.add(new Path(name, pos, points));
           }
         }
-        ret_terrain.add(new SquareTerrain(size, heights, current_tileset.path, textures, current_tileset.root_size));
       }
     }
 
-    return new LevelData(ret_terrain, model_paths, model_data, heights);
+    return new LevelData(ret_terrain, model_paths, model_data, heights, paths);
   }
 }

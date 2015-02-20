@@ -12,17 +12,19 @@ import 'drawable.dart';
 import 'element.dart';
 import 'model_importer.dart';
 import 'behaviour.dart';
+import 'path.dart';
 
 class LevelData
 {
   List<SquareTerrain> terrain_list_;
   List<String> models_ = new List<String>();
   List<Vector3> model_info_ = new List<Vector3>();
+  List<Path> paths_ = new List<Path>();
   List<List<int>> heights_;
 
   Map<String,BaseGeometry> models_geometry_ = new Map<String, BaseGeometry>();
 
-  LevelData(this.terrain_list_, this.models_, this.model_info_, this.heights_);
+  LevelData(this.terrain_list_, this.models_, this.model_info_, this.heights_, this.paths_);
 
   Future<TerrainBehaviour> AddToGameState(GameState state, DrawableFactory drawable_factory)
   {
@@ -40,6 +42,11 @@ class LevelData
       Quaternion rot = new Quaternion.identity();
       //rot.setAxisAngle(new Vector3(1.0, 0.0, 0.0 ), -60 * (math.PI / 180));
       e1.drawable_.Rotate(rot);
+    }
+
+    if (paths_ != null)
+    {
+      state.paths_.addAll(paths_);
     }
 
     if (models_ != null)

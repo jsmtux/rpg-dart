@@ -8,11 +8,13 @@ import 'drawable.dart';
 import 'renderer.dart';
 import 'element.dart';
 import 'behaviour.dart';
+import 'path.dart';
 
 class GameState extends SimpleHtmlState
 {
   Renderer renderer_;
   List<EngineElement> elements_ = new List<EngineElement>();
+  List<Path> paths_ = new List<Path>();
 
   EngineElement addElement(Drawable drawable, Behaviour behaviour)
   {

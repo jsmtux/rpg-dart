@@ -10,10 +10,12 @@ import 'drawable_factory.dart';
 import 'level_importer.dart';
 import 'level_data.dart';
 import 'behaviour.dart';
+import 'enemy_behaviour.dart';
 import 'geometry_data.dart';
 import 'base_geometry.dart';
 import 'element.dart';
 import 'camera.dart';
+import 'pc_behaviour.dart';
 
 void initGame (TerrainBehaviour terrain, GameState state, DrawableFactory drawable_factory, GameLoopHtml gameLoop, Camera cur_cam)
 {
@@ -50,9 +52,7 @@ void initGame (TerrainBehaviour terrain, GameState state, DrawableFactory drawab
   animation_skeleton.sequences_["die"] = new AnimationSequence([31, 7, 15, 23, 31], 0.2);
   BaseGeometry quad_skeleton = new TexturedGeometry(quad_vertices, quad_indices, quad_coords, "images/skeletonspear.png");
   EngineElement e3 = state.addElement(drawable_factory.createAnimatedDrawable(quad_skeleton, animation_skeleton) ,
-      new EnemyBehaviour(14.0, 14.0, terrain, gameLoop.keyboard));
-  EngineElement e4 = state.addElement(drawable_factory.createAnimatedDrawable(quad_skeleton, animation_skeleton) ,
-      new EnemyBehaviour(25.0, 14.0, terrain, gameLoop.keyboard));
+      new EnemyBehaviour(terrain, state.paths_.first));
 
   gameLoop.start();
 }
@@ -67,7 +67,7 @@ main() {
 
   LevelImporter level_importer = new LevelImporter();
   Future<TerrainBehaviour> import_res =
-      level_importer.RequestFile("images/map_test.json").then((LevelData data) => (data.AddToGameState(draw_state, drawable_factory)));
+      level_importer.RequestFile("images/map_test2.json").then((LevelData data) => (data.AddToGameState(draw_state, drawable_factory)));
 
   Camera cur_cam = new Camera(renderer.m_worldview_);
 

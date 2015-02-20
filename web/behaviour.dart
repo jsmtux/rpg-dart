@@ -1,13 +1,12 @@
 library behaviour;
 
 import 'package:vector_math/vector_math.dart';
-import 'package:game_loop/game_loop_html.dart';
 import 'dart:math' as math;
 
 import 'element.dart';
 import 'game_state.dart';
 import 'drawable.dart';
-import 'camera.dart';
+import 'directions.dart';
 
 abstract class Behaviour
 {
@@ -143,24 +142,12 @@ class Tile3dBehaviour extends TerrainElementBehaviour
   void init(EngineElement parent)
   {
     super.init(parent);
-    terrain_.addObstacle(new Vector2(x_, y_));
+    //terrain_.addObstacle(new Vector2(x_, y_));
   }
 
   void update(GameState state)
   {
   }
-}
-
-class Directions
-{
-  final _value;
-  const Directions._internal(this._value);
-  toString() => 'Enum.$_value';
-
-  static const UP = const Directions._internal('UP');
-  static const DOWN = const Directions._internal('DOWN');
-  static const LEFT = const Directions._internal('LEFT');
-  static const RIGHT = const Directions._internal('RIGHT');
 }
 
 abstract class SpriteBehaviour extends TerrainElementBehaviour
@@ -229,152 +216,3 @@ abstract class WalkingBehaviour extends SpriteBehaviour
     }
   }
 }
-
-class EnemyBehaviour extends WalkingBehaviour
-{
-  Keyboard keyboard_;
-  int num_steps_ = 0;
-  Directions walking_dir_ = Directions.UP;
-  bool dead_ = false;
-
-  EnemyBehaviour(double x, double y, TerrainBehaviour terrain, this.keyboard_) : super(x, y, terrain)
-  {
-    vel_ = 0.03;
-  }
-
-  void hit(SpriteBehaviour behaviour)
-  {
-    if(!dead_)
-    {
-     dead_ = true;
-     anim_drawable_.SetSequence("die", 1);
-    }
-  }
-
-  void update(GameState state)
-  {
-    if (!dead_)
-    {
-      if (num_steps_ > 100)
-      {
-        switch(walking_dir_)
-        {
-          case Directions.UP:
-            walking_dir_ = Directions.LEFT;
-            break;
-          case Directions.DOWN:
-            walking_dir_ = Directions.RIGHT;
-            break;
-          case Directions.LEFT:
-            walking_dir_ = Directions.DOWN;
-            break;
-          case Directions.RIGHT:
-            walking_dir_ = Directions.UP;
-            break;
-        }
-        num_steps_ = 0;
-      }
-      num_steps_++;
-      walk(walking_dir_);
-    }
-  }
-}
-
-class PCBehaviour extends WalkingBehaviour
-{
-  bool attacking_ = false;
-  bool attack_pressed = false;
-  Keyboard keyboard_;
-  Camera camera_;
-
-  PCBehaviour(double x, double y, TerrainBehaviour terrain, this.keyboard_, this.camera_) : super(x, y, terrain)
-  {
-    vel_ = 0.05;
-  }
-
-  void update(GameState state)
-  {
-    double vel = 0.04;
-    if(attacking_ == true)
-    {
-      for (EngineElement element in state.elements_)
-      {
-        if (element.behaviour_ is EnemyBehaviour)
-        {
-          EnemyBehaviour enemy = element.behaviour_;
-          if (enemy.squareDistance(this) < 1.0)
-          {
-            enemy.hit(this);
-          }
-        }
-      }
-    }
-    else if(keyboard_.isDown(Keyboard.SPACE))
-    {
-      if (attacking_ == false)
-      {
-        attacking_ = true;
-        switch(dir_)
-        {
-          case Directions.UP:
-            anim_drawable_.SetSequence("stab_t");
-            break;
-          case Directions.LEFT:
-            anim_drawable_.SetSequence("stab_l");
-            break;
-          case Directions.DOWN:
-            anim_drawable_.SetSequence("stab_b");
-            break;
-          case Directions.RIGHT:
-            anim_drawable_.SetSequence("stab_r");
-            break;
-        }
-      }
-    }
-    else if(keyboard_.isDown(Keyboard.UP))
-    {
-      walk(Directions.UP);
-    }
-    else if(keyboard_.isDown(Keyboard.DOWN))
-    {
-      walk(Directions.DOWN);
-    }
-    else if(keyboard_.isDown(Keyboard.LEFT))
-    {
-      walk(Directions.LEFT);
-    }
-    else if(keyboard_.isDown(Keyboard.RIGHT))
-    {
-      walk(Directions.RIGHT);
-    }
-    else
-    {
-      if(anim_drawable_.current_sequence_name_ != null && anim_drawable_.current_sequence_name_.contains("walk"))
-      {
-        switch(dir_)
-        {
-          case Directions.UP:
-            anim_drawable_.SetSequence("stand_t");
-            break;
-          case Directions.LEFT:
-            anim_drawable_.SetSequence("stand_l");
-            break;
-          case Directions.DOWN:
-            anim_drawable_.SetSequence("stand_b");
-            break;
-          case Directions.RIGHT:
-            anim_drawable_.SetSequence("stand_r");
-            break;
-        }
-      }
-    }
-
-    if (anim_drawable_.current_sequence_ == null)
-    {
-      attacking_ = false;
-    }
-
-    camera_.SetPos(new Vector2(-x_, -y_));
-  }
-}
-

@@ -10028,4 +10028,9 @@
    <tile gid="4124"/>
   </data>
  </layer>
+ <objectgroup name="path1" width="50" height="50">
+  <object x="82" y="519">
+   <polyline points="0,0 4,100 166,94 163,162 552,160 548,29 324,29 325,65 294,67 294,-47 52,-48 53,-14 -1,-15 3,1"/>
+  </object>
+ </objectgroup>
 </map>
