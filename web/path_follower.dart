@@ -8,7 +8,7 @@ import 'path.dart';
 
 abstract class PathFollower
 {
-  void updateWalk(WalkingBehaviour behaviour);
+  void updateWalk(WalkingBehaviourState behaviour);
 }
 
 class SquarePathFollower implements PathFollower
@@ -16,7 +16,7 @@ class SquarePathFollower implements PathFollower
   int num_steps_ = 0;
   Directions walking_dir_ = Directions.UP;
 
-  void updateWalk(WalkingBehaviour behaviour)
+  void updateWalk(WalkingBehaviourState behaviour)
   {
     if (num_steps_ > 100)
     {
@@ -42,6 +42,68 @@ class SquarePathFollower implements PathFollower
   }
 }
 
+class SpriteFollower implements PathFollower
+{
+  SpriteBehaviour following_;
+  bool walk_horizontal_ = false;
+  int same_direction_time_ = 0;
+  Vector2 same_direction_pos_;
+  bool same_line_ = false;
+  Directions difference_ = Directions.UP;
+  
+  SpriteFollower(this.following_);
+  
+  bool canAttack()
+  {
+    return same_line_;
+  }
+  
+  void updateWalk(WalkingBehaviourState behaviour)
+  {
+    double diff_x = behaviour.element_.x_ - following_.x_;
+    double diff_y = behaviour.element_.y_ - following_.y_;
+    double threshold = 0.2;
+    
+    same_line_ = diff_x.abs() < threshold || diff_y.abs() < threshold;
+    
+    if (same_line_ || 
+        ((diff_x - diff_x.floor()).abs() < 0.1 && walk_horizontal_) || 
+        ((diff_y - diff_y.floor()).abs() < 0.1 && !walk_horizontal_))
+    {
+      walk_horizontal_ = diff_x.abs() > diff_y.abs();
+    }
+    
+    if(walk_horizontal_)
+    {
+      if (diff_x > threshold)
+      {
+        difference_ = Directions.LEFT;      
+      }
+      else if (diff_x < -threshold)
+      {
+        difference_ = Directions.RIGHT;      
+      }
+    }
+    else
+    {  
+      if (diff_y < -threshold)
+      {
+        difference_ = Directions.UP;      
+      }
+      else if (diff_y > threshold)
+      {
+        difference_ = Directions.DOWN;      
+      }
+    }
+    behaviour.walk(difference_);      
+  }
+  
+  Directions getOrientation()
+  {
+    return difference_;
+  }
+}
+
 class MapPathFollower implements PathFollower
 {
   Path path_;
@@ -49,7 +111,7 @@ class MapPathFollower implements PathFollower
 
   MapPathFollower(this.path_);
 
-  void updateWalk(WalkingBehaviour behaviour)
+  void updateWalk(WalkingBehaviourState behaviour)
   {
     if (cur_path_point_ >= path_.points.length)
     {
@@ -60,7 +122,8 @@ class MapPathFollower implements PathFollower
     int x = position.x.floor();
     int y = position.y.floor();
 
-    Vector2 b_pos = new Vector2(behaviour.x_.floorToDouble(), behaviour.y_.floorToDouble());
+    Vector2 b_pos = new Vector2(behaviour.element_.x_.floorToDouble(),
+        behaviour.element_.y_.floorToDouble());
 
     if (b_pos.x != x)
     {

@@ -34,6 +34,7 @@ void initGame (TerrainBehaviour terrain, GameState state, DrawableFactory drawab
   animation_pc.sequences_["stab_l"] = new AnimationSequence([144, 145, 146, 147, 148, 149], 0.05);
   animation_pc.sequences_["stab_b"] = new AnimationSequence([160 ,161, 162, 163, 164, 165], 0.05);
   animation_pc.sequences_["stab_r"] = new AnimationSequence([176, 177, 178, 179, 180, 181], 0.05);
+  animation_pc.sequences_["die"] = new AnimationSequence([46, 40, 41, 42, 43, 44, 45], 0.2);
   BaseGeometry quad = new TexturedGeometry(quad_vertices, quad_indices, quad_coords, "images/pc.png");
   EngineElement e2 = state.addElement(drawable_factory.createAnimatedDrawable(quad, animation_pc) ,
       new PCBehaviour(20.0, 15.0, terrain, gameLoop.keyboard, cur_cam));

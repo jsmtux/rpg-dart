@@ -10,101 +10,150 @@ import 'enemy_behaviour.dart';
 import 'element.dart';
 import 'directions.dart';
 
-class PCBehaviour extends WalkingBehaviour
+class PCNormalState extends WalkingBehaviourState
 {
-  bool attacking_ = false;
-  bool attack_pressed = false;
-  Keyboard keyboard_;
-  Camera camera_;
-
-  PCBehaviour(double x, double y, TerrainBehaviour terrain, this.keyboard_, this.camera_) : super(x, y, terrain)
+  PCNormalState(SpriteBehaviour element) : super(element, 0.05);
+  
+  void hit(SpriteBehaviour sprite)
   {
-    vel_ = 0.05;
+    PCBehaviour element = element_;
+    element.setState(element.dead_state_);
   }
-
+  
   void update(GameState state)
   {
-    double vel = 0.04;
-    if(attacking_ == true)
+    PCBehaviour element = element_;
+    if(element.keyboard_.isDown(Keyboard.SPACE))
     {
-      for (EngineElement element in state.elements_)
-      {
-        if (element.behaviour_ is EnemyBehaviour)
-        {
-          EnemyBehaviour enemy = element.behaviour_;
-          if (enemy.squareDistance(this) < 1.0)
-          {
-            enemy.hit(this);
-          }
-        }
-      }
+      element.attacking_state_.dir_ = dir_;
+      element.setState(element.attacking_state_);
     }
-    else if(keyboard_.isDown(Keyboard.SPACE))
-    {
-      if (attacking_ == false)
-      {
-        attacking_ = true;
-        switch(dir_)
-        {
-          case Directions.UP:
-            anim_drawable_.SetSequence("stab_t");
-            break;
-          case Directions.LEFT:
-            anim_drawable_.SetSequence("stab_l");
-            break;
-          case Directions.DOWN:
-            anim_drawable_.SetSequence("stab_b");
-            break;
-          case Directions.RIGHT:
-            anim_drawable_.SetSequence("stab_r");
-            break;
-        }
-      }
-    }
-    else if(keyboard_.isDown(Keyboard.UP))
+    else if(element.keyboard_.isDown(Keyboard.UP))
     {
       walk(Directions.UP);
     }
-    else if(keyboard_.isDown(Keyboard.DOWN))
+    else if(element.keyboard_.isDown(Keyboard.DOWN))
     {
       walk(Directions.DOWN);
     }
-    else if(keyboard_.isDown(Keyboard.LEFT))
+    else if(element.keyboard_.isDown(Keyboard.LEFT))
     {
       walk(Directions.LEFT);
     }
-    else if(keyboard_.isDown(Keyboard.RIGHT))
+    else if(element.keyboard_.isDown(Keyboard.RIGHT))
     {
       walk(Directions.RIGHT);
     }
     else
     {
-      if(anim_drawable_.current_sequence_name_ != null && anim_drawable_.current_sequence_name_.contains("walk"))
+      switch(dir_)
       {
-        switch(dir_)
-        {
-          case Directions.UP:
-            anim_drawable_.SetSequence("stand_t");
-            break;
-          case Directions.LEFT:
-            anim_drawable_.SetSequence("stand_l");
-            break;
-          case Directions.DOWN:
-            anim_drawable_.SetSequence("stand_b");
-            break;
-          case Directions.RIGHT:
-            anim_drawable_.SetSequence("stand_r");
-            break;
-        }
+        case Directions.UP:
+          element.anim_drawable_.SetSequence("stand_t");
+          break;
+        case Directions.LEFT:
+          element.anim_drawable_.SetSequence("stand_l");
+          break;
+        case Directions.DOWN:
+          element.anim_drawable_.SetSequence("stand_b");
+          break;
+        case Directions.RIGHT:
+          element.anim_drawable_.SetSequence("stand_r");
+          break;
       }
     }
 
-    if (anim_drawable_.current_sequence_ == null)
-    {
-      attacking_ = false;
-    }
+    element.camera_.SetPos(new Vector2(-element.x_, -element.y_));
+  }
+}
 
-    camera_.SetPos(new Vector2(-x_, -y_));
+class PCAttackingState extends WalkingBehaviourState
+{
+  PCAttackingState(SpriteBehaviour element) : super(element, 0.0);
+  
+  void begin()
+  {
+    PCBehaviour this_element = element_;
+    switch(dir_)
+    {
+      case Directions.UP:
+        this_element.anim_drawable_.SetSequence("stab_t");
+        break;
+      case Directions.LEFT:
+        this_element.anim_drawable_.SetSequence("stab_l");
+        break;
+      case Directions.DOWN:
+        this_element.anim_drawable_.SetSequence("stab_b");
+        break;
+      case Directions.RIGHT:
+        this_element.anim_drawable_.SetSequence("stab_r");
+        break;
+    }
+  }
+  
+  void hit(SpriteBehaviour sprite)
+  {
+    PCBehaviour element = element_;
+    element.setState(element.dead_state_);
+  }
+  
+  void update(GameState state)
+  {
+    PCBehaviour this_element = element_;
+    for (EngineElement element in state.elements_)
+    {
+      if (element.behaviour_ is EnemyBehaviour)
+      {
+        EnemyBehaviour enemy = element.behaviour_;
+        if (enemy.squareDistance(this_element) < 1.0)
+        {
+          enemy.hit(this_element);
+        }
+      }
+    }
+    if (this_element.anim_drawable_.current_sequence_ == null)
+    {
+      this_element.setState(this_element.normal_state_);
+    }
+  }
+}
+
+class PCDeadState extends BehaviourState
+{
+  PCDeadState(SpriteBehaviour element) : super(element);
+  
+  void begin()
+  {
+    PCBehaviour element = element_;
+    element.anim_drawable_.SetSequence("die", 1);
+  }
+
+  void hit(SpriteBehaviour sprite)
+  {
+  }
+  void update(GameState state)
+  { 
+  }
+}
+
+class PCBehaviour extends SpriteBehaviour
+{
+  bool attacking_ = false;
+  bool attack_pressed = false;
+  Keyboard keyboard_;
+  Camera camera_;
+  bool dead_ = false;
+  
+  PCNormalState normal_state_;
+  PCAttackingState attacking_state_;
+  PCDeadState dead_state_;
+
+  PCBehaviour(double x, double y, TerrainBehaviour terrain, this.keyboard_, this.camera_) : super(x, y, terrain)
+  {
+    normal_state_ = new PCNormalState(this);
+    attacking_state_ = new PCAttackingState(this);
+    dead_state_ = new PCDeadState(this);
+    cur_state_ = normal_state_;
   }
 }
 

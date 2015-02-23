@@ -234,20 +234,20 @@ class LevelImporter extends AsyncImporter<LevelData>
         {
           for (Map object in layer["objects"])
           {
-            double path_scale = 0.06;
+            double path_scale = 0.0625;
             String name = object["name"];
             Vector2 pos = new Vector2.zero();
             pos.x = object["x"] * path_scale;
             pos.y = size.y - object["y"] * path_scale;
-            pos.x = pos.x.ceilToDouble();
-            pos.y = pos.y.ceilToDouble();
+            pos.x = pos.x.floorToDouble();
+            pos.y = pos.y.ceilToDouble() + 2;
             List<Vector2> points = new List<Vector2>();
             for(Map point in object["polyline"])
             {
               Vector2 p_pos = new Vector2.zero();
               p_pos.x = point["x"] * path_scale;
               p_pos.y = - point["y"] * path_scale;
-              p_pos.x = p_pos.x.ceilToDouble();
+              p_pos.x = p_pos.x.floorToDouble();
               p_pos.y = p_pos.y.ceilToDouble();
               points.add(p_pos);
             }

@@ -142,7 +142,7 @@ class Tile3dBehaviour extends TerrainElementBehaviour
   void init(EngineElement parent)
   {
     super.init(parent);
-    //terrain_.addObstacle(new Vector2(x_, y_));
+    terrain_.addObstacle(new Vector2(x_, y_));
   }
 
   void update(GameState state)
@@ -150,8 +150,59 @@ class Tile3dBehaviour extends TerrainElementBehaviour
   }
 }
 
+abstract class BehaviourState
+{
+  SpriteBehaviour element_;
+
+  BehaviourState(this.element_);
+  void hit(SpriteBehaviour sprite);
+  void update(GameState state);
+  
+  void begin()
+  {
+  }
+  
+  void end()
+  {
+  }
+}
+
+abstract class WalkingBehaviourState extends BehaviourState
+{
+  Directions dir_;
+  double vel_;
+
+  WalkingBehaviourState(SpriteBehaviour element, this.vel_) : super (element);
+
+  void walk(Directions dir)
+  {
+    dir_ = dir;
+    switch(dir)
+    {
+      case Directions.UP:
+        element_.move(element_.x_, element_.y_+ vel_);
+        element_.anim_drawable_.SetSequence("walk_t");
+        break;
+      case Directions.DOWN:
+        element_.move(element_.x_, element_.y_- vel_);
+        element_.anim_drawable_.SetSequence("walk_b");
+        break;
+      case Directions.LEFT:
+        element_.move(element_.x_- vel_, element_.y_);
+        element_.anim_drawable_.SetSequence("walk_l");
+        break;
+      case Directions.RIGHT:
+        element_.move(element_.x_+ vel_, element_.y_);
+        element_.anim_drawable_.SetSequence("walk_r");
+        break;
+    }
+  }
+}
+
 abstract class SpriteBehaviour extends TerrainElementBehaviour
 {
+  BehaviourState cur_state_ = null;
+  AnimatedDrawable anim_drawable_;
   SpriteBehaviour(double x, double y, TerrainBehaviour terrain) : super(x, y, terrain)
   {
     Quaternion rot = new Quaternion.identity();
@@ -164,10 +215,23 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
   {
     super.init(parent);
     drawable_.setTransparent(true);
+    anim_drawable_ = parent.drawable_;
   }
 
   void hit(SpriteBehaviour sprite)
   {
+    if (cur_state_ != null)
+    {
+      cur_state_.hit(sprite);
+    }
+  }
+  
+  void update(GameState state)
+  {
+    if (cur_state_ != null)
+    {
+      cur_state_.update(state);
+    }
   }
 
   double squareDistance(SpriteBehaviour sprite)
@@ -176,43 +240,11 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
     double diff_y = y_ - sprite.y_;
     return diff_x * diff_x + diff_y * diff_y;
   }
-}
-
-abstract class WalkingBehaviour extends SpriteBehaviour
-{
-  double vel_;
-  Directions dir_;
-  AnimatedDrawable anim_drawable_;
-
-  WalkingBehaviour(double x, double y, TerrainBehaviour terrain) : super(x, y, terrain);
-
-  void init(EngineElement parent)
+  
+  void setState(BehaviourState state)
   {
-    super.init(parent);
-    anim_drawable_ = drawable_;
-  }
-
-  void walk(Directions dir)
-  {
-    dir_ = dir;
-    switch(dir)
-    {
-      case Directions.UP:
-        move(x_, y_+ vel_);
-        anim_drawable_.SetSequence("walk_t");
-        break;
-      case Directions.DOWN:
-        move(x_, y_- vel_);
-        anim_drawable_.SetSequence("walk_b");
-        break;
-      case Directions.LEFT:
-        move(x_- vel_, y_);
-        anim_drawable_.SetSequence("walk_l");
-        break;
-      case Directions.RIGHT:
-        move(x_+ vel_, y_);
-        anim_drawable_.SetSequence("walk_r");
-        break;
-    }
+    cur_state_.end();
+    cur_state_ = state;
+    cur_state_.begin();
   }
 }
