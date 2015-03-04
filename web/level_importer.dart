@@ -184,7 +184,7 @@ class LevelImporter extends AsyncImporter<LevelData>
 
     Map jsonData = JSON.decode(data);
 
-    List<Path> paths = new List<Path>();
+    Map<String, Path> paths = new Map<String, Path>();
 
     Vector2 size = new Vector2.zero();
     size.y = jsonData["height"] * 1.0;
@@ -251,7 +251,7 @@ class LevelImporter extends AsyncImporter<LevelData>
               p_pos.y = p_pos.y.ceilToDouble();
               points.add(p_pos);
             }
-            paths.add(new Path(name, pos, points));
+            paths[name] = new Path(name, pos, points);
           }
         }
       }

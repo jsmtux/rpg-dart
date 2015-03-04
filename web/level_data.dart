@@ -19,7 +19,7 @@ class LevelData
   List<SquareTerrain> terrain_list_;
   List<String> models_ = new List<String>();
   List<Vector3> model_info_ = new List<Vector3>();
-  List<Path> paths_ = new List<Path>();
+  Map<String, Path> paths_ = new Map<String, Path>();
   List<List<int>> heights_;
 
   Map<String,BaseGeometry> models_geometry_ = new Map<String, BaseGeometry>();

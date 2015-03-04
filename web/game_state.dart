@@ -14,7 +14,7 @@ class GameState extends SimpleHtmlState
 {
   Renderer renderer_;
   List<EngineElement> elements_ = new List<EngineElement>();
-  List<Path> paths_ = new List<Path>();
+  Map<String, Path> paths_ = new Map<String, Path>();
 
   EngineElement addElement(Drawable drawable, Behaviour behaviour)
   {

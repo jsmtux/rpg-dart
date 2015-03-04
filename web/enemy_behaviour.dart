@@ -11,7 +11,7 @@ import 'directions.dart';
 class EnemyNormalState extends WalkingBehaviourState
 {
   PathFollower path_follower_;
-  
+
   EnemyNormalState(SpriteBehaviour element, Path path) : super(element, 0.03)
   {
     path_follower_ = new MapPathFollower(path);
@@ -32,25 +32,28 @@ class EnemyNormalState extends WalkingBehaviourState
       if (element.behaviour_ is PCBehaviour)
       {
         PCBehaviour enemy = element.behaviour_;
-        double dist = enemy.squareDistance(this_element); 
-        SpriteFollower sprite_follower = path_follower_;
-        if (dist < 2 && (sprite_follower.canAttack()))
+        double dist = enemy.squareDistance(this_element);
+        if (dist < 2)
         {
-          walking = false;
-          switch(sprite_follower.getOrientation())
+          SpriteFollower sprite_follower = path_follower_;
+          if(sprite_follower.canAttack())
           {
-            case Directions.UP:
-              this_element.anim_drawable_.SetSequence("stab_t");
-              break;
-            case Directions.DOWN:
-              this_element.anim_drawable_.SetSequence("stab_b");
-              break;
-            case Directions.LEFT:
-              this_element.anim_drawable_.SetSequence("stab_l");
-              break;
-            case Directions.RIGHT:
-              this_element.anim_drawable_.SetSequence("stab_r");
-              break;
+            walking = false;
+            switch(sprite_follower.getOrientation())
+            {
+              case Directions.UP:
+                this_element.anim_drawable_.SetSequence("stab_t");
+                break;
+              case Directions.DOWN:
+                this_element.anim_drawable_.SetSequence("stab_b");
+                break;
+              case Directions.LEFT:
+                this_element.anim_drawable_.SetSequence("stab_l");
+                break;
+              case Directions.RIGHT:
+                this_element.anim_drawable_.SetSequence("stab_r");
+                break;
+            }
           }
           if (this_element.anim_drawable_.current_in_sequence_ == 4)
           {
@@ -71,21 +74,21 @@ class EnemyNormalState extends WalkingBehaviourState
 }
 
 class EnemyDeadState extends BehaviourState
-{  
+{
   EnemyDeadState(SpriteBehaviour element) : super(element);
-  
+
   void begin()
   {
     EnemyBehaviour element = element_;
     element_.anim_drawable_.SetSequence("die", 1);
   }
-  
+
   void hit(SpriteBehaviour sprite)
   {
   }
-  
+
   void update(GameState state)
-  { 
+  {
   }
 }
 
@@ -95,7 +98,7 @@ class EnemyBehaviour extends SpriteBehaviour
   EnemyDeadState dead_state_;
   EnemyNormalState normal_state_;
 
-  EnemyBehaviour(TerrainBehaviour terrain, Path path) 
+  EnemyBehaviour(TerrainBehaviour terrain, Path path)
     : super(path.position.x.floorToDouble(), path.position.y.floorToDouble(), terrain)
   {
     dead_state_ = new EnemyDeadState(this);
