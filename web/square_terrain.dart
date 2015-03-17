@@ -33,7 +33,7 @@ class SquareTerrain
         {
           continue;
         }
-        int num_texture = textures_[j][i];
+        int num_texture = textures_[i][j];
         int num_texture_y = (num_texture / num_images_root).floor();
         Vector2 tex_offset = new Vector2.zero();
         tex_offset.x = num_texture /num_images_root - num_texture_y + bleeding_correction / 2;

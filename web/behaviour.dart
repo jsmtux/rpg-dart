@@ -37,16 +37,16 @@ class TerrainBehaviour extends Behaviour
   void addObstacle(Vector2 position)
   {
     int x = position.x.floor();
-    int y = heights_.length - position.y.floor();
+    int y = heights_[0].length - position.y.floor();
     obstacles_.add(new Vector2(x *1.0, y*1.0));
   }
 
   double getHeight(Vector2 position)
   {
     int x = position.x.floor();
-    int y = heights_.length - position.y.floor();
+    int y = heights_[0].length - position.y.floor();
     double height;
-    if (x > 0 && y > 0 && heights_.length > x && heights_[x].length > y)
+    if (x > 0 && y > 0 && heights_.length > x && heights_[y].length > y)
     {
       bool obstacle_found = false;
 
@@ -66,7 +66,7 @@ class TerrainBehaviour extends Behaviour
         height = heights_[x][y]*1.0;
 
         double d_x = position.x - x;
-        double d_y = y - (heights_.length - position.y);
+        double d_y = y - (heights_[0].length - position.y);
 
         if (height < 0)
         {
@@ -157,11 +157,11 @@ abstract class BehaviourState
   BehaviourState(this.element_);
   void hit(SpriteBehaviour sprite);
   void update(GameState state);
-  
+
   void begin()
   {
   }
-  
+
   void end()
   {
   }
@@ -225,7 +225,7 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
       cur_state_.hit(sprite);
     }
   }
-  
+
   void update(GameState state)
   {
     if (cur_state_ != null)
@@ -240,7 +240,7 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
     double diff_y = y_ - sprite.y_;
     return diff_x * diff_x + diff_y * diff_y;
   }
-  
+
   void setState(BehaviourState state)
   {
     cur_state_.end();

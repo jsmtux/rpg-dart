@@ -93,10 +93,10 @@ class LevelImporter extends AsyncImporter<LevelData>
           {
             for (int j = 0; j < size.y; j++)
             {
-              int texture = data[(i*size.x + j).floor()] - current_tileset.first_gid;
+              int texture = data[(i + j*size.x).floor()] - current_tileset.first_gid;
               if (texture >= 0)
               {
-                Vector3 cur_model = new Vector3(j*1.0,size.y - i*1.0,texture*1.0);
+                Vector3 cur_model = new Vector3(i*1.0,size.y - j*1.0 -1 ,texture*1.0);
                 model_data.add(cur_model);
               }
             }
@@ -221,7 +221,7 @@ class LevelImporter extends AsyncImporter<LevelData>
             textures.add(new List<int>());
             for (int j = 0; j < size.y; j++)
             {
-              int texture = data[(i*size.x + j).floor()] - current_tileset.first_gid;
+              int texture = data[(i + j*size.x).floor()] - current_tileset.first_gid;
               textures[i].add(texture);
             }
           }
@@ -240,7 +240,7 @@ class LevelImporter extends AsyncImporter<LevelData>
             pos.x = object["x"] * path_scale;
             pos.y = size.y - object["y"] * path_scale;
             pos.x = pos.x.floorToDouble();
-            pos.y = pos.y.ceilToDouble() + 2;
+            pos.y = pos.y.ceilToDouble() + 1;
             List<Vector2> points = new List<Vector2>();
             for(Map point in object["polyline"])
             {

@@ -15,6 +15,7 @@ import "game_state.dart";
 import 'geometry_data.dart';
 
 import "enemy_behaviour.dart";
+import 'pc_behaviour.dart';
 import "camera.dart";
 
 class SpriteData
@@ -51,6 +52,18 @@ class EnemyBehaviourDefinition implements BehaviourDefinition
   Behaviour getBehaviour(SpriteLoader loader)
   {
     return new EnemyBehaviour(loader.terrain_, loader.state_.paths_[path_name_]);
+  }
+}
+
+class PCBehaviourDefinition implements BehaviourDefinition
+{
+  double x_, y_;
+
+  PCBehaviourDefinition(this.x_, this.y_);
+
+  Behaviour getBehaviour(SpriteLoader loader)
+  {
+    return new PCBehaviour(x_, y_, loader.terrain_, loader.gameLoop_.keyboard, loader.cur_cam_);
   }
 }
 
@@ -91,7 +104,7 @@ class SpriteImporter extends AsyncImporter<SpriteLoader>
     if (drawable_spec.containsKey("sequences"))
     {
       res.anim_ = new AnimationData();
-      res.anim_.num_images_side_ = 8;
+      res.anim_.num_images_side_ = drawable_spec["num_images_side"];
       res.anim_.sequences_ = new Map<String, AnimationSequence>();
       for (Map sequence in drawable_spec["sequences"])
       {
@@ -109,6 +122,9 @@ class SpriteImporter extends AsyncImporter<SpriteLoader>
     {
       case "EnemyBehaviour":
         res.behaviour_ = new EnemyBehaviourDefinition(behaviour_spec["path"]);
+        break;
+      case "PCBehaviour":
+        res.behaviour_ = new PCBehaviourDefinition(behaviour_spec["posx"], behaviour_spec["posy"]);
         break;
     }
   }
