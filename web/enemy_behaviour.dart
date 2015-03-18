@@ -4,7 +4,6 @@ import 'behaviour.dart';
 import 'game_state.dart';
 import 'path_follower.dart';
 import 'path.dart';
-import 'element.dart';
 import 'pc_behaviour.dart';
 import 'directions.dart';
 
@@ -27,11 +26,11 @@ class EnemyNormalState extends WalkingBehaviourState
   {
     bool walking = true;
     EnemyBehaviour this_element = element_;
-    for (EngineElement element in state.elements_)
+    for (Behaviour behaviour in state.behaviours_)
     {
-      if (element.behaviour_ is PCBehaviour)
+      if (behaviour is PCBehaviour)
       {
-        PCBehaviour enemy = element.behaviour_;
+        PCBehaviour enemy = behaviour;
         double dist = enemy.squareDistance(this_element);
         if (dist < 2)
         {

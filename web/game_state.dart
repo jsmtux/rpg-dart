@@ -6,42 +6,37 @@ import 'package:game_loop/game_loop_html.dart';
 
 import 'drawable.dart';
 import 'renderer.dart';
-import 'element.dart';
 import 'behaviour.dart';
 import 'path.dart';
 
 class GameState extends SimpleHtmlState
 {
   Renderer renderer_;
-  List<EngineElement> elements_ = new List<EngineElement>();
+  List<Drawable> drawables_ = new List<Drawable>();
+  List<Behaviour> behaviours_ = new List<Behaviour>();
   Map<String, Path> paths_ = new Map<String, Path>();
 
-  EngineElement addElement(Drawable drawable, Behaviour behaviour)
+  void addElement(Drawable drawable, Behaviour behaviour)
   {
-    EngineElement toAdd = new EngineElement(drawable, behaviour);
     if (behaviour != null)
     {
-      behaviour.init(toAdd);
+      behaviour.init(drawable);
     }
 
-    elements_.add(toAdd);
-    int num_elements = elements_.length;
-    renderer_.addDrawable(toAdd.drawable_);
-    return toAdd;
+    drawables_.add(drawable);
+    behaviours_.add(behaviour);
+    int num_elements = drawables_.length;
   }
 
   void onRender(GameLoop gameLoop) {
-    renderer_.render();
+    renderer_.render(drawables_);
   }
 
   void onUpdate(GameLoop gameLoop)
   {
-    for (EngineElement element in elements_)
+    for (Behaviour behaviour in behaviours_)
     {
-      if(element.behaviour_ != null)
-      {
-        element.behaviour_.update(this);
-      }
+      behaviour.update(this);
     }
   }
 

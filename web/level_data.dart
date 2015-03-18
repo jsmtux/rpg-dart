@@ -9,7 +9,6 @@ import 'game_state.dart';
 import 'drawable_factory.dart';
 import 'base_geometry.dart';
 import 'drawable.dart';
-import 'element.dart';
 import 'model_importer.dart';
 import 'behaviour.dart';
 import 'path.dart';
@@ -38,10 +37,10 @@ class LevelData
       height += 0.005;
 
       Drawable terrain_drawable = drawable_factory.createTexturedDrawable(terrain_geom);
-      EngineElement e1 = state.addElement(terrain_drawable, behaviour_t);
+      state.addElement(terrain_drawable, behaviour_t);
       Quaternion rot = new Quaternion.identity();
       //rot.setAxisAngle(new Vector3(1.0, 0.0, 0.0 ), -60 * (math.PI / 180));
-      e1.drawable_.Rotate(rot);
+      terrain_drawable.Rotate(rot);
     }
 
     if (paths_ != null)
@@ -81,9 +80,9 @@ class LevelData
       double x = info.x;
       double y = info.y;
       int z = info.z.floor();
-      EngineElement el = state.addElement(
-          drawable_factory.createTexturedDrawable(models_geometry_[models_[z]]), new Tile3dBehaviour(x, y, behaviour_t));
-      el.drawable_.setScale(1/3);
+      Drawable toAdd = drawable_factory.createTexturedDrawable(models_geometry_[models_[z]]);
+      state.addElement(toAdd , new Tile3dBehaviour(x, y, behaviour_t));
+      toAdd.setScale(1/3);
     }
     completer.complete(behaviour_t);
   }

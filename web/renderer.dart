@@ -26,8 +26,6 @@ class Renderer
   Shader texture_shader_;
   Shader atlas_shader_;
 
-  List<Drawable> drawables_ = new List<Drawable>();
-
   Renderer(CanvasElement canvas)
   {
     canvas_ = canvas;
@@ -58,17 +56,12 @@ class Renderer
 
   }
 
-  void addDrawable(Drawable drawable)
-  {
-    drawables_.add(drawable);
-  }
-
   void renderElement(Drawable d)
   {
     d.Draw(gl_, m_worldview_, m_perspective_, dimensions_);
   }
 
-  void render()
+  void render(List<Drawable> drawables)
   {
     gl_.viewport(0, 0, view_width_, view_height_);
     gl_.clear(webgl.RenderingContext.COLOR_BUFFER_BIT | webgl.RenderingContext.DEPTH_BUFFER_BIT);
@@ -76,7 +69,7 @@ class Renderer
     m_perspective_ = makePerspectiveMatrix(radians(45.0), view_width_/view_height_, 0.1, 100.0);
 
     List<Drawable> sorted_drawables = new List<Drawable>();
-    for(Drawable d in drawables_)
+    for(Drawable d in drawables)
     {
       if(!d.isTransparent())
       {

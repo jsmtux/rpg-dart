@@ -7,19 +7,18 @@ import 'behaviour.dart';
 import 'camera.dart';
 import 'game_state.dart';
 import 'enemy_behaviour.dart';
-import 'element.dart';
 import 'directions.dart';
 
 class PCNormalState extends WalkingBehaviourState
 {
   PCNormalState(SpriteBehaviour element) : super(element, 0.05);
-  
+
   void hit(SpriteBehaviour sprite)
   {
     PCBehaviour element = element_;
     element.setState(element.dead_state_);
   }
-  
+
   void update(GameState state)
   {
     PCBehaviour element = element_;
@@ -70,7 +69,7 @@ class PCNormalState extends WalkingBehaviourState
 class PCAttackingState extends WalkingBehaviourState
 {
   PCAttackingState(SpriteBehaviour element) : super(element, 0.0);
-  
+
   void begin()
   {
     PCBehaviour this_element = element_;
@@ -90,21 +89,21 @@ class PCAttackingState extends WalkingBehaviourState
         break;
     }
   }
-  
+
   void hit(SpriteBehaviour sprite)
   {
     PCBehaviour element = element_;
     element.setState(element.dead_state_);
   }
-  
+
   void update(GameState state)
   {
     PCBehaviour this_element = element_;
-    for (EngineElement element in state.elements_)
+    for (Behaviour behaviour in state.behaviours_)
     {
-      if (element.behaviour_ is EnemyBehaviour)
+      if (behaviour is EnemyBehaviour)
       {
-        EnemyBehaviour enemy = element.behaviour_;
+        EnemyBehaviour enemy = behaviour;
         if (enemy.squareDistance(this_element) < 1.0)
         {
           enemy.hit(this_element);
@@ -121,7 +120,7 @@ class PCAttackingState extends WalkingBehaviourState
 class PCDeadState extends BehaviourState
 {
   PCDeadState(SpriteBehaviour element) : super(element);
-  
+
   void begin()
   {
     PCBehaviour element = element_;
@@ -132,7 +131,7 @@ class PCDeadState extends BehaviourState
   {
   }
   void update(GameState state)
-  { 
+  {
   }
 }
 
@@ -143,7 +142,7 @@ class PCBehaviour extends SpriteBehaviour
   Keyboard keyboard_;
   Camera camera_;
   bool dead_ = false;
-  
+
   PCNormalState normal_state_;
   PCAttackingState attacking_state_;
   PCDeadState dead_state_;

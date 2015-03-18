@@ -10,7 +10,6 @@ import "base_geometry.dart";
 import 'drawable_factory.dart';
 import "animation.dart";
 import "behaviour.dart";
-import "element.dart";
 import "game_state.dart";
 import 'geometry_data.dart';
 
@@ -24,7 +23,7 @@ class SpriteData
   AnimationData anim_;
   BehaviourDefinition behaviour_;
 
-  EngineElement AddToGameState(SpriteLoader loader)
+  void AddToGameState(SpriteLoader loader)
   {
     BaseDrawable drawable;
     if (anim_ != null)
@@ -35,7 +34,7 @@ class SpriteData
     {
       drawable = loader.drawable_factory_.createBaseDrawable(geom_);
     }
-    return loader.state_.addElement(drawable , behaviour_.getBehaviour(loader));
+    loader.state_.addElement(drawable , behaviour_.getBehaviour(loader));
   }
 }
 

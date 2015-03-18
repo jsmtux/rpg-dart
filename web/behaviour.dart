@@ -3,14 +3,13 @@ library behaviour;
 import 'package:vector_math/vector_math.dart';
 import 'dart:math' as math;
 
-import 'element.dart';
 import 'game_state.dart';
 import 'drawable.dart';
 import 'directions.dart';
 
 abstract class Behaviour
 {
-  void init(EngineElement parent);
+  void init(Drawable drawable);
   void update(GameState state);
 }
 
@@ -26,7 +25,7 @@ class TerrainBehaviour extends Behaviour
 
   TerrainBehaviour(this.heights_);
 
-  void init(EngineElement parent)
+  void init(Drawable drawable)
   {
   }
 
@@ -107,9 +106,9 @@ abstract class TerrainElementBehaviour extends Behaviour
 
   TerrainElementBehaviour(this.x_, this.y_, this.terrain_);
 
-  void init(EngineElement parent)
+  void init(Drawable drawable)
   {
-    drawable_ = parent.drawable_;
+    drawable_ = drawable;
     move(x_, y_);
   }
 
@@ -139,9 +138,9 @@ class Tile3dBehaviour extends TerrainElementBehaviour
 {
   Tile3dBehaviour(double x, double y, TerrainBehaviour terrain) : super(x, y, terrain);
 
-  void init(EngineElement parent)
+  void init(Drawable drawable)
   {
-    super.init(parent);
+    super.init(drawable);
     terrain_.addObstacle(new Vector2(x_, y_));
   }
 
@@ -211,11 +210,11 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
     setOffset(new Vector3(-1.0, -1.0, 2.0));
   }
 
-  void init(EngineElement parent)
+  void init(Drawable drawable)
   {
-    super.init(parent);
+    super.init(drawable);
     drawable_.setTransparent(true);
-    anim_drawable_ = parent.drawable_;
+    anim_drawable_ = drawable;
   }
 
   void hit(SpriteBehaviour sprite)
