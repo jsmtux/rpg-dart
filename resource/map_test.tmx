@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="100" height="70" tilewidth="16" tileheight="16">
  <tileset firstgid="1" name="terrain" tilewidth="16" tileheight="16">
-  <image source="../../../Escritorio/lpc/terrain_atlas.png" width="1024" height="1024"/>
+  <image source="images/terrain_atlas.png" width="1024" height="1024"/>
   <terraintypes>
    <terrain name="Nuevo Terreno" tile="-1"/>
   </terraintypes>
  </tileset>
  <tileset firstgid="4097" name="models_layer" tilewidth="16" tileheight="16">
   <image source="3d_tiles_template.png" width="80" height="80"/>
+  <tile id="0">
+   <properties>
+    <property name="name" value="images/tree.model"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="name" value="images/mushroom0.model"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="name" value="images/boulder1.model"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="name" value="images/brick.model"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="name" value="images/chest.model"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="4122" name="heights_layer" tilewidth="16" tileheight="16">
   <image source="height_template.png" width="64" height="64"/>

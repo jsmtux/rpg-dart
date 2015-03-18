@@ -195,7 +195,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "image":"images/terrain_atlas.png",
+         "image":"/images\/terrain_atlas.png",
          "imageheight":1024,
          "imagewidth":1024,
          "margin":0,
@@ -226,6 +226,29 @@
             },
          "spacing":0,
          "tileheight":16,
+         "tileproperties":
+            {
+             "0":
+                {
+                 "name":"images\/tree.model"
+                },
+             "1":
+                {
+                 "name":"images\/mushroom0.model"
+                },
+             "2":
+                {
+                 "name":"images\/boulder1.model"
+                },
+             "3":
+                {
+                 "name":"images\/brick.model"
+                },
+             "4":
+                {
+                 "name":"images\/chest.model"
+                }
+            },
          "tilewidth":16
         }, 
         {
@@ -245,12 +268,5 @@
         }],
  "tilewidth":16,
  "version":1,
- "width":100,
- "models":[
-	"images/tree.model",
-	"images/mushroom0.model",
- 	"images/boulder1.model",
- 	"images/brick.model",
- 	"images/chest.model"
- ]
+ "width":100
 }

@@ -15,6 +15,7 @@ class Tileset
   int root_size;
   String path;
   String name;
+  Map properties;
 }
 
 class LevelImporter extends AsyncImporter<LevelData>
@@ -33,6 +34,7 @@ class LevelImporter extends AsyncImporter<LevelData>
       current.name = tileset["name"];
       current.root_size = (tileset["imageheight"] / tileset["tileheight"]).floor();
       current.root_size = current.root_size * current.root_size;
+      current.properties = tileset["tileproperties"];
       parsed_tilesets.add(current);
     }
 
@@ -64,7 +66,7 @@ class LevelImporter extends AsyncImporter<LevelData>
     return ret_tileset;
   }
 
-  List<Vector3> readModelData(List position, List layers, List<Tileset> parsed_tilesets, Vector2 size)
+  List<Vector3> readModelData(List position, List layers, List<Tileset> parsed_tilesets, Vector2 size, List<String> model_paths)
   {
     List<Vector3> model_data = new List<Vector3>();
 
@@ -89,6 +91,11 @@ class LevelImporter extends AsyncImporter<LevelData>
 
         if (current_tileset.name == "models_layer")
         {
+          for (int i = 0; i < current_tileset.properties.length; i++)
+          {
+            model_paths.add(current_tileset.properties["${i}"]["name"]);
+          }
+
           for (int i = 0; i < size.x; i++)
           {
             for (int j = 0; j < size.y; j++)
@@ -192,11 +199,11 @@ class LevelImporter extends AsyncImporter<LevelData>
 
     List<Tileset> parsed_tilesets = readTilesets(jsonData["tilesets"]);
 
-    List<String> model_paths = jsonData["models"];
-
     List layers = jsonData["layers"];
 
-    List<Vector3> model_data = readModelData(jsonData["objects"], layers, parsed_tilesets, size);
+
+    List<String> model_paths = new List<String>();
+    List<Vector3> model_data = readModelData(jsonData["objects"], layers, parsed_tilesets, size, model_paths);
 
     List<List<int>> heights = readHeightData(layers, parsed_tilesets, size);
 
