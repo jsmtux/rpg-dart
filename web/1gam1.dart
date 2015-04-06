@@ -10,10 +10,13 @@ import 'sprite_importer.dart';
 
 
 main() {
-  CanvasElement canvas = querySelector(".game-element");
+  CanvasElement canvas = querySelector("#game-element");
+  DivElement div = querySelector("#game-area");
   GameLoopHtml gameLoop = new GameLoopHtml(canvas);
+  gameLoop.pointerLock.lockOnClick = false;
 
-  Renderer renderer = new Renderer(canvas);
+  Renderer renderer = new Renderer(div, canvas);
+
   DrawableFactory drawable_factory = new DrawableFactory(renderer);
   GameState draw_state = new GameState(renderer);
 

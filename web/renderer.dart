@@ -11,6 +11,7 @@ import 'drawable.dart';
 class Renderer
 {
   CanvasElement canvas_;
+  DivElement view_;
   webgl.RenderingContext gl_;
   webgl.Program shader_program_;
 
@@ -26,19 +27,17 @@ class Renderer
   Shader texture_shader_;
   Shader atlas_shader_;
 
-  Renderer(CanvasElement canvas)
+  Renderer(DivElement div, CanvasElement canvas)
   {
     canvas_ = canvas;
-    canvas.height = window.innerHeight - 20;
-    canvas.width = window.innerWidth - 20;
-    view_width_ = canvas.width;
-    view_height_ = canvas.height;
+    view_ = div;
+    setSize();
     window.onResize.listen((event) {
-      canvas.height = window.innerHeight;
-      canvas.width = window.innerWidth;
-      view_width_ = canvas.width;
-      view_height_ = canvas.height;
-          });
+      setSize();
+    });
+    window.onDeviceOrientation.listen((event) {
+      setSize();
+    });
     gl_ = canvas.getContext('experimental-webgl');
     color_shader_ = createColorShader(gl_);
     texture_shader_ = createTextureShader(gl_);
@@ -49,6 +48,20 @@ class Renderer
     gl_.enable(webgl.RenderingContext.DEPTH_TEST);
     gl_.blendFunc(webgl.RenderingContext.SRC_ALPHA, webgl.RenderingContext.ONE_MINUS_SRC_ALPHA);
     gl_.enable(webgl.RenderingContext.BLEND);
+  }
+
+  void setSize()
+  {
+    int new_height = window.innerHeight;
+    int new_width = window.innerWidth;
+    view_.style.height = new_height.toString() + 'px';
+    view_.style.width = new_width.toString() + 'px';
+    canvas_.height = new_height;
+    canvas_.width = new_width;
+    view_width_ = new_width;
+    view_height_ = new_height;
+    view_.style.marginTop = (-new_height / 2).toString() + 'px';
+    view_.style.marginLeft = (-new_width / 2).toString() + 'px';
   }
 
   void resize(Event e)
