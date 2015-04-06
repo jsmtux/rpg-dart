@@ -78,7 +78,6 @@ class EnemyDeadState extends BehaviourState
 
   void begin()
   {
-    EnemyBehaviour element = element_;
     element_.anim_drawable_.SetSequence("die", 1);
   }
 
@@ -98,7 +97,7 @@ class EnemyBehaviour extends SpriteBehaviour
   EnemyNormalState normal_state_;
 
   EnemyBehaviour(TerrainBehaviour terrain, Path path)
-    : super(path.position.x.floorToDouble(), path.position.y.floorToDouble(), terrain)
+    : super(path.points[0].x.floorToDouble(), path.points[0].y.floorToDouble(), terrain)
   {
     dead_state_ = new EnemyDeadState(this);
     normal_state_ = new EnemyNormalState(this, path);

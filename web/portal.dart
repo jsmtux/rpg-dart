@@ -11,7 +11,7 @@ class Portal
 
   Portal(this.map_name_, this.state_);
 
-  void transport(TerrainBehaviour terrain, SpriteBehaviour element)
+  void transport(TerrainBehaviour terrain, TerrainElementBehaviour element)
   {
     GameArea area = state_.areas_[map_name_];
     if (area == null)

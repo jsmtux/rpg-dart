@@ -78,8 +78,8 @@
 		"behaviour":
 		{
 	  		"type":"PCBehaviour",
-	  		"posx":20.0,
-	  		"posy":15.0
+	  		"posx":35.0,
+	  		"posy":40.0
 		}
 	},
 	"skeleton1":

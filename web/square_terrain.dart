@@ -41,22 +41,22 @@ class SquareTerrain
 
         Vertex va = new Vertex.zero();
         va.position_.x = i*1.0;
-        va.position_.y = size_.y - j*1.0;
+        va.position_.y = size_.y - (j-1)*1.0;
         va.text_coord_.x = tex_offset.x;
         va.text_coord_.y = tex_offset.y;
         Vertex vb = new Vertex.zero();
         vb.position_.x = i*1.0;
-        vb.position_.y = size_.y - (j+1)*1.0;
+        vb.position_.y = size_.y - j*1.0;
         vb.text_coord_.x = tex_offset.x;
         vb.text_coord_.y = tex_offset.y + tex_size.y;
         Vertex vc = new Vertex.zero();
         vc.position_.x = (i+1)*1.0;
-        vc.position_.y = size_.y - j*1.0;
+        vc.position_.y = size_.y - (j-1)*1.0;
         vc.text_coord_.x = tex_offset.x + tex_size.x;
         vc.text_coord_.y = tex_offset.y;
         Vertex vd = new Vertex.zero();
         vd.position_.x = (i+1)*1.0;
-        vd.position_.y = size_.y - (j+1)*1.0;
+        vd.position_.y = size_.y - j*1.0;
         vd.text_coord_.x = tex_offset.x + tex_size.x;
         vd.text_coord_.y = tex_offset.y + tex_size.y;
 

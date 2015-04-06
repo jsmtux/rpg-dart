@@ -33,6 +33,7 @@ class LevelData
   {
     Completer completer = new Completer();
     TerrainBehaviour behaviour_t = new TerrainBehaviour(heights_, offset_);
+    area.terrain_ = behaviour_t;
 
     double height = 0.0;
     for (SquareTerrain sq in terrain_list_)

@@ -24,7 +24,6 @@ class GameArea
     loadTerrain(level_path, state, loader.drawable_factory_)
         .then((res)
         {
-          terrain_ = res;
           if(behaviour_path != null)
             initBehaviour(behaviour_path, res, loader, state);
           ret.complete(true);
@@ -58,6 +57,5 @@ class GameArea
 
     drawables_.add(drawable);
     behaviours_.add(behaviour);
-    int num_elements = drawables_.length;
   }
 }

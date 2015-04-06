@@ -34,11 +34,13 @@
          "y":0
         }, 
         {
+         "draworder":"topdown",
          "height":60,
          "name":"paths",
          "objects":[
                 {
                  "height":0,
+                 "id":1,
                  "name":"",
                  "polyline":[
                         {
@@ -54,16 +56,16 @@
                          "y":31
                         }, 
                         {
-                         "x":0,
-                         "y":47
+                         "x":-0.333333333333314,
+                         "y":50.3333333333333
                         }, 
                         {
-                         "x":15,
-                         "y":48
+                         "x":16.3333333333333,
+                         "y":49.6666666666667
                         }, 
                         {
-                         "x":15,
-                         "y":31
+                         "x":15.3333333333334,
+                         "y":30.6666666666666
                         }, 
                         {
                          "x":16,
@@ -77,6 +79,7 @@
                     {
                      "map":"first"
                     },
+                 "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
@@ -90,6 +93,7 @@
          "x":0,
          "y":0
         }],
+ "nextobjectid":2,
  "orientation":"orthogonal",
  "properties":
     {
@@ -97,6 +101,7 @@
      "yoffset":"5",
      "zoffset":"2"
     },
+ "renderorder":"right-down",
  "tileheight":16,
  "tilesets":[
         {
@@ -154,7 +159,7 @@
         }, 
         {
          "firstgid":42,
-         "image":"images\/terrain_atlas.png",
+         "image":"images/terrain_atlas.png",
          "imageheight":1024,
          "imagewidth":1024,
          "margin":0,

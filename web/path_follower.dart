@@ -118,9 +118,8 @@ class MapPathFollower implements PathFollower
       cur_path_point_ = 0;
     }
     Vector2 position = path_.points[cur_path_point_];
-    position = position + path_.position;
     int x = position.x.floor();
-    int y = position.y.floor() - 2;
+    int y = position.y.floor();
 
     Vector2 b_pos = new Vector2(behaviour.element_.x_.floorToDouble(),
         behaviour.element_.y_.floorToDouble());

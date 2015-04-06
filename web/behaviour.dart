@@ -61,7 +61,7 @@ class TerrainBehaviour extends Behaviour
     Portal ret;
     for (Vector3 portal in portal_positions_)
     {
-      if (portal.x == x && portal.y == y + 1)
+      if (portal.x == x && portal.y == y)
       {
         ret = portals_[portal.z.floor()];
         break;
@@ -82,7 +82,7 @@ class TerrainBehaviour extends Behaviour
 
       for (Vector2 obstacle in obstacles_)
       {
-        if (obstacle.x == x && obstacle.y == y + 1)
+        if (obstacle.x == x && obstacle.y == y)
         {
           obstacle_found = true;
           break;
@@ -100,7 +100,6 @@ class TerrainBehaviour extends Behaviour
 
         if (height < 0)
         {
-          int a, b, c, d;
           if (heights_[x][y] == -2)
             {
               int a = heights_[x-1][y];
@@ -249,7 +248,7 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
     Quaternion rot = new Quaternion.identity();
     rot.setAxisAngle(new Vector3(1.0, 0.0, 0.0 ), -100 * (math.PI / 180));
     rotation_ = rot;
-    setOffset(new Vector3(-1.0, -1.0, 2.0));
+    setOffset(new Vector3(-1.0, 0.0, 2.0));
   }
 
   void init(Drawable drawable)

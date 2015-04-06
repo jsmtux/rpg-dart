@@ -103,7 +103,7 @@ class LevelImporter extends AsyncImporter<LevelData>
               int texture = data[(i + j*size.x).floor()] - current_tileset.first_gid;
               if (texture >= 0)
               {
-                Vector3 cur_model = new Vector3(i*1.0,size.y - j*1.0 -1 ,texture*1.0);
+                Vector3 cur_model = new Vector3(i*1.0,size.y - j*1.0 ,texture*1.0);
                 model_data.add(cur_model);
               }
             }
@@ -263,18 +263,14 @@ class LevelImporter extends AsyncImporter<LevelData>
             double path_scale = 0.0625;
             String name = object["name"];
             Vector2 pos = new Vector2.zero();
-            pos.x = object["x"] * path_scale;
-            pos.y = size.y - object["y"] * path_scale;
-            pos.x = pos.x.floorToDouble();
-            pos.y = pos.y.ceilToDouble() + 1;
+            pos.x = object["x"] * 1.0;
+            pos.y = object["y"] * 1.0;
             List<Vector2> points = new List<Vector2>();
             for (Map point in object["polyline"])
             {
               Vector2 p_pos = new Vector2.zero();
-              p_pos.x = point["x"] * path_scale;
-              p_pos.y = - point["y"] * path_scale;
-              p_pos.x = p_pos.x.floorToDouble();
-              p_pos.y = p_pos.y.ceilToDouble();
+              p_pos.x = ((point["x"] + pos.x) * path_scale).floorToDouble();
+              p_pos.y = size.y - ((point["y"] + pos.y ) * path_scale).floorToDouble();
               points.add(p_pos);
             }
             Map properties = object["properties"];
@@ -284,14 +280,13 @@ class LevelImporter extends AsyncImporter<LevelData>
 
               for(Vector2 point in points)
               {
-                Vector2 absolute = point + pos;
                 portals.putIfAbsent(map_name, () => new List<Vector2>());
-                portals[map_name].add(absolute);
+                portals[map_name].add(point);
               }
             }
             else
             {
-              paths[name] = new Path(name, pos, points);
+              paths[name] = new Path(name, points);
             }
           }
         }
