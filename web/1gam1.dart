@@ -6,6 +6,7 @@ import 'renderer.dart';
 import 'game_state.dart';
 import 'drawable_factory.dart';
 import 'camera.dart';
+import 'sprite_importer.dart';
 
 
 main() {
@@ -18,8 +19,15 @@ main() {
 
   Camera cur_cam = new Camera(renderer.m_worldview_);
 
-  draw_state.loadTerrain("images/map_test.json", drawable_factory)
-    .then((res) => draw_state.initBehaviour("images/map_units_test.json",res, draw_state, drawable_factory, gameLoop, cur_cam));
+  SpriteLoader loader = new SpriteLoader(drawable_factory, gameLoop, cur_cam);
+
+  draw_state.loadArea("first", "images/map_test.json", "images/map_units_test.json", loader)
+    .then((bool ret)
+        {
+          loader.gameLoop_.state = draw_state;
+          draw_state.setVisible("first", true);
+        });
+  draw_state.loadArea("second", "images/map_test_2.json", null, loader);
 
   gameLoop.start();
 }

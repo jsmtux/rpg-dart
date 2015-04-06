@@ -3,14 +3,15 @@ library behaviour;
 import 'package:vector_math/vector_math.dart';
 import 'dart:math' as math;
 
-import 'game_state.dart';
+import 'game_area.dart';
 import 'drawable.dart';
 import 'directions.dart';
+import 'portal.dart';
 
 abstract class Behaviour
 {
   void init(Drawable drawable);
-  void update(GameState state);
+  void update(GameArea area);
 }
 
 double calculateVectorLength(Vector2 vec)
@@ -22,15 +23,27 @@ class TerrainBehaviour extends Behaviour
 {
   List<List<int>> heights_;
   List<Vector2> obstacles_ = new List<Vector2>();
+  List<Vector3> portal_positions_ = new List<Vector3>();
+  Vector3 offset_;
+  List<Portal> portals_ = new List<Portal>();
 
-  TerrainBehaviour(this.heights_);
+  TerrainBehaviour(this.heights_, this.offset_);
 
   void init(Drawable drawable)
   {
   }
 
-  void update(GameState state)
+  void update(GameArea area)
   {
+  }
+
+  void addPortal(Portal portal, List<Vector2> positions)
+  {
+    portals_.add(portal);
+    for (Vector2 pos in positions)
+    {
+      portal_positions_.add(new Vector3(pos.x, pos.y, (portals_.length - 1) * 1.0));
+    }
   }
 
   void addObstacle(Vector2 position)
@@ -38,6 +51,24 @@ class TerrainBehaviour extends Behaviour
     int x = position.x.floor();
     int y = heights_[0].length - position.y.floor();
     obstacles_.add(new Vector2(x *1.0, y*1.0));
+  }
+
+  Portal getPortal(Vector2 position)
+  {
+    int x = position.x.floor();
+    int y = position.y.floor();
+
+    Portal ret;
+    for (Vector3 portal in portal_positions_)
+    {
+      if (portal.x == x && portal.y == y + 1)
+      {
+        ret = portals_[portal.z.floor()];
+        break;
+      }
+    }
+
+    return ret;
   }
 
   double getHeight(Vector2 position)
@@ -88,7 +119,7 @@ class TerrainBehaviour extends Behaviour
             }
         }
 
-        height = height / 5.0;
+        height = height / 5.0 + offset_.z;
       }
     }
 
@@ -114,7 +145,13 @@ abstract class TerrainElementBehaviour extends Behaviour
 
   void move(double x, double y)
   {
-    double height = terrain_.getHeight(new Vector2(x, y));
+    Vector2 pos = new Vector2(x, y);
+    Portal p = terrain_.getPortal(pos);
+    if (p != null)
+    {
+      p.transport(terrain_, this);
+    }
+    double height = terrain_.getHeight(pos);
 
     if (height != null)
     {
@@ -126,6 +163,11 @@ abstract class TerrainElementBehaviour extends Behaviour
       }
       drawable_.setPosition(new Vector3((x_ + offset_.x)*1.0, (y_ + offset_.y)*1.0, height + offset_.z));
     }
+  }
+
+  void setTerrain(TerrainBehaviour t)
+  {
+    terrain_ = t;
   }
 
   void setOffset(Vector3 offset)
@@ -144,7 +186,7 @@ class Tile3dBehaviour extends TerrainElementBehaviour
     terrain_.addObstacle(new Vector2(x_, y_));
   }
 
-  void update(GameState state)
+  void update(GameArea area)
   {
   }
 }
@@ -155,7 +197,7 @@ abstract class BehaviourState
 
   BehaviourState(this.element_);
   void hit(SpriteBehaviour sprite);
-  void update(GameState state);
+  void update(GameArea area);
 
   void begin()
   {
@@ -225,11 +267,11 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
     }
   }
 
-  void update(GameState state)
+  void update(GameArea area)
   {
     if (cur_state_ != null)
     {
-      cur_state_.update(state);
+      cur_state_.update(area);
     }
   }
 

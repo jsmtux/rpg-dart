@@ -29,11 +29,11 @@ class SquareTerrain
     {
       for (int j = 0; j < size_.y; j++)
       {
-        if (heights_[i][j] == -1)
+        int num_texture = textures_[i][j];
+        if (heights_[i][j] == - 1 || num_texture <= 0)
         {
           continue;
         }
-        int num_texture = textures_[i][j];
         int num_texture_y = (num_texture / num_images_root).floor();
         Vector2 tex_offset = new Vector2.zero();
         tex_offset.x = num_texture /num_images_root - num_texture_y + bleeding_correction / 2;

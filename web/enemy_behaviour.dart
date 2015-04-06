@@ -1,7 +1,7 @@
 library enemy_behaviour;
 
 import 'behaviour.dart';
-import 'game_state.dart';
+import 'game_area.dart';
 import 'path_follower.dart';
 import 'path.dart';
 import 'pc_behaviour.dart';
@@ -22,11 +22,11 @@ class EnemyNormalState extends WalkingBehaviourState
     element_.setState(element.dead_state_);
   }
 
-  void update(GameState state)
+  void update(GameArea area)
   {
     bool walking = true;
     EnemyBehaviour this_element = element_;
-    for (Behaviour behaviour in state.behaviours_)
+    for (Behaviour behaviour in area.behaviours_)
     {
       if (behaviour is PCBehaviour)
       {
@@ -86,7 +86,7 @@ class EnemyDeadState extends BehaviourState
   {
   }
 
-  void update(GameState state)
+  void update(GameArea area)
   {
   }
 }

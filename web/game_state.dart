@@ -8,63 +8,54 @@ import 'package:game_loop/game_loop_html.dart';
 import 'drawable.dart';
 import 'renderer.dart';
 import 'behaviour.dart';
-import 'path.dart';
-import 'level_importer.dart';
-import 'level_data.dart';
-import 'drawable_factory.dart';
 import 'sprite_importer.dart';
-import 'camera.dart';
+import 'game_area.dart';
 
 class GameState extends SimpleHtmlState
 {
   Renderer renderer_;
-  List<Drawable> drawables_ = new List<Drawable>();
-  List<Behaviour> behaviours_ = new List<Behaviour>();
-  Map<String, Path> paths_ = new Map<String, Path>();
 
-  Future<TerrainBehaviour> loadTerrain(String level_path, DrawableFactory drawable_factory)
+  Map<String, GameArea> areas_ = new Map<String, GameArea>();
+  List<GameArea> visible_areas_ = new List<GameArea>();
+  List<GameArea> updated_areas_ = new List<GameArea>();
+
+  Future loadArea(String name, String level_path, String behaviour_path, SpriteLoader loader)
   {
-    LevelImporter level_importer = new LevelImporter();
-    return level_importer.RequestFile(level_path).then((LevelData data) => (data.AddToGameState(this, drawable_factory)));
+    Completer ret = new Completer();
+    GameArea toAdd = new GameArea();
+    toAdd.LoadGameArea(level_path, behaviour_path, loader, this).then((bool ok){areas_[name] = toAdd; ret.complete(ok);});
+    areas_[name] = toAdd;
+    return ret.future;
   }
 
-  void initBehaviour(String behaviour_path, TerrainBehaviour terrain, GameState state, DrawableFactory drawable_factory, GameLoopHtml gameLoop, Camera cur_cam)
+  void setVisible(String areaName, bool visible)
   {
-    SpriteImporter sprite_importer = new SpriteImporter();
-    sprite_importer.RequestFile(behaviour_path).then(
-      (loader)
-      {
-        loader.configure(terrain, state, drawable_factory, gameLoop, cur_cam);
-        loader.AddToGameState();
-      }
-    );
-
-    gameLoop.state = this;
-
-  }
-
-  void addElement(Drawable drawable, Behaviour behaviour)
-  {
-    if (behaviour != null)
+    GameArea area = areas_[areaName];
+    visible_areas_.remove(area);
+    if (visible)
     {
-      behaviour.init(drawable);
+      visible_areas_.add(area);
     }
-
-    drawables_.add(drawable);
-    behaviours_.add(behaviour);
-    int num_elements = drawables_.length;
   }
 
   void onRender(GameLoop gameLoop) {
-    renderer_.render(drawables_);
+    List<List<Drawable>> list = new List<List<Drawable>>();
+    for(GameArea area in visible_areas_)
+    {
+      list.add(area.drawables_);
+    };
+    renderer_.render(list);
   }
 
   void onUpdate(GameLoop gameLoop)
   {
-    for (Behaviour behaviour in behaviours_)
+    areas_.forEach((k, area)
     {
-      behaviour.update(this);
-    }
+      for (Behaviour behaviour in area.behaviours_)
+      {
+        behaviour.update(area);
+      }
+    });
   }
 
   void onKeyDown(KeyboardEvent event) {

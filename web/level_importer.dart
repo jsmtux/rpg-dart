@@ -192,12 +192,31 @@ class LevelImporter extends AsyncImporter<LevelData>
     Map jsonData = JSON.decode(data);
 
     Map<String, Path> paths = new Map<String, Path>();
+    Map<String, List<Vector2>> portals = new Map<String, List<Vector2>>();
 
     Vector2 size = new Vector2.zero();
     size.y = jsonData["height"] * 1.0;
     size.x = jsonData["width"] * 1.0;
 
     List<Tileset> parsed_tilesets = readTilesets(jsonData["tilesets"]);
+
+    Vector3 offset = new Vector3.zero();
+    if(jsonData.containsKey("properties"))
+    {
+      Map properties = jsonData["properties"];
+      if (properties.containsKey("xoffset"))
+      {
+        offset.x = double.parse(properties["xoffset"]);
+      }
+      if (properties.containsKey("yoffset"))
+      {
+        offset.y = double.parse(properties["yoffset"]);
+      }
+      if (properties.containsKey("zoffset"))
+      {
+        offset.z = double.parse(properties["zoffset"]);
+      }
+    }
 
     List layers = jsonData["layers"];
 
@@ -249,7 +268,7 @@ class LevelImporter extends AsyncImporter<LevelData>
             pos.x = pos.x.floorToDouble();
             pos.y = pos.y.ceilToDouble() + 1;
             List<Vector2> points = new List<Vector2>();
-            for(Map point in object["polyline"])
+            for (Map point in object["polyline"])
             {
               Vector2 p_pos = new Vector2.zero();
               p_pos.x = point["x"] * path_scale;
@@ -258,12 +277,27 @@ class LevelImporter extends AsyncImporter<LevelData>
               p_pos.y = p_pos.y.ceilToDouble();
               points.add(p_pos);
             }
-            paths[name] = new Path(name, pos, points);
+            Map properties = object["properties"];
+            if (properties.length != 0)
+            {
+              String map_name = properties["map"];
+
+              for(Vector2 point in points)
+              {
+                Vector2 absolute = point + pos;
+                portals.putIfAbsent(map_name, () => new List<Vector2>());
+                portals[map_name].add(absolute);
+              }
+            }
+            else
+            {
+              paths[name] = new Path(name, pos, points);
+            }
           }
         }
       }
     }
 
-    return new LevelData(ret_terrain, model_paths, model_data, heights, paths);
+    return new LevelData(ret_terrain, model_paths, model_data, heights, paths, portals, offset);
   }
 }

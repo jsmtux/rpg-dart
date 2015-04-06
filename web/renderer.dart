@@ -61,7 +61,7 @@ class Renderer
     d.Draw(gl_, m_worldview_, m_perspective_, dimensions_);
   }
 
-  void render(List<Drawable> drawables)
+  void render(List<List<Drawable>> drawables)
   {
     gl_.viewport(0, 0, view_width_, view_height_);
     gl_.clear(webgl.RenderingContext.COLOR_BUFFER_BIT | webgl.RenderingContext.DEPTH_BUFFER_BIT);
@@ -69,17 +69,21 @@ class Renderer
     m_perspective_ = makePerspectiveMatrix(radians(45.0), view_width_/view_height_, 0.1, 100.0);
 
     List<Drawable> sorted_drawables = new List<Drawable>();
-    for(Drawable d in drawables)
+    for(List<Drawable> list in drawables)
     {
-      if(!d.isTransparent())
+      for(Drawable d in list)
       {
-        renderElement(d);
-      }
-      else
-      {
-        sorted_drawables.add(d);
+        if(!d.isTransparent())
+        {
+          renderElement(d);
+        }
+        else
+        {
+          sorted_drawables.add(d);
+        }
       }
     }
+
     sorted_drawables.sort((x,y) => y.position_.y.compareTo(x.position_.y));
     gl_.depthMask(false);
     for(Drawable d in sorted_drawables)

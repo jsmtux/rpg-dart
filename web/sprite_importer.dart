@@ -11,6 +11,7 @@ import 'drawable_factory.dart';
 import "animation.dart";
 import "behaviour.dart";
 import "game_state.dart";
+import 'game_area.dart';
 import 'geometry_data.dart';
 
 import "enemy_behaviour.dart";
@@ -23,7 +24,7 @@ class SpriteData
   AnimationData anim_;
   BehaviourDefinition behaviour_;
 
-  void AddToGameState(SpriteLoader loader)
+  void AddToGameState(SpriteLoader loader, TerrainBehaviour terrain, GameArea area, GameState state)
   {
     BaseDrawable drawable;
     if (anim_ != null)
@@ -34,13 +35,13 @@ class SpriteData
     {
       drawable = loader.drawable_factory_.createBaseDrawable(geom_);
     }
-    loader.state_.addElement(drawable , behaviour_.getBehaviour(loader));
+    area.addElement(drawable , behaviour_.getBehaviour(terrain, area, loader, state));
   }
 }
 
 abstract class BehaviourDefinition
 {
-  Behaviour getBehaviour(SpriteLoader loader);
+  Behaviour getBehaviour(TerrainBehaviour terrain, GameArea area, SpriteLoader loader, GameState state);
 }
 
 class EnemyBehaviourDefinition implements BehaviourDefinition
@@ -48,9 +49,9 @@ class EnemyBehaviourDefinition implements BehaviourDefinition
   String path_name_;
   EnemyBehaviourDefinition(this.path_name_);
 
-  Behaviour getBehaviour(SpriteLoader loader)
+  Behaviour getBehaviour(TerrainBehaviour terrain, GameArea area, SpriteLoader loader, GameState state)
   {
-    return new EnemyBehaviour(loader.terrain_, loader.state_.paths_[path_name_]);
+    return new EnemyBehaviour(terrain, area.paths_[path_name_]);
   }
 }
 
@@ -60,42 +61,30 @@ class PCBehaviourDefinition implements BehaviourDefinition
 
   PCBehaviourDefinition(this.x_, this.y_);
 
-  Behaviour getBehaviour(SpriteLoader loader)
+  Behaviour getBehaviour(TerrainBehaviour terrain, GameArea area, SpriteLoader loader, GameState state)
   {
-    return new PCBehaviour(x_, y_, loader.terrain_, loader.gameLoop_.keyboard, loader.cur_cam_);
+    return new PCBehaviour(x_, y_, terrain, loader.gameLoop_.keyboard, loader.cur_cam_, state);
   }
 }
 
 class SpriteLoader
 {
-  List<SpriteData> sprites_data_;
-  TerrainBehaviour terrain_;
-  GameState state_;
   DrawableFactory drawable_factory_;
   GameLoopHtml gameLoop_;
   Camera cur_cam_;
 
-  SpriteLoader(this.sprites_data_);
+  SpriteLoader(this.drawable_factory_, this.gameLoop_, this.cur_cam_);
 
-  void configure(TerrainBehaviour terrain, GameState state, DrawableFactory drawable_factory, GameLoopHtml gameLoop, Camera cur_cam)
+  void AddToGameState(List<SpriteData> sprites_data, TerrainBehaviour terrain, GameArea area, GameState state)
   {
-    terrain_ = terrain;
-    state_ = state;
-    drawable_factory_ = drawable_factory;
-    gameLoop_ = gameLoop;
-    cur_cam_ = cur_cam;
-  }
-
-  void AddToGameState()
-  {
-    for (SpriteData sprite in sprites_data_)
+    for (SpriteData sprite in sprites_data)
     {
-      sprite.AddToGameState(this);
+      sprite.AddToGameState(this, terrain, area, state);
     }
   }
 }
 
-class SpriteImporter extends AsyncImporter<SpriteLoader>
+class SpriteImporter extends AsyncImporter<List<SpriteData>>
 {
   void processDrawable(Map drawable_spec, SpriteData res)
   {
@@ -146,7 +135,7 @@ class SpriteImporter extends AsyncImporter<SpriteLoader>
     });
   }
 
-  SpriteLoader processFile(String data)
+  List<SpriteData> processFile(String data)
   {
     List<SpriteData> ret = new List<SpriteData>();
     Map jsonData = JSON.decode(data);
@@ -167,6 +156,6 @@ class SpriteImporter extends AsyncImporter<SpriteLoader>
       ret.add(current);
     });
 
-    return new SpriteLoader(ret);
+    return ret;
   }
 }

@@ -50,54 +50,54 @@ class SpriteFollower implements PathFollower
   Vector2 same_direction_pos_;
   bool same_line_ = false;
   Directions difference_ = Directions.UP;
-  
+
   SpriteFollower(this.following_);
-  
+
   bool canAttack()
   {
     return same_line_;
   }
-  
+
   void updateWalk(WalkingBehaviourState behaviour)
   {
     double diff_x = behaviour.element_.x_ - following_.x_;
     double diff_y = behaviour.element_.y_ - following_.y_;
     double threshold = 0.2;
-    
+
     same_line_ = diff_x.abs() < threshold || diff_y.abs() < threshold;
-    
-    if (same_line_ || 
-        ((diff_x - diff_x.floor()).abs() < 0.1 && walk_horizontal_) || 
+
+    if (same_line_ ||
+        ((diff_x - diff_x.floor()).abs() < 0.1 && walk_horizontal_) ||
         ((diff_y - diff_y.floor()).abs() < 0.1 && !walk_horizontal_))
     {
       walk_horizontal_ = diff_x.abs() > diff_y.abs();
     }
-    
+
     if(walk_horizontal_)
     {
       if (diff_x > threshold)
       {
-        difference_ = Directions.LEFT;      
+        difference_ = Directions.LEFT;
       }
       else if (diff_x < -threshold)
       {
-        difference_ = Directions.RIGHT;      
+        difference_ = Directions.RIGHT;
       }
     }
     else
-    {  
+    {
       if (diff_y < -threshold)
       {
-        difference_ = Directions.UP;      
+        difference_ = Directions.UP;
       }
       else if (diff_y > threshold)
       {
-        difference_ = Directions.DOWN;      
+        difference_ = Directions.DOWN;
       }
     }
-    behaviour.walk(difference_);      
+    behaviour.walk(difference_);
   }
-  
+
   Directions getOrientation()
   {
     return difference_;
@@ -120,7 +120,7 @@ class MapPathFollower implements PathFollower
     Vector2 position = path_.points[cur_path_point_];
     position = position + path_.position;
     int x = position.x.floor();
-    int y = position.y.floor();
+    int y = position.y.floor() - 2;
 
     Vector2 b_pos = new Vector2(behaviour.element_.x_.floorToDouble(),
         behaviour.element_.y_.floorToDouble());
