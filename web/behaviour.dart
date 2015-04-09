@@ -144,7 +144,7 @@ abstract class TerrainElementBehaviour extends Behaviour
 
   void move(double x, double y)
   {
-    Vector2 pos = new Vector2(x, y);
+    Vector2 pos = new Vector2(x, y-1);
     Portal p = terrain_.getPortal(pos);
     if (p != null)
     {
@@ -248,7 +248,7 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
     Quaternion rot = new Quaternion.identity();
     rot.setAxisAngle(new Vector3(1.0, 0.0, 0.0 ), -100 * (math.PI / 180));
     rotation_ = rot;
-    setOffset(new Vector3(-1.0, 0.0, 2.0));
+    setOffset(new Vector3(-1.0, -1.0, 2.0));
   }
 
   void init(Drawable drawable)

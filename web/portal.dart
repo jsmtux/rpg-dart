@@ -7,6 +7,8 @@ import 'behaviour.dart';
 class Portal
 {
   String map_name_;
+  List<String> areas_hide_;
+  List<String> areas_show_;
   GameState state_;
 
   Portal(this.map_name_, this.state_);
@@ -22,6 +24,14 @@ class Portal
     {
       element.terrain_ = area.terrain_;
       state_.setVisible(map_name_, true);
+      for (String area in areas_hide_)
+      {
+        state_.setVisible(area, false);
+      }
+      for (String area in areas_show_)
+      {
+        state_.setVisible(area, true);
+      }
     }
   }
 }

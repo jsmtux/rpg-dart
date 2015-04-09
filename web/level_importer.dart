@@ -192,7 +192,7 @@ class LevelImporter extends AsyncImporter<LevelData>
     Map jsonData = JSON.decode(data);
 
     Map<String, Path> paths = new Map<String, Path>();
-    Map<String, List<Vector2>> portals = new Map<String, List<Vector2>>();
+    List<PortalDescription> portals = new List<PortalDescription>();
 
     Vector2 size = new Vector2.zero();
     size.y = jsonData["height"] * 1.0;
@@ -276,13 +276,18 @@ class LevelImporter extends AsyncImporter<LevelData>
             Map properties = object["properties"];
             if (properties.length != 0)
             {
-              String map_name = properties["map"];
-
-              for(Vector2 point in points)
+              PortalDescription current_portal = new PortalDescription();
+              current_portal.map_name_ = properties["map"];
+              if (properties.containsKey("hide"))
               {
-                portals.putIfAbsent(map_name, () => new List<Vector2>());
-                portals[map_name].add(point);
+                current_portal.map_hide_.add(properties["hide"]);
               }
+              if(properties.containsKey("show"))
+              {
+                current_portal.map_show_.add(properties["show"]);
+              }
+              current_portal.points_ = points;
+              portals.add(current_portal);
             }
             else
             {

@@ -15,6 +15,15 @@ import 'path.dart';
 import 'portal.dart';
 import 'game_state.dart';
 
+
+class PortalDescription
+{
+  String map_name_;
+  List<Vector2> points_ = new List<Vector2>();
+  List<String> map_hide_ = new List<String>();
+  List<String> map_show_ = new List<String>();
+}
+
 class LevelData
 {
   List<SquareTerrain> terrain_list_;
@@ -23,7 +32,7 @@ class LevelData
   Map<String, Path> paths_ = new Map<String, Path>();
   List<List<int>> heights_;
   Vector3 offset_;
-  Map<String, List<Vector2>> portals_;
+  List<PortalDescription> portals_;
 
   Map<String,BaseGeometry> models_geometry_ = new Map<String, BaseGeometry>();
 
@@ -54,14 +63,18 @@ class LevelData
       area.paths_.addAll(paths_);
     }
 
-    portals_.forEach((String name, List<Vector2> positions){
-      for (Vector2 pos in positions)
+    for (PortalDescription portal in portals_)
+    {
+      Portal toAdd = new Portal(portal.map_name_, state);
+      toAdd.areas_hide_ = portal.map_hide_;
+      toAdd.areas_show_ = portal.map_show_;
+      for (Vector2 pos in portal.points_)
       {
         pos.x += offset_.x;
         pos.y += offset_.y;
       }
-      behaviour_t.addPortal(new Portal(name, state), positions);
-    });
+      behaviour_t.addPortal(toAdd, portal.points_);
+    }
 
     if (models_ != null)
     {
