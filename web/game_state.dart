@@ -7,7 +7,7 @@ import 'package:game_loop/game_loop_html.dart';
 
 import 'drawable.dart';
 import 'renderer.dart';
-import 'behaviour.dart';
+import 'behaviour/behaviour.dart';
 import 'sprite_importer.dart';
 import 'game_area.dart';
 

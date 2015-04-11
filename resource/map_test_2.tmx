@@ -35,6 +35,11 @@
     <property name="name" value="images/chest.model"/>
    </properties>
   </tile>
+  <tile id="5">
+   <properties>
+    <property name="name" value="images/sign.model"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="42" name="terrain_atlas" tilewidth="16" tileheight="16">
   <image source="../web/images/terrain_atlas.png" width="1024" height="1024"/>
@@ -1647,10 +1652,10 @@
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="1"/>
-   <tile gid="3"/>
-   <tile gid="3"/>
-   <tile gid="3"/>
-   <tile gid="3"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="1"/>
@@ -4543,7 +4548,7 @@
    <tile gid="0"/>
   </data>
  </layer>
- <layer name="terrain" width="75" height="60">
+ <layer name="terrain" width="75" height="60" visible="0">
   <data>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -9047,7 +9052,7 @@
    <tile gid="0"/>
   </data>
  </layer>
- <layer name="models_layer" width="75" height="60">
+ <layer name="models_layer" width="75" height="60" visible="0">
   <data>
    <tile gid="0"/>
    <tile gid="0"/>

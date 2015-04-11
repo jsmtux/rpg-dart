@@ -10,11 +10,12 @@ import 'drawable_factory.dart';
 import 'base_geometry.dart';
 import 'drawable.dart';
 import 'model_importer.dart';
-import 'behaviour.dart';
+import 'behaviour/terrain_behaviour.dart';
+import 'behaviour/terrain_element_behaviour.dart';
 import 'path.dart';
 import 'portal.dart';
 import 'game_state.dart';
-
+import 'sprite_importer.dart';
 
 class PortalDescription
 {
@@ -38,7 +39,7 @@ class LevelData
 
   LevelData(this.terrain_list_, this.models_, this.model_info_, this.heights_, this.paths_, this.portals_, this.offset_);
 
-  Future<TerrainBehaviour> AddToGameState(GameArea area, GameState state, DrawableFactory drawable_factory)
+  Future<TerrainBehaviour> AddToGameState(GameArea area, GameState state, SpriteLoader loader)
   {
     Completer completer = new Completer();
     TerrainBehaviour behaviour_t = new TerrainBehaviour(heights_, offset_);
@@ -50,7 +51,7 @@ class LevelData
       BaseGeometry terrain_geom = sq.calculateBaseGeometry(height);
       height += 0.005;
 
-      Drawable terrain_drawable = drawable_factory.createTexturedDrawable(terrain_geom);
+      Drawable terrain_drawable = loader.drawable_factory_.createTexturedDrawable(terrain_geom);
       area.addElement(terrain_drawable, behaviour_t);
       Quaternion rot = new Quaternion.identity();
       //rot.setAxisAngle(new Vector3(1.0, 0.0, 0.0 ), -60 * (math.PI / 180));
@@ -81,7 +82,7 @@ class LevelData
       ModelImporter importer = new ModelImporter();
       for (String path in models_)
       {
-        importer.RequestFile(path).then((List<BaseGeometry> model) => checkFinished(area, model, path, completer, drawable_factory, behaviour_t));
+        importer.RequestFile(path).then((List<BaseGeometry> model) => checkFinished(area, model, path, completer, loader, behaviour_t));
       }
     }
     else
@@ -92,25 +93,25 @@ class LevelData
     return completer.future;
   }
 
-  void checkFinished(GameArea area, List<BaseGeometry> model, String path, Completer completer, DrawableFactory drawable_factory, TerrainBehaviour behaviour_t)
+  void checkFinished(GameArea area, List<BaseGeometry> model, String path, Completer completer, SpriteLoader loader, TerrainBehaviour behaviour_t)
   {
     models_geometry_[path] = model[0];
     if (models_.length == models_geometry_.length)
     {
-      processFinished(area, completer, drawable_factory, behaviour_t);
+      processFinished(area, completer, loader, behaviour_t);
     }
   }
 
-  void processFinished(GameArea area, Completer completer, DrawableFactory drawable_factory, TerrainBehaviour behaviour_t)
+  void processFinished(GameArea area, Completer completer, SpriteLoader loader, TerrainBehaviour behaviour_t)
   {
     for (Vector3 info in model_info_)
     {
       double x = info.x + offset_.x;
       double y = info.y + offset_.y;
       int z = info.z.floor();
-      Drawable toAdd = drawable_factory.createTexturedDrawable(models_geometry_[models_[z]]);
+      loader.addModels(models_geometry_);
+      Drawable toAdd = loader.drawable_factory_.createTexturedDrawable(models_geometry_[models_[z]]);
       area.addElement(toAdd , new Tile3dBehaviour(x, y, behaviour_t));
-      toAdd.setScale(1/3);
     }
     completer.complete(behaviour_t);
   }

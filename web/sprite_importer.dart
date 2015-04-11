@@ -9,14 +9,17 @@ import "async_importer.dart";
 import "base_geometry.dart";
 import 'drawable_factory.dart';
 import "animation.dart";
-import "behaviour.dart";
 import "game_state.dart";
 import 'game_area.dart';
 import 'geometry_data.dart';
-
-import "enemy_behaviour.dart";
-import 'pc_behaviour.dart';
 import "camera.dart";
+import "dialogue_box.dart";
+
+import 'behaviour/behaviour.dart';
+import 'behaviour/enemy_behaviour.dart';
+import 'behaviour/pc_behaviour.dart';
+import 'behaviour/terrain_behaviour.dart';
+import 'behaviour/sign_behaviour.dart';
 
 class SpriteData
 {
@@ -27,13 +30,14 @@ class SpriteData
   void AddToGameState(SpriteLoader loader, TerrainBehaviour terrain, GameArea area, GameState state)
   {
     BaseDrawable drawable;
+
     if (anim_ != null)
     {
       drawable = loader.drawable_factory_.createAnimatedDrawable(geom_, anim_);
     }
     else
     {
-      drawable = loader.drawable_factory_.createBaseDrawable(geom_);
+      drawable = loader.drawable_factory_.createTexturedDrawable(geom_);
     }
     area.addElement(drawable , behaviour_.getBehaviour(terrain, area, loader, state));
   }
@@ -67,13 +71,28 @@ class PCBehaviourDefinition implements BehaviourDefinition
   }
 }
 
+class SignBehaviourDefinition implements BehaviourDefinition
+{
+  String text_;
+  double x_, y_;
+
+  SignBehaviourDefinition(this.text_, this.x_, this.y_);
+
+  Behaviour getBehaviour(TerrainBehaviour terrain, GameArea area, SpriteLoader loader, GameState state)
+  {
+    return new SignBehaviour(x_, y_, terrain, text_, loader.text_output_);
+  }
+}
+
 class SpriteLoader
 {
   DrawableFactory drawable_factory_;
   GameLoopHtml gameLoop_;
   Camera cur_cam_;
+  TextOutput text_output_;
+  Map<String,BaseGeometry> models_geometry_ = new Map<String, BaseGeometry>();
 
-  SpriteLoader(this.drawable_factory_, this.gameLoop_, this.cur_cam_);
+  SpriteLoader(this.drawable_factory_, this.gameLoop_, this.cur_cam_, this.text_output_);
 
   void AddToGameState(List<SpriteData> sprites_data, TerrainBehaviour terrain, GameArea area, GameState state)
   {
@@ -82,25 +101,46 @@ class SpriteLoader
       sprite.AddToGameState(this, terrain, area, state);
     }
   }
+
+  void addModels(Map<String,BaseGeometry> models)
+  {
+    models_geometry_.addAll(models);
+  }
+
+  BaseGeometry getModelGeometry(String name)
+  {
+    return models_geometry_[name];
+  }
 }
 
 class SpriteImporter extends AsyncImporter<List<SpriteData>>
 {
+  SpriteLoader loader_;
+
+  SpriteImporter(this.loader_);
+
   void processDrawable(Map drawable_spec, SpriteData res)
   {
-    res.geom_ = new TexturedGeometry(quad_vertices, quad_indices, quad_coords, drawable_spec["path"]);
-    if (drawable_spec.containsKey("sequences"))
+    if(drawable_spec["type"]=="quad")
     {
-      res.anim_ = new AnimationData();
-      res.anim_.num_images_side_ = drawable_spec["num_images_side"];
-      res.anim_.sequences_ = new Map<String, AnimationSequence>();
-      for (Map sequence in drawable_spec["sequences"])
+      res.geom_ = new TexturedGeometry(quad_vertices, quad_indices, quad_coords, drawable_spec["path"]);
+      if (drawable_spec.containsKey("sequences"))
       {
-        String name = sequence["name"];
-        double speed = sequence["time"];
-        List<int> seq = sequence["sequence"];
-        res.anim_.sequences_[name] = new AnimationSequence(seq, speed);
+        res.anim_ = new AnimationData();
+        res.anim_.num_images_side_ = drawable_spec["num_images_side"];
+        res.anim_.sequences_ = new Map<String, AnimationSequence>();
+        for (Map sequence in drawable_spec["sequences"])
+        {
+          String name = sequence["name"];
+          double speed = sequence["time"];
+          List<int> seq = sequence["sequence"];
+          res.anim_.sequences_[name] = new AnimationSequence(seq, speed);
+        }
       }
+    }
+    else
+    {
+      res.geom_ = loader_.getModelGeometry(drawable_spec["path"]);
     }
   }
 
@@ -113,6 +153,9 @@ class SpriteImporter extends AsyncImporter<List<SpriteData>>
         break;
       case "PCBehaviour":
         res.behaviour_ = new PCBehaviourDefinition(behaviour_spec["posx"], behaviour_spec["posy"]);
+        break;
+      case "SignBehaviour":
+        res.behaviour_ = new SignBehaviourDefinition(behaviour_spec["text"], behaviour_spec["posx"], behaviour_spec["posy"]);
         break;
     }
   }

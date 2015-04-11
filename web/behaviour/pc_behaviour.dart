@@ -3,12 +3,14 @@ library pc_behaviour;
 import 'package:vector_math/vector_math.dart';
 import 'package:game_loop/game_loop_html.dart';
 
+import '../camera.dart';
+import '../game_state.dart';
+import '../game_area.dart';
 import 'behaviour.dart';
-import 'camera.dart';
-import 'game_state.dart';
-import 'game_area.dart';
 import 'enemy_behaviour.dart';
+import 'terrain_behaviour.dart';
 import 'directions.dart';
+import 'terrain_element_behaviour.dart';
 
 class PCNormalState extends WalkingBehaviourState
 {

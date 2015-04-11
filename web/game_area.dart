@@ -5,11 +5,12 @@ import 'dart:async';
 import 'path.dart';
 import 'level_importer.dart';
 import 'level_data.dart';
-import 'drawable_factory.dart';
 import 'drawable.dart';
-import 'behaviour.dart';
 import 'sprite_importer.dart';
 import 'game_state.dart';
+import 'behaviour/behaviour.dart';
+import 'behaviour/terrain_behaviour.dart';
+
 
 class GameArea
 {
@@ -21,7 +22,7 @@ class GameArea
   Future<bool> LoadGameArea(String level_path, String behaviour_path, SpriteLoader loader, GameState state)
   {
     Completer ret = new Completer();
-    loadTerrain(level_path, state, loader.drawable_factory_)
+    loadTerrain(level_path, state, loader)
         .then((res)
         {
           if(behaviour_path != null)
@@ -31,15 +32,15 @@ class GameArea
     return ret.future;
   }
 
-  Future<TerrainBehaviour> loadTerrain(String level_path, GameState state, DrawableFactory drawable_factory)
+  Future<TerrainBehaviour> loadTerrain(String level_path, GameState state, SpriteLoader loader)
   {
     LevelImporter level_importer = new LevelImporter();
-    return level_importer.RequestFile(level_path).then((LevelData data) => (data.AddToGameState(this, state, drawable_factory)));
+    return level_importer.RequestFile(level_path).then((LevelData data) => (data.AddToGameState(this, state, loader)));
   }
 
   void initBehaviour(String behaviour_path, TerrainBehaviour terrain, SpriteLoader loader, GameState state)
   {
-    SpriteImporter sprite_importer = new SpriteImporter();
+    SpriteImporter sprite_importer = new SpriteImporter(loader);
     sprite_importer.RequestFile(behaviour_path).then(
       (sprites)
       {

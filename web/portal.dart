@@ -2,7 +2,8 @@ library portal;
 
 import 'game_area.dart';
 import 'game_state.dart';
-import 'behaviour.dart';
+import 'behaviour/terrain_behaviour.dart';
+import 'behaviour/terrain_element_behaviour.dart';
 
 class Portal
 {

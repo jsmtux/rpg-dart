@@ -148,5 +148,18 @@
 		"behaviour":{
 			"path":"path2"
 		}
+	},
+	"sign_entrance":{
+		"drawable":{
+			"type":"model",
+			"path":"images/sign.model"
+	  	},
+		"behaviour":{
+	  		"type":"SignBehaviour",
+	  		"posx":33.0,
+	  		"posy":40.0,
+	  		"text":"sign text"
+		}
 	}
 }
+

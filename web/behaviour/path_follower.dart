@@ -3,8 +3,8 @@ library path_follower;
 import 'package:vector_math/vector_math.dart';
 
 import 'directions.dart';
-import 'behaviour.dart';
-import 'path.dart';
+import 'terrain_element_behaviour.dart';
+import '../path.dart';
 
 abstract class PathFollower
 {

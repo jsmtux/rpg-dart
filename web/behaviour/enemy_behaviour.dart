@@ -1,9 +1,11 @@
 library enemy_behaviour;
 
-import 'behaviour.dart';
-import 'game_area.dart';
+import '../game_area.dart';
 import 'path_follower.dart';
-import 'path.dart';
+import '../path.dart';
+import 'behaviour.dart';
+import 'terrain_behaviour.dart';
+import 'terrain_element_behaviour.dart';
 import 'pc_behaviour.dart';
 import 'directions.dart';
 
