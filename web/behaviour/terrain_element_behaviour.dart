@@ -164,8 +164,8 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
 
   double squareDistance(TerrainElementBehaviour sprite)
   {
-    double diff_x = x_ - sprite.x_;
-    double diff_y = y_ - sprite.y_;
+    double diff_x = x_ - sprite.x_ - 0.5;
+    double diff_y = y_ - sprite.y_ - 0.5;
     return diff_x * diff_x + diff_y * diff_y;
   }
 
