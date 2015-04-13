@@ -15,7 +15,6 @@ import 'terrain_element_behaviour.dart';
 class PCNormalState extends WalkingBehaviourState
 {
   PCNormalState(SpriteBehaviour element) : super(element, 0.05);
-  bool test = false;
 
   void hit(SpriteBehaviour sprite)
   {
@@ -28,16 +27,6 @@ class PCNormalState extends WalkingBehaviourState
     PCBehaviour element = element_;
     if(element.keyboard_.isDown(Keyboard.SPACE))
     {
-      element.state_.setVisible("second", test);
-      if (test)
-      {
-        element.setTerrain(element.state_.areas_["second"].terrain_);
-      }
-      else
-      {
-        element.setTerrain(element.state_.areas_["first"].terrain_);
-      }
-      test = !test;
       element.attacking_state_.dir_ = dir_;
       element.setState(element.attacking_state_);
     }

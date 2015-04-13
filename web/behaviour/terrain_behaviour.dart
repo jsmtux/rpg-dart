@@ -100,9 +100,31 @@ class TerrainBehaviour extends Behaviour
               int c = heights_[x][y+1];
               height = a * d_y + c * (1 - d_y);
             }
-            else if (heights_[x][y] < -3)
+            else if (heights_[x][y] == -4)
             {
-              print("dx is $d_x and dy is $d_y");
+              int b = heights_[x+1][y-1];
+              int c = heights_[x-1][y+1];
+              if( d_x > d_y)
+              {
+                height = b * d_y + c * (1 - d_y);
+              }
+              else
+              {
+                height = b * d_x + c * (1 - d_x);
+              }
+            }
+            else if (heights_[x][y] == -5)
+            {
+              int a = heights_[x-1][y-1];
+              int d = heights_[x+1][y+1];
+              if( (1 - d_x) > d_y)
+              {
+                height = a * d_y + d * (1 - d_y);
+              }
+              else
+              {
+                height = d * d_x + a * (1 - d_x);
+              }
             }
         }
 
