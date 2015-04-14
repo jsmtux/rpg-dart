@@ -76,59 +76,58 @@ class TerrainBehaviour extends Behaviour
           break;
         }
       }
+
+      height = heights_[x][y]*1.0;
+
+      double d_x = position.x - x;
+      double d_y = y - (heights_[0].length - position.y);
+
+      if (height < 0)
+      {
+        if (heights_[x][y] == -2)
+          {
+            int a = heights_[x-1][y];
+            int b = heights_[x+1][y];
+            height = b * d_x + a * (1 - d_x);
+          }
+          else if (heights_[x][y] == -3)
+          {
+            int a = heights_[x][y-1];
+            int c = heights_[x][y+1];
+            height = a * d_y + c * (1 - d_y);
+          }
+          else if (heights_[x][y] == -4)
+          {
+            int b = heights_[x+1][y-1];
+            int c = heights_[x-1][y+1];
+            if( d_x > d_y)
+            {
+              height = b * d_y + c * (1 - d_y);
+            }
+            else
+            {
+              height = b * d_x + c * (1 - d_x);
+            }
+          }
+          else if (heights_[x][y] == -5)
+          {
+            int a = heights_[x-1][y-1];
+            int d = heights_[x+1][y+1];
+            if( (1 - d_x) > d_y)
+            {
+              height = a * d_y + d * (1 - d_y);
+            }
+            else
+            {
+              height = d * d_x + a * (1 - d_x);
+            }
+          }
+      }
+
+      height = height / 5.0 + offset_.z;
       if (obstacle_found)
       {
-      }
-      else
-      {
-        height = heights_[x][y]*1.0;
-
-        double d_x = position.x - x;
-        double d_y = y - (heights_[0].length - position.y);
-
-        if (height < 0)
-        {
-          if (heights_[x][y] == -2)
-            {
-              int a = heights_[x-1][y];
-              int b = heights_[x+1][y];
-              height = b * d_x + a * (1 - d_x);
-            }
-            else if (heights_[x][y] == -3)
-            {
-              int a = heights_[x][y-1];
-              int c = heights_[x][y+1];
-              height = a * d_y + c * (1 - d_y);
-            }
-            else if (heights_[x][y] == -4)
-            {
-              int b = heights_[x+1][y-1];
-              int c = heights_[x-1][y+1];
-              if( d_x > d_y)
-              {
-                height = b * d_y + c * (1 - d_y);
-              }
-              else
-              {
-                height = b * d_x + c * (1 - d_x);
-              }
-            }
-            else if (heights_[x][y] == -5)
-            {
-              int a = heights_[x-1][y-1];
-              int d = heights_[x+1][y+1];
-              if( (1 - d_x) > d_y)
-              {
-                height = a * d_y + d * (1 - d_y);
-              }
-              else
-              {
-                height = d * d_x + a * (1 - d_x);
-              }
-            }
-        }
-
-        height = height / 5.0 + offset_.z;
+        height += 1.0;
       }
     }
 

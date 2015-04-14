@@ -23,30 +23,16 @@ abstract class TerrainElementBehaviour extends Behaviour
   void init(Drawable drawable)
   {
     drawable_ = drawable;
-    move(x_, y_);
+    setPos(x_, y_);
   }
 
-  void move(double x, double y)
+  void setPos(double x, double y)
   {
     Vector2 pos = new Vector2(x, y);
-    Portal p = terrain_.getPortal(pos);
-    if (p != null)
-    {
-      p.transport(terrain_, this);
-    }
     double height = terrain_.getHeight(pos);
-
-    if (height != null)
-    {
-      x_ = x;
-      y_ = y;
-      if (rotation_ != null)
-      {
-        drawable_.setRotation(rotation_);
-      }
-      drawable_.setPosition(new Vector3((x_ + offset_.x)*1.0, (y_ + offset_.y)*1.0, height + offset_.z));
-    }
+    drawable_.setPosition(new Vector3((x_ + offset_.x)*1.0, (y_ + offset_.y)*1.0, height + offset_.z));
   }
+
 
   void setTerrain(TerrainBehaviour t)
   {
@@ -128,12 +114,53 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
 {
   BehaviourState cur_state_ = null;
   AnimatedDrawable anim_drawable_;
+  static const double gravity = -0.1;
+  double z_accel_ = gravity;
+  double height_;
+  bool on_ground_ = true;
+
   SpriteBehaviour(double x, double y, TerrainBehaviour terrain) : super(x, y, terrain)
   {
+    height_ = terrain.getHeight(new Vector2(x,y));
     Quaternion rot = new Quaternion.identity();
     rot.setAxisAngle(new Vector3(1.0, 0.0, 0.0 ), -100 * (math.PI / 180));
     rotation_ = rot;
     setOffset(new Vector3(-1.0, 0.0, 2.0));
+  }
+
+  void move(double x, double y)
+  {
+    Vector2 pos = new Vector2(x, y);
+    Portal p = terrain_.getPortal(pos);
+    if (p != null)
+    {
+      p.transport(terrain_, this);
+    }
+    double height = terrain_.getHeight(pos);
+
+    on_ground_ = false;
+    if (height != null && height < (height_ + 0.5))
+    {
+      x_ = x;
+      y_ = y;
+      if (rotation_ != null)
+      {
+        drawable_.setRotation(rotation_);
+      }
+      if (height_ == null)
+      {
+        height_ = height;
+      }
+      else
+      {
+        if(height_ <= height)
+        {
+          on_ground_ = true;
+          height_ = height;
+        }
+      }
+      drawable_.setPosition(new Vector3((x_ + offset_.x)*1.0, (y_ + offset_.y)*1.0, height_ + offset_.z));
+    }
   }
 
   void init(Drawable drawable)
@@ -156,6 +183,13 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
 
   void update(GameArea area)
   {
+    z_accel_ -= 0.01;
+    if (z_accel_ < gravity)
+    {
+      z_accel_ = gravity;
+    }
+    height_ += z_accel_;
+    move(x_, y_);
     if (cur_state_ != null)
     {
       cur_state_.update(area);

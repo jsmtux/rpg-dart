@@ -16,6 +16,6 @@ class Camera
   {
     cam_mat.setIdentity();
     cam_mat.rotate(new Vector3(-1.0,0.0,0.0), radians(45.0));
-    cam_mat.translate(3.0 + vec.x, 10.0 + vec.y, -10.0);
+    cam_mat.translate(vec.x, 12.0 + vec.y, -15.0);
   }
 }

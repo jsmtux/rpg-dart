@@ -25,6 +25,10 @@ class PCNormalState extends WalkingBehaviourState
   void update(GameArea area)
   {
     PCBehaviour element = element_;
+    if(element.keyboard_.isDown(Keyboard.C) && element.on_ground_)
+    {
+      element.z_accel_ = 0.15;
+    }
     if(element.keyboard_.isDown(Keyboard.SPACE))
     {
       element.attacking_state_.dir_ = dir_;
