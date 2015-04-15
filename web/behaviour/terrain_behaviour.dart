@@ -10,7 +10,7 @@ import '../game_area.dart';
 class TerrainBehaviour extends Behaviour
 {
   List<List<int>> heights_;
-  List<Vector2> obstacles_ = new List<Vector2>();
+  Map<Vector2, double> obstacles_ = new Map<Vector2, double>();
   List<Vector3> portal_positions_ = new List<Vector3>();
   Vector3 offset_;
   List<Portal> portals_ = new List<Portal>();
@@ -34,11 +34,11 @@ class TerrainBehaviour extends Behaviour
     }
   }
 
-  void addObstacle(Vector2 position)
+  void addObstacle(Vector2 position, double height)
   {
     int x = position.x.floor() - offset_.x.floor();
     int y = heights_[0].length - (position.y.floor() - offset_.y.floor());
-    obstacles_.add(new Vector2(x *1.0, y*1.0));
+    obstacles_[new Vector2(x *1.0, y*1.0)] = height;
   }
 
   Portal getPortal(Vector2 position)
@@ -66,16 +66,15 @@ class TerrainBehaviour extends Behaviour
     double height;
     if (x > 0 && y > 0 && heights_.length > x && heights_[y].length > y)
     {
-      bool obstacle_found = false;
+      double obstacle_height = 0.0;
 
-      for (Vector2 obstacle in obstacles_)
+      obstacles_.forEach((pos, height)
       {
-        if (obstacle.x == x && obstacle.y == y)
+        if (pos.x == x && pos.y == y)
         {
-          obstacle_found = true;
-          break;
+          obstacle_height = height;
         }
-      }
+      });
 
       height = heights_[x][y]*1.0;
 
@@ -124,11 +123,7 @@ class TerrainBehaviour extends Behaviour
           }
       }
 
-      height = height / 5.0 + offset_.z;
-      if (obstacle_found)
-      {
-        height += 1.0;
-      }
+      height = height / 5.0 + offset_.z + obstacle_height;
     }
 
     return height;

@@ -47,13 +47,14 @@ abstract class TerrainElementBehaviour extends Behaviour
 
 class Tile3dBehaviour extends TerrainElementBehaviour
 {
-  Tile3dBehaviour(double x, double y, TerrainBehaviour terrain) : super(x, y, terrain);
+  double height_;
+  Tile3dBehaviour(double x, double y, this.height_, TerrainBehaviour terrain) : super(x, y, terrain);
 
   void init(Drawable drawable)
   {
     super.init(drawable);
     drawable.setScale(1/3);
-    terrain_.addObstacle(new Vector2(x_, y_));
+    terrain_.addObstacle(new Vector2(x_, y_), height_);
   }
 
   void update(GameArea area)
@@ -131,16 +132,16 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
   void move(double x, double y)
   {
     Vector2 pos = new Vector2(x, y);
-    Portal p = terrain_.getPortal(pos);
-    if (p != null)
-    {
-      p.transport(terrain_, this);
-    }
     double height = terrain_.getHeight(pos);
 
     on_ground_ = false;
     if (height != null && height < (height_ + 0.5))
     {
+      Portal p = terrain_.getPortal(pos);
+      if (p != null)
+      {
+        p.transport(terrain_, this);
+      }
       x_ = x;
       y_ = y;
       if (rotation_ != null)

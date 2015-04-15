@@ -14,7 +14,7 @@ class SignBehaviour extends Tile3dBehaviour
   String text_;
   bool set_ = false;
 
-  SignBehaviour(double x, double y, TerrainBehaviour terrain, this.text_, this.text_output_) : super(x, y, terrain);
+  SignBehaviour(double x, double y, TerrainBehaviour terrain, this.text_, this.text_output_) : super(x, y, 1.0, terrain);
 
   void update(GameArea area)
   {
@@ -36,7 +36,7 @@ class SignBehaviour extends Tile3dBehaviour
         {
           if (pc.squareDistance(this) < 1.0)
           {
-            text_output_.setText("Sing has set text!");
+            text_output_.setText(text_);
             text_output_.setVisible(true);
             set_ = true;
           }

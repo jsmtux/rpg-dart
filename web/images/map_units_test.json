@@ -158,7 +158,15 @@
 	  		"type":"SignBehaviour",
 	  		"posx":33.0,
 	  		"posy":40.0,
-	  		"text":"sign text"
+	  		"text":"press space to attack and c to jump"
+		}
+	},
+	"sign_inside":{
+		"parent":"sign_entrance",
+		"behaviour":{
+			"posx":59.0,
+	  		"posy":36.0,
+			"text":"go up the stairs for next floor"
 		}
 	}
 }

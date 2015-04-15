@@ -29,6 +29,7 @@ class LevelData
 {
   List<SquareTerrain> terrain_list_;
   List<String> models_ = new List<String>();
+  List<double> model_heights_ = new List<double>();
   List<Vector3> model_info_ = new List<Vector3>();
   Map<String, Path> paths_ = new Map<String, Path>();
   List<List<int>> heights_;
@@ -37,7 +38,7 @@ class LevelData
 
   Map<String,BaseGeometry> models_geometry_ = new Map<String, BaseGeometry>();
 
-  LevelData(this.terrain_list_, this.models_, this.model_info_, this.heights_, this.paths_, this.portals_, this.offset_);
+  LevelData(this.terrain_list_, this.models_, this.model_heights_, this.model_info_, this.heights_, this.paths_, this.portals_, this.offset_);
 
   Future<TerrainBehaviour> AddToGameState(GameArea area, GameState state, SpriteLoader loader)
   {
@@ -104,14 +105,14 @@ class LevelData
 
   void processFinished(GameArea area, Completer completer, SpriteLoader loader, TerrainBehaviour behaviour_t)
   {
+    loader.addModels(models_geometry_);
     for (Vector3 info in model_info_)
     {
       double x = info.x + offset_.x;
       double y = info.y + offset_.y;
-      int z = info.z.floor();
-      loader.addModels(models_geometry_);
-      Drawable toAdd = loader.drawable_factory_.createTexturedDrawable(models_geometry_[models_[z]]);
-      area.addElement(toAdd , new Tile3dBehaviour(x, y, behaviour_t));
+      int model = info.z.floor();
+      Drawable toAdd = loader.drawable_factory_.createTexturedDrawable(models_geometry_[models_[model]]);
+      area.addElement(toAdd , new Tile3dBehaviour(x, y, model_heights_[model], behaviour_t));
     }
     completer.complete(behaviour_t);
   }
