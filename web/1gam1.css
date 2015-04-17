@@ -41,3 +41,18 @@
   font-size: 2em;
   text-align: center
 }
+
+#analog_control_base {
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:50px;
+  visibility: hidden;
+}
+
+#analog_control {
+  position:absolute;
+  width:15px;
+  top:17px;
+  left:17px;
+}

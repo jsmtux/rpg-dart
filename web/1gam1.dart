@@ -8,12 +8,17 @@ import 'drawable_factory.dart';
 import 'camera.dart';
 import 'sprite_importer.dart';
 import 'dialogue_box.dart';
+import 'input.dart';
 
 main() {
   CanvasElement canvas = querySelector("#game-element");
   DivElement div = querySelector("#game-area");
+  DivElement div_analog = querySelector('#analog_control_base');
   GameLoopHtml gameLoop = new GameLoopHtml(canvas);
   gameLoop.pointerLock.lockOnClick = false;
+  Input input;
+
+  input = new CombinedInput(canvas, div_analog, gameLoop.keyboard);
 
   DialogueBox dialogue = new DialogueBox(querySelector("#dialogue"));
 
@@ -24,12 +29,12 @@ main() {
 
   Camera cur_cam = new Camera(renderer.m_worldview_);
 
-  SpriteLoader loader = new SpriteLoader(drawable_factory, gameLoop, cur_cam, dialogue);
+  SpriteLoader loader = new SpriteLoader(drawable_factory, input, cur_cam, dialogue);
 
   draw_state.loadArea("first", "images/map_test.json", "images/map_units_test.json", loader)
     .then((bool ret)
         {
-          loader.gameLoop_.state = draw_state;
+          gameLoop.state = draw_state;
           draw_state.setVisible("first", true);
         });
   draw_state.loadArea("second", "images/map_test_2.json", null, loader);

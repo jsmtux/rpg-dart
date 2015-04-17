@@ -14,6 +14,7 @@ import 'game_area.dart';
 import 'geometry_data.dart';
 import "camera.dart";
 import "dialogue_box.dart";
+import 'input.dart';
 
 import 'behaviour/behaviour.dart';
 import 'behaviour/enemy_behaviour.dart';
@@ -67,7 +68,7 @@ class PCBehaviourDefinition implements BehaviourDefinition
 
   Behaviour getBehaviour(TerrainBehaviour terrain, GameArea area, SpriteLoader loader, GameState state)
   {
-    return new PCBehaviour(x_, y_, terrain, loader.gameLoop_.keyboard, loader.cur_cam_, state);
+    return new PCBehaviour(x_, y_, terrain, loader.input_, loader.cur_cam_, state);
   }
 }
 
@@ -87,12 +88,12 @@ class SignBehaviourDefinition implements BehaviourDefinition
 class SpriteLoader
 {
   DrawableFactory drawable_factory_;
-  GameLoopHtml gameLoop_;
+  Input input_;
   Camera cur_cam_;
   TextOutput text_output_;
   Map<String,BaseGeometry> models_geometry_ = new Map<String, BaseGeometry>();
 
-  SpriteLoader(this.drawable_factory_, this.gameLoop_, this.cur_cam_, this.text_output_);
+  SpriteLoader(this.drawable_factory_, this.input_, this.cur_cam_, this.text_output_);
 
   void AddToGameState(List<SpriteData> sprites_data, TerrainBehaviour terrain, GameArea area, GameState state)
   {

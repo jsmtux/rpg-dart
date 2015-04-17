@@ -1,11 +1,11 @@
 library pc_behaviour;
 
 import 'package:vector_math/vector_math.dart';
-import 'package:game_loop/game_loop_html.dart';
 
 import '../camera.dart';
 import '../game_state.dart';
 import '../game_area.dart';
+import '../input.dart';
 import 'behaviour.dart';
 import 'enemy_behaviour.dart';
 import 'terrain_behaviour.dart';
@@ -25,30 +25,18 @@ class PCNormalState extends WalkingBehaviourState
   void update(GameArea area)
   {
     PCBehaviour element = element_;
-    if(element.keyboard_.isDown(Keyboard.C) && element.on_ground_)
+    if(element.input_.isDown(Input.JUMP) && element.on_ground_)
     {
       element.z_accel_ = 0.15;
     }
-    if(element.keyboard_.isDown(Keyboard.SPACE))
+    if(element.input_.isDown(Input.ATTACK))
     {
       element.attacking_state_.dir_ = dir_;
       element.setState(element.attacking_state_);
     }
-    else if(element.keyboard_.isDown(Keyboard.UP))
+    else if(element.input_.getAxis(Input.X) != 0 || element.input_.getAxis(Input.Y) != 0 )
     {
-      walk(Directions.UP);
-    }
-    else if(element.keyboard_.isDown(Keyboard.DOWN))
-    {
-      walk(Directions.DOWN);
-    }
-    else if(element.keyboard_.isDown(Keyboard.LEFT))
-    {
-      walk(Directions.LEFT);
-    }
-    else if(element.keyboard_.isDown(Keyboard.RIGHT))
-    {
-      walk(Directions.RIGHT);
+      walkDir(new Vector2(element.input_.getAxis(Input.X), element.input_.getAxis(Input.Y)));
     }
     else
     {
@@ -146,7 +134,7 @@ class PCBehaviour extends SpriteBehaviour
 {
   bool attacking_ = false;
   bool attack_pressed = false;
-  Keyboard keyboard_;
+  Input input_;
   Camera camera_;
   bool dead_ = false;
   GameState state_;
@@ -155,7 +143,7 @@ class PCBehaviour extends SpriteBehaviour
   PCAttackingState attacking_state_;
   PCDeadState dead_state_;
 
-  PCBehaviour(double x, double y, TerrainBehaviour terrain, this.keyboard_, this.camera_, this.state_) : super(x, y, terrain)
+  PCBehaviour(double x, double y, TerrainBehaviour terrain, this.input_, this.camera_, this.state_) : super(x, y, terrain)
   {
     normal_state_ = new PCNormalState(this);
     attacking_state_ = new PCAttackingState(this);

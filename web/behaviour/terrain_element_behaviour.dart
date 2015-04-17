@@ -86,25 +86,68 @@ abstract class WalkingBehaviourState extends BehaviourState
 
   WalkingBehaviourState(SpriteBehaviour element, this.vel_) : super (element);
 
+  void walkDir(Vector2 dir)
+  {
+    double angle = math.atan2(dir.y, dir.x) - math.PI / 4;
+    if(angle < 0)
+    {
+      angle += 2*math.PI;
+    }
+    Vector2 movement = dir.normalized() * vel_;
+    element_.move(element_.x_ + movement.y, element_.y_ - movement.x);
+    if (angle < math.PI / 2)
+    {
+      look(Directions.RIGHT);
+    }
+    else if (angle < math.PI)
+    {
+      look(Directions.UP);
+    }
+    else if (angle < 3 * math.PI / 2)
+    {
+      look(Directions.LEFT);
+    }
+    else
+    {
+      look(Directions.DOWN);
+    }
+  }
+
   void walk(Directions dir)
+  {
+    look(dir);
+    switch(dir)
+    {
+      case Directions.UP:
+        element_.move(element_.x_, element_.y_+ vel_);
+        break;
+      case Directions.DOWN:
+        element_.move(element_.x_, element_.y_- vel_);
+        break;
+      case Directions.LEFT:
+        element_.move(element_.x_- vel_, element_.y_);
+        break;
+      case Directions.RIGHT:
+        element_.move(element_.x_+ vel_, element_.y_);
+        break;
+    }
+  }
+
+  void look(Directions dir)
   {
     dir_ = dir;
     switch(dir)
     {
       case Directions.UP:
-        element_.move(element_.x_, element_.y_+ vel_);
         element_.anim_drawable_.SetSequence("walk_t");
         break;
       case Directions.DOWN:
-        element_.move(element_.x_, element_.y_- vel_);
         element_.anim_drawable_.SetSequence("walk_b");
         break;
       case Directions.LEFT:
-        element_.move(element_.x_- vel_, element_.y_);
         element_.anim_drawable_.SetSequence("walk_l");
         break;
       case Directions.RIGHT:
-        element_.move(element_.x_+ vel_, element_.y_);
         element_.anim_drawable_.SetSequence("walk_r");
         break;
     }
