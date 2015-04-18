@@ -51,10 +51,6 @@ class KeyboardInput implements Input
       {
         ret = 1.0;
       }
-      if(keyboard_.isDown(Keyboard.LEFT) || keyboard_.isDown(Keyboard.RIGHT))
-      {
-        ret *= 0.55;
-      }
     }
     else if(axis == Input.Y)
     {
@@ -65,10 +61,6 @@ class KeyboardInput implements Input
       else if (keyboard_.isDown(Keyboard.LEFT))
       {
         ret = -1.0;
-      }
-      if(keyboard_.isDown(Keyboard.UP) || keyboard_.isDown(Keyboard.DOWN))
-      {
-        ret *= 0.4;
       }
     }
     return ret;

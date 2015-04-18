@@ -1,132 +1,53 @@
 library pc_behaviour;
 
+import 'dart:math' as math;
+
 import 'package:vector_math/vector_math.dart';
 
 import '../camera.dart';
 import '../game_state.dart';
 import '../game_area.dart';
 import '../input.dart';
-import 'behaviour.dart';
-import 'enemy_behaviour.dart';
-import 'terrain_behaviour.dart';
-import 'directions.dart';
+import '../geometry_data.dart';
+import '../base_geometry.dart';
+import '../drawable_factory.dart';
+import 'laser_behaviour.dart';
 import 'terrain_element_behaviour.dart';
 
-class PCNormalState extends WalkingBehaviourState
+class PCNormalState extends DrivingBehaviourState
 {
-  PCNormalState(SpriteBehaviour element) : super(element, 0.05);
+  int last_shot_ = 0;
+  TexturedGeometry laser_geom_ = new TexturedGeometry(quad_vertices, quad_indices, quad_coords, "images/laser.png");
+  int cadence_ = 100;
+  PCNormalState(SpriteBehaviour element) : super(element, 0.01, 0.15);
 
   void hit(SpriteBehaviour sprite)
   {
-    PCBehaviour element = element_;
-    element.setState(element.dead_state_);
   }
 
-  void update(GameArea area)
+  void update()
   {
     PCBehaviour element = element_;
+    Quaternion rot = new Quaternion.axisAngle(new Vector3(0.0, 0.0, 1.0), angle_);
+
+    element.drawable_.setRotation(rot);
     if(element.input_.isDown(Input.JUMP) && element.on_ground_)
     {
       element.z_accel_ = 0.15;
     }
     if(element.input_.isDown(Input.ATTACK))
     {
-      element.attacking_state_.dir_ = dir_;
-      element.setState(element.attacking_state_);
-    }
-    else if(element.input_.getAxis(Input.X) != 0 || element.input_.getAxis(Input.Y) != 0 )
-    {
-      walkDir(new Vector2(element.input_.getAxis(Input.X), element.input_.getAxis(Input.Y)));
-    }
-    else
-    {
-      switch(dir_)
+      int difference = (new DateTime.now()).millisecondsSinceEpoch - last_shot_;
+      if(difference > cadence_)
       {
-        case Directions.UP:
-          element.anim_drawable_.SetSequence("stand_t");
-          break;
-        case Directions.LEFT:
-          element.anim_drawable_.SetSequence("stand_l");
-          break;
-        case Directions.DOWN:
-          element.anim_drawable_.SetSequence("stand_b");
-          break;
-        case Directions.RIGHT:
-          element.anim_drawable_.SetSequence("stand_r");
-          break;
+        element.area_.addElement(element.drawable_factory_.createTexturedDrawable(laser_geom_)
+            , new LaserBehaviour(0.2, angle_, element.height_ + 0.3, element.x_ + 0.1 * math.cos(angle_) + 0.7 * math.sin(-angle_)
+                , element.y_ +0.1 * math.sin(angle_) + 0.7 * math.cos(-angle_), element.area_));
+        last_shot_ = (new DateTime.now()).millisecondsSinceEpoch;
       }
     }
-
-    element.camera_.SetPos(new Vector2(-element.x_, -element.y_));
-  }
-}
-
-class PCAttackingState extends WalkingBehaviourState
-{
-  PCAttackingState(SpriteBehaviour element) : super(element, 0.0);
-
-  void begin()
-  {
-    PCBehaviour this_element = element_;
-    switch(dir_)
-    {
-      case Directions.UP:
-        this_element.anim_drawable_.SetSequence("stab_t");
-        break;
-      case Directions.LEFT:
-        this_element.anim_drawable_.SetSequence("stab_l");
-        break;
-      case Directions.DOWN:
-        this_element.anim_drawable_.SetSequence("stab_b");
-        break;
-      case Directions.RIGHT:
-        this_element.anim_drawable_.SetSequence("stab_r");
-        break;
-    }
-  }
-
-  void hit(SpriteBehaviour sprite)
-  {
-    PCBehaviour element = element_;
-    element.setState(element.dead_state_);
-  }
-
-  void update(GameArea area)
-  {
-    PCBehaviour this_element = element_;
-    for (Behaviour behaviour in area.behaviours_)
-    {
-      if (behaviour is EnemyBehaviour)
-      {
-        EnemyBehaviour enemy = behaviour;
-        if (enemy.squareDistance(this_element) < 1.0)
-        {
-          enemy.hit(this_element);
-        }
-      }
-    }
-    if (this_element.anim_drawable_.current_sequence_ == null)
-    {
-      this_element.setState(this_element.normal_state_);
-    }
-  }
-}
-
-class PCDeadState extends BehaviourState
-{
-  PCDeadState(SpriteBehaviour element) : super(element);
-
-  void begin()
-  {
-    PCBehaviour element = element_;
-    element.anim_drawable_.SetSequence("die", 1);
-  }
-
-  void hit(SpriteBehaviour sprite)
-  {
-  }
-  void update(GameArea area)
-  {
+    driveDir(new Vector2(element.input_.getAxis(Input.X), element.input_.getAxis(Input.Y)));
+    element.camera_.SetPos(new Vector2(-element.x_, -element.y_), -angle_);
   }
 }
 
@@ -138,16 +59,13 @@ class PCBehaviour extends SpriteBehaviour
   Camera camera_;
   bool dead_ = false;
   GameState state_;
+  DrawableFactory drawable_factory_;
 
   PCNormalState normal_state_;
-  PCAttackingState attacking_state_;
-  PCDeadState dead_state_;
 
-  PCBehaviour(double x, double y, TerrainBehaviour terrain, this.input_, this.camera_, this.state_) : super(x, y, terrain)
+  PCBehaviour(double x, double y, this.drawable_factory_, GameArea area, this.input_, this.camera_, this.state_) : super(x, y, area)
   {
     normal_state_ = new PCNormalState(this);
-    attacking_state_ = new PCAttackingState(this);
-    dead_state_ = new PCDeadState(this);
     cur_state_ = normal_state_;
   }
 }

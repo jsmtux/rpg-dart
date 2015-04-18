@@ -20,7 +20,7 @@ class SquareTerrain
   BaseGeometry calculateBaseGeometry(double height)
   {
     TexturedGeometry ret = new TexturedGeometry(new List<double>(), new List<int>(), new List<double>(), this.image_);
-    int bleeding_correction_factor = 512;
+    int bleeding_correction_factor = 128;
     double bleeding_correction = 1/bleeding_correction_factor;
     int num_images_root = math.sqrt(num_images_).floor();
     Vector2 tex_size = new Vector2(1/num_images_root - bleeding_correction, 1/num_images_root - bleeding_correction);

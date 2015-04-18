@@ -21,7 +21,7 @@ class TerrainBehaviour extends Behaviour
   {
   }
 
-  void update(GameArea area)
+  void update()
   {
   }
 

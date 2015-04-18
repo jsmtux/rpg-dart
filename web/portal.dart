@@ -23,7 +23,7 @@ class Portal
     }
     else
     {
-      element.terrain_ = area.terrain_;
+      element.area_ = area;
       state_.setVisible(map_name_, true);
       for (String area in areas_hide_)
       {
