@@ -15,6 +15,7 @@ abstract class Drawable
   bool isTransparent();
   void setTransparent(bool val);
   void setPosition(Vector3 pos);
+  void move(Vector3 amount);
   void setScale(double scale);
   void setRotation(Quaternion rot);
   void Rotate(Quaternion rot);
@@ -95,6 +96,11 @@ class BaseDrawable implements Drawable
   void setPosition(Vector3 pos)
   {
     position_ = pos;
+  }
+
+  void move(Vector3 amount)
+  {
+    position_ += amount;
   }
 }
 

@@ -66,9 +66,9 @@ class LevelImporter extends AsyncImporter<LevelData>
     return ret_tileset;
   }
 
-  List<Vector3> readModelData( List layers, List<Tileset> parsed_tilesets, Vector2 size, List<String> model_paths, List<double> model_heights)
+  List<ModelInstance> readModelData(List<ModelDescription> model_descriptions, List layers, List<Tileset> parsed_tilesets, Vector2 size)
   {
-    List<Vector3> model_data = new List<Vector3>();
+    List<ModelInstance> model_data = new List<ModelInstance>();
 
     for (Map layer in layers)
     {
@@ -82,13 +82,17 @@ class LevelImporter extends AsyncImporter<LevelData>
         {
           for (int i = 0; i < current_tileset.properties.length; i++)
           {
-            model_paths.add(current_tileset.properties["${i}"]["name"]);
-            double height = 1.0;
+            ModelDescription toAdd = new ModelDescription();
+            toAdd.path_ = (current_tileset.properties["${i}"]["name"]);
             if(current_tileset.properties["${i}"].containsKey("height"))
             {
-              height = double.parse(current_tileset.properties["${i}"]["height"]);
+              toAdd.height_ = double.parse(current_tileset.properties["${i}"]["height"]);
             }
-            model_heights.add(height);
+            if(current_tileset.properties["${i}"].containsKey("rotation"))
+            {
+              toAdd.rotation_ = int.parse(current_tileset.properties["${i}"]["rotation"]);
+            }
+            model_descriptions.add(toAdd);
           }
 
           for (int i = 0; i < size.x; i++)
@@ -98,8 +102,10 @@ class LevelImporter extends AsyncImporter<LevelData>
               int texture = data[(i + j*size.x).floor()] - current_tileset.first_gid;
               if (texture >= 0)
               {
-                Vector3 cur_model = new Vector3(i*1.0,size.y - j*1.0, texture*1.0);
-                model_data.add(cur_model);
+                ModelInstance model = new ModelInstance();
+                model.position_ = new Vector2(i*1.0,size.y - j*1.0);
+                model.description_ = model_descriptions[texture];
+                model_data.add(model);
               }
             }
           }
@@ -109,6 +115,50 @@ class LevelImporter extends AsyncImporter<LevelData>
 
     return model_data;
   }
+
+  List<BehaviourDescription> readBehaviourData(List layers, List<Tileset> parsed_tilesets, Vector2 size)
+  {
+    List<BehaviourDescription> ret = new List<BehaviourDescription>();
+    for (Map layer in layers)
+    {
+      if (layer.containsKey("data"))
+      {
+        List<int> data = layer["data"];
+        List<String> behaviour_names = new List<String>();
+        List<String> model_paths = new List<String>();
+
+        Tileset current_tileset = getTileset(parsed_tilesets, layer);
+
+        if (current_tileset.name == "behaviours_layer")
+        {
+          for (int i = 0; i < current_tileset.properties.length; i++)
+          {
+            String new_name = current_tileset.properties["${i}"]["type"];
+            String model_path = current_tileset.properties["${i}"]["path"];
+            behaviour_names.add(new_name);
+            model_paths.add(model_path);
+          }
+          for (int i = 0; i < size.x; i++)
+          {
+            for (int j = 0; j < size.y; j++)
+            {
+              int id = data[(i + j*size.x).floor()] - current_tileset.first_gid;
+              if (id >= 0)
+              {
+                BehaviourDescription desc = new BehaviourDescription();
+                desc.position_ = new Vector2(i*1.0, size.y - j*1.0);
+                desc.model_path_ = model_paths[id];
+                desc.behaviour_type_ = behaviour_names[id];
+                ret.add(desc);
+              }
+            }
+          }
+        }
+      }
+    }
+    return ret;
+  }
+
 
   List<List<int>> readHeightData(List layers, List<Tileset> parsed_tilesets, Vector2 size)
   {
@@ -215,10 +265,10 @@ class LevelImporter extends AsyncImporter<LevelData>
 
     List layers = jsonData["layers"];
 
+    List<ModelDescription> model_descriptions = new List<ModelDescription>();
+    List<ModelInstance> models = readModelData(model_descriptions, layers, parsed_tilesets, size);
 
-    List<String> model_paths = new List<String>();
-    List<double> model_heights = new List<double>();
-    List<Vector3> model_data = readModelData(layers, parsed_tilesets, size, model_paths, model_heights);
+    List<BehaviourDescription> behaviours = readBehaviourData(layers, parsed_tilesets, size);
 
     List<List<int>> heights = readHeightData(layers, parsed_tilesets, size);
 
@@ -294,6 +344,6 @@ class LevelImporter extends AsyncImporter<LevelData>
       }
     }
 
-    return new LevelData(ret_terrain, model_paths, model_heights, model_data, heights, paths, portals, offset);
+    return new LevelData(ret_terrain, models, model_descriptions, behaviours, heights, paths, portals, offset);
   }
 }

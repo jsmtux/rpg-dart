@@ -1,5 +1,7 @@
 library pc_behaviour;
 
+import 'dart:math' as math;
+
 import 'package:vector_math/vector_math.dart';
 
 import '../camera.dart';
@@ -22,7 +24,7 @@ class PCNormalState extends WalkingBehaviourState
     element.setState(element.dead_state_);
   }
 
-  void update(GameArea area)
+  void update()
   {
     PCBehaviour element = element_;
     if(element.input_.isDown(Input.JUMP) && element.on_ground_)
@@ -91,10 +93,10 @@ class PCAttackingState extends WalkingBehaviourState
     element.setState(element.dead_state_);
   }
 
-  void update(GameArea area)
+  void update()
   {
     PCBehaviour this_element = element_;
-    for (Behaviour behaviour in area.behaviours_)
+    for (Behaviour behaviour in element_.area_.behaviours_)
     {
       if (behaviour is EnemyBehaviour)
       {
@@ -125,7 +127,7 @@ class PCDeadState extends BehaviourState
   void hit(SpriteBehaviour sprite)
   {
   }
-  void update(GameArea area)
+  void update()
   {
   }
 }
@@ -143,7 +145,7 @@ class PCBehaviour extends SpriteBehaviour
   PCAttackingState attacking_state_;
   PCDeadState dead_state_;
 
-  PCBehaviour(double x, double y, TerrainBehaviour terrain, this.input_, this.camera_, this.state_) : super(x, y, terrain)
+  PCBehaviour(double x, double y, GameArea area, this.input_, this.camera_, this.state_) : super(x, y, area)
   {
     normal_state_ = new PCNormalState(this);
     attacking_state_ = new PCAttackingState(this);

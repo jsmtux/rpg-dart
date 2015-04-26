@@ -4,7 +4,6 @@ import '../game_area.dart';
 import 'path_follower.dart';
 import '../path.dart';
 import 'behaviour.dart';
-import 'terrain_behaviour.dart';
 import 'terrain_element_behaviour.dart';
 import 'pc_behaviour.dart';
 import 'directions.dart';
@@ -24,11 +23,11 @@ class EnemyNormalState extends WalkingBehaviourState
     element_.setState(element.dead_state_);
   }
 
-  void update(GameArea area)
+  void update()
   {
     bool walking = true;
     EnemyBehaviour this_element = element_;
-    for (Behaviour behaviour in area.behaviours_)
+    for (Behaviour behaviour in element_.area_.behaviours_)
     {
       if (behaviour is PCBehaviour)
       {
@@ -87,7 +86,7 @@ class EnemyDeadState extends BehaviourState
   {
   }
 
-  void update(GameArea area)
+  void update()
   {
   }
 }
@@ -98,8 +97,8 @@ class EnemyBehaviour extends SpriteBehaviour
   EnemyDeadState dead_state_;
   EnemyNormalState normal_state_;
 
-  EnemyBehaviour(TerrainBehaviour terrain, Path path)
-    : super(path.points[0].x.floorToDouble(), path.points[0].y.floorToDouble(), terrain)
+  EnemyBehaviour(GameArea area, Path path)
+    : super(path.points[0].x.floorToDouble(), path.points[0].y.floorToDouble(), area)
   {
     dead_state_ = new EnemyDeadState(this);
     normal_state_ = new EnemyNormalState(this, path);

@@ -2,8 +2,6 @@ library sprite_importer;
 
 import "dart:convert";
 
-import 'package:game_loop/game_loop_html.dart';
-
 import "drawable.dart";
 import "async_importer.dart";
 import "base_geometry.dart";
@@ -17,10 +15,10 @@ import "dialogue_box.dart";
 import 'input.dart';
 
 import 'behaviour/behaviour.dart';
-import 'behaviour/enemy_behaviour.dart';
 import 'behaviour/pc_behaviour.dart';
 import 'behaviour/terrain_behaviour.dart';
 import 'behaviour/sign_behaviour.dart';
+import 'behaviour/enemy_behaviour.dart';
 
 class SpriteData
 {
@@ -40,13 +38,13 @@ class SpriteData
     {
       drawable = loader.drawable_factory_.createTexturedDrawable(geom_);
     }
-    area.addElement(drawable , behaviour_.getBehaviour(terrain, area, loader, state));
+    area.addElement(drawable , behaviour_.getBehaviour(area, loader, state));
   }
 }
 
 abstract class BehaviourDefinition
 {
-  Behaviour getBehaviour(TerrainBehaviour terrain, GameArea area, SpriteLoader loader, GameState state);
+  Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state);
 }
 
 class EnemyBehaviourDefinition implements BehaviourDefinition
@@ -54,9 +52,9 @@ class EnemyBehaviourDefinition implements BehaviourDefinition
   String path_name_;
   EnemyBehaviourDefinition(this.path_name_);
 
-  Behaviour getBehaviour(TerrainBehaviour terrain, GameArea area, SpriteLoader loader, GameState state)
+  Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state)
   {
-    return new EnemyBehaviour(terrain, area.paths_[path_name_]);
+    return new EnemyBehaviour(area, area.paths_[path_name_]);
   }
 }
 
@@ -66,9 +64,9 @@ class PCBehaviourDefinition implements BehaviourDefinition
 
   PCBehaviourDefinition(this.x_, this.y_);
 
-  Behaviour getBehaviour(TerrainBehaviour terrain, GameArea area, SpriteLoader loader, GameState state)
+  Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state)
   {
-    return new PCBehaviour(x_, y_, terrain, loader.input_, loader.cur_cam_, state);
+    return new PCBehaviour(x_, y_, area, loader.input_, loader.cur_cam_, state);
   }
 }
 
@@ -79,9 +77,9 @@ class SignBehaviourDefinition implements BehaviourDefinition
 
   SignBehaviourDefinition(this.text_, this.x_, this.y_);
 
-  Behaviour getBehaviour(TerrainBehaviour terrain, GameArea area, SpriteLoader loader, GameState state)
+  Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state)
   {
-    return new SignBehaviour(x_, y_, terrain, text_, loader.text_output_);
+    return new SignBehaviour(x_, y_, area, text_, loader.text_output_);
   }
 }
 

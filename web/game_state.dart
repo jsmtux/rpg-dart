@@ -51,10 +51,7 @@ class GameState extends SimpleHtmlState
   {
     areas_.forEach((k, area)
     {
-      for (Behaviour behaviour in area.behaviours_)
-      {
-        behaviour.update(area);
-      }
+      area.updateBehaviour();
     });
   }
 

@@ -1,12 +1,12 @@
 library level_data;
 
 import 'dart:async';
+import 'dart:math' as Math;
 
 import 'package:vector_math/vector_math.dart';
 
 import "square_terrain.dart";
 import 'game_area.dart';
-import 'drawable_factory.dart';
 import 'base_geometry.dart';
 import 'drawable.dart';
 import 'model_importer.dart';
@@ -25,20 +25,43 @@ class PortalDescription
   List<String> map_show_ = new List<String>();
 }
 
+class ModelDescription
+{
+  String path_;
+  int rotation_ = 0;
+  double height_ = 1.0;
+}
+
+class ModelInstance
+{
+  ModelDescription description_;
+  Vector2 position_;
+}
+
+class BehaviourDescription
+{
+  Vector2 position_;
+  String model_path_;
+  String behaviour_type_;
+}
+
+
 class LevelData
 {
   List<SquareTerrain> terrain_list_;
-  List<String> models_ = new List<String>();
-  List<double> model_heights_ = new List<double>();
-  List<Vector3> model_info_ = new List<Vector3>();
+  List<ModelInstance> models_ = new List<ModelInstance>();
+  List<ModelDescription> model_descriptions_ = new List<ModelDescription>();
   Map<String, Path> paths_ = new Map<String, Path>();
   List<List<int>> heights_;
   Vector3 offset_;
+  List<BehaviourDescription> behaviour_descriptions_;
   List<PortalDescription> portals_;
+  List<String> requested_models_ = new List<String>();
 
   Map<String,BaseGeometry> models_geometry_ = new Map<String, BaseGeometry>();
 
-  LevelData(this.terrain_list_, this.models_, this.model_heights_, this.model_info_, this.heights_, this.paths_, this.portals_, this.offset_);
+  LevelData(this.terrain_list_, this.models_, this.model_descriptions_, this.behaviour_descriptions_,
+      this.heights_, this.paths_, this.portals_, this.offset_);
 
   Future<TerrainBehaviour> AddToGameState(GameArea area, GameState state, SpriteLoader loader)
   {
@@ -81,9 +104,17 @@ class LevelData
     if (models_ != null)
     {
       ModelImporter importer = new ModelImporter();
-      for (String path in models_)
+      for (ModelDescription model_desc in model_descriptions_)
       {
-        importer.RequestFile(path).then((List<BaseGeometry> model) => checkFinished(area, model, path, completer, loader, behaviour_t));
+        if (!models_geometry_.containsKey(model_desc.path_) && !requested_models_.contains(model_desc.path_))
+        {
+          requested_models_.add(model_desc.path_);
+          importer.RequestFile(model_desc.path_)
+            .then((List<BaseGeometry> model)
+                => checkFinished(area, model, model_desc.path_, completer, loader, behaviour_t));
+        }else{
+          checkFinished(area, null, null, completer, loader, behaviour_t);
+        }
       }
     }
     else
@@ -96,8 +127,12 @@ class LevelData
 
   void checkFinished(GameArea area, List<BaseGeometry> model, String path, Completer completer, SpriteLoader loader, TerrainBehaviour behaviour_t)
   {
-    models_geometry_[path] = model[0];
-    if (models_.length == models_geometry_.length)
+    if(path != null)
+    {
+      requested_models_.remove(path);
+      models_geometry_[path] = model[0];
+    }
+    if (requested_models_.length == 0)
     {
       processFinished(area, completer, loader, behaviour_t);
     }
@@ -106,13 +141,29 @@ class LevelData
   void processFinished(GameArea area, Completer completer, SpriteLoader loader, TerrainBehaviour behaviour_t)
   {
     loader.addModels(models_geometry_);
-    for (Vector3 info in model_info_)
+    for (ModelInstance info in models_)
     {
-      double x = info.x + offset_.x;
-      double y = info.y + offset_.y;
-      int model = info.z.floor();
-      Drawable toAdd = loader.drawable_factory_.createTexturedDrawable(models_geometry_[models_[model]]);
-      area.addElement(toAdd , new Tile3dBehaviour(x, y, model_heights_[model], behaviour_t));
+      double x = info.position_.x + offset_.x;
+      double y = info.position_.y + offset_.y;
+      Drawable toAdd = loader.drawable_factory_.createTexturedDrawable(models_geometry_[info.description_.path_]);
+      Quaternion rot = new Quaternion.axisAngle(new Vector3(0.0, 0.0, 1.0 ), info.description_.rotation_ * Math.PI / 180);
+      toAdd.Rotate(rot);
+      area.addElement(toAdd , new Tile3dBehaviour(x, y, info.description_.height_, area));
+    }
+    SpriteImporter sprite_importer = new SpriteImporter(loader);
+    for(BehaviourDescription desc in behaviour_descriptions_)
+    {
+      Map drawable_spec = new Map();
+      drawable_spec["type"] = "model";
+      drawable_spec["path"] = desc.model_path_;
+      Map behaviour_spec = new Map();
+      behaviour_spec["type"] = desc.behaviour_type_;
+      behaviour_spec["posx"] = desc.position_.x;
+      behaviour_spec["posy"] = desc.position_.y;
+      SpriteData data = new SpriteData();
+      sprite_importer.processBehaviour(behaviour_spec, data);
+      sprite_importer.processDrawable(drawable_spec, data);
+      data.AddToGameState(loader, area.terrain_, area, null);
     }
     completer.complete(behaviour_t);
   }
