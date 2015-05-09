@@ -1,7 +1,5 @@
 library pc_behaviour;
 
-import 'dart:math' as math;
-
 import 'package:vector_math/vector_math.dart';
 
 import '../camera.dart';
@@ -10,7 +8,6 @@ import '../game_area.dart';
 import '../input.dart';
 import 'behaviour.dart';
 import 'enemy_behaviour.dart';
-import 'terrain_behaviour.dart';
 import 'directions.dart';
 import 'terrain_element_behaviour.dart';
 

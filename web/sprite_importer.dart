@@ -2,6 +2,8 @@ library sprite_importer;
 
 import "dart:convert";
 
+import 'package:vector_math/vector_math.dart';
+
 import "drawable.dart";
 import "async_importer.dart";
 import "base_geometry.dart";
@@ -19,6 +21,7 @@ import 'behaviour/pc_behaviour.dart';
 import 'behaviour/terrain_behaviour.dart';
 import 'behaviour/sign_behaviour.dart';
 import 'behaviour/enemy_behaviour.dart';
+import 'behaviour/guard_behaviour.dart';
 
 class SpriteData
 {
@@ -55,6 +58,18 @@ class EnemyBehaviourDefinition implements BehaviourDefinition
   Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state)
   {
     return new EnemyBehaviour(area, area.paths_[path_name_]);
+  }
+}
+
+class GuardBehaviourDefinition implements BehaviourDefinition
+{
+  String path_name_;
+  double x_, y_;
+  GuardBehaviourDefinition(this.x_, this.y_);
+
+  Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state)
+  {
+    return new GuardBehaviour(area, new Vector2(x_, y_), loader.text_output_);
   }
 }
 
@@ -155,6 +170,9 @@ class SpriteImporter extends AsyncImporter<List<SpriteData>>
         break;
       case "SignBehaviour":
         res.behaviour_ = new SignBehaviourDefinition(behaviour_spec["text"], behaviour_spec["posx"], behaviour_spec["posy"]);
+        break;
+      case "GuardBehaviour":
+        res.behaviour_ = new GuardBehaviourDefinition(behaviour_spec["posx"], behaviour_spec["posy"]);
         break;
     }
   }

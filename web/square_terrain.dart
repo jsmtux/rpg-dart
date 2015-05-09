@@ -102,6 +102,8 @@ class SquareTerrain
         ret.indices_.add(id);
       }
     }
+    int ind_len = ret.indices_.length;
+    print("index lenth is $ind_len");
 
     return ret;
   }

@@ -31,13 +31,13 @@ main() {
 
   SpriteLoader loader = new SpriteLoader(drawable_factory, input, cur_cam, dialogue);
 
-  draw_state.loadArea("first", "images/map_test.json", "images/map_units_test.json", loader)
+  draw_state.loadArea("first", "images/castle_village_test.json", "images/map_units_village.json", loader)
     .then((bool ret)
         {
           gameLoop.state = draw_state;
           draw_state.setVisible("first", true);
         });
-  draw_state.loadArea("second", "images/map_test_2.json", null, loader);
+  //draw_state.loadArea("second", "images/map_test_2.json", null, loader);
 
   gameLoop.start();
 }

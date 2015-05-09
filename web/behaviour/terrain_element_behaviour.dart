@@ -29,6 +29,10 @@ abstract class TerrainElementBehaviour extends Behaviour
   {
     Vector2 pos = new Vector2(x, y);
     double height = area_.terrain_.getHeight(pos);
+    if (height == null)
+    {
+      height = 0.0;
+    }
     drawable_.setPosition(new Vector3((x_ + offset_.x)*1.0, (y_ + offset_.y)*1.0, height + offset_.z));
   }
 
@@ -52,8 +56,6 @@ class Tile3dBehaviour extends TerrainElementBehaviour
   void init(Drawable drawable)
   {
     super.init(drawable);
-    drawable.setScale(1/3);
-    drawable.move(new Vector3(0.5, 0.5, 0.0));
     area_.terrain_.addObstacle(new Vector2(x_, y_), height_);
   }
 

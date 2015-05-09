@@ -143,11 +143,12 @@ class LevelData
     loader.addModels(models_geometry_);
     for (ModelInstance info in models_)
     {
-      double x = info.position_.x + offset_.x;
-      double y = info.position_.y + offset_.y;
+      double x = info.position_.x + offset_.x + 0.5;
+      double y = info.position_.y + offset_.y + 0.5;
       Drawable toAdd = loader.drawable_factory_.createTexturedDrawable(models_geometry_[info.description_.path_]);
       Quaternion rot = new Quaternion.axisAngle(new Vector3(0.0, 0.0, 1.0 ), info.description_.rotation_ * Math.PI / 180);
       toAdd.Rotate(rot);
+      toAdd.setScale(1/3);
       area.addElement(toAdd , new Tile3dBehaviour(x, y, info.description_.height_, area));
     }
     SpriteImporter sprite_importer = new SpriteImporter(loader);
