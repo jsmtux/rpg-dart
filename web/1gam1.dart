@@ -37,7 +37,8 @@ main() {
           gameLoop.state = draw_state;
           draw_state.setVisible("first", true);
         });
-  //draw_state.loadArea("second", "images/map_test_2.json", null, loader);
+  draw_state.loadArea("second", "images/roof1.json", null, loader);
+  draw_state.setVisible("second", true);
 
   gameLoop.start();
 }

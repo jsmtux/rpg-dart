@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="15" tilewidth="16" tileheight="16" nextobjectid="1">
+ <properties>
+  <property name="xoffset" value="44"/>
+  <property name="yoffset" value="51"/>
+  <property name="zoffset" value="2"/>
+ </properties>
+ <tileset firstgid="1" name="terrain" tilewidth="16" tileheight="16">
+  <image source="../web/images/terrain_atlas.png" width="1024" height="1024"/>
+ </tileset>
+ <tileset firstgid="4097" source="heights_layer.tsx"/>
+ <layer name="Tile Layer 1" width="15" height="15">
+  <data encoding="base64" compression="zlib">
+   eJzt0jsOgCAQRVFcBiLuSxH25XdfftfiLckUSKKlk5y8hjdQoNS70ShhUCXSohbdBi0cukR6BNHtMWDElMgZi+iu2LDjSOSJ67/383tzurrgX8GgijLnzQ3nWjh0UcpdFnWhskbu8giZ3ae5Ad2fVTo=
+  </data>
+ </layer>
+ <layer name="Tile Layer 2" width="15" height="15">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAMMAqQhtH1CgAxHwHMj0MvLxAzE8C8o3qHrF5+LGmBWL3YMLpZAlj04gLEpGdyAQCELgxV
+  </data>
+ </layer>
+</map>

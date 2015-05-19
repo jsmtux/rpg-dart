@@ -7,7 +7,6 @@ import 'package:game_loop/game_loop_html.dart';
 
 import 'drawable.dart';
 import 'renderer.dart';
-import 'behaviour/behaviour.dart';
 import 'sprite_importer.dart';
 import 'game_area.dart';
 
@@ -31,10 +30,17 @@ class GameState extends SimpleHtmlState
   void setVisible(String areaName, bool visible)
   {
     GameArea area = areas_[areaName];
-    visible_areas_.remove(area);
-    if (visible)
+    bool already_visible = visible_areas_.contains(area);
+    if (already_visible && !visible || !already_visible && visible)
     {
-      visible_areas_.add(area);
+      visible_areas_.remove(area);
+      if (visible)
+      {
+        if(!visible_areas_.contains(area))
+        {
+          visible_areas_.add(area);
+        }
+      }
     }
   }
 

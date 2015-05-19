@@ -17,22 +17,19 @@ class Portal
   void transport(TerrainBehaviour terrain, TerrainElementBehaviour element)
   {
     GameArea area = state_.areas_[map_name_];
-    if (area == null)
-    {
-      print("Game area $map_name_ not found for portal");
-    }
-    else
+    if (area != null)
     {
       element.area_ = area;
       state_.setVisible(map_name_, true);
-      for (String area in areas_hide_)
-      {
-        state_.setVisible(area, false);
-      }
-      for (String area in areas_show_)
-      {
-        state_.setVisible(area, true);
-      }
+    }
+
+    for (String area in areas_hide_)
+    {
+      state_.setVisible(area, false);
+    }
+    for (String area in areas_show_)
+    {
+      state_.setVisible(area, true);
     }
   }
 }

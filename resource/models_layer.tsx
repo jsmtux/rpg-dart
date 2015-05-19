@@ -34,4 +34,9 @@
    <property name="rotation" value="90"/>
   </properties>
  </tile>
+ <tile id="6">
+  <properties>
+   <property name="name" value="images/tall_brick.model"/>
+  </properties>
+ </tile>
 </tileset>
