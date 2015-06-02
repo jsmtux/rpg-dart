@@ -6,6 +6,7 @@ import 'shader.dart';
 
 import 'package:vector_math/vector_math.dart';
 
+import 'camera.dart';
 import 'drawable.dart';
 
 class Renderer
@@ -27,9 +28,10 @@ class Renderer
   Shader texture_shader_;
   Shader atlas_shader_;
 
-  Renderer(DivElement div, CanvasElement canvas)
+  Camera camera_;
+
+  Renderer(DivElement div, this.canvas_, this.camera_)
   {
-    canvas_ = canvas;
     view_ = div;
     setSize();
     window.onResize.listen((event) {
@@ -38,7 +40,7 @@ class Renderer
     window.onDeviceOrientation.listen((event) {
       setSize();
     });
-    gl_ = canvas.getContext('experimental-webgl');
+    gl_ = canvas_.getContext('experimental-webgl');
     color_shader_ = createColorShader(gl_);
     texture_shader_ = createTextureShader(gl_);
     atlas_shader_ = createAtlasShader(gl_);
@@ -71,13 +73,20 @@ class Renderer
 
   void renderElement(Drawable d)
   {
-    d.Draw(gl_, m_worldview_, m_perspective_, dimensions_);
+    d.draw(gl_, m_worldview_, m_perspective_, dimensions_);
+  }
+
+  bool inViewPort(Drawable drawable, Camera cam)
+  {
+    return drawable.getPosition().xy.distanceTo(-cam.GetPos().xy) < 30.0 + drawable.getSize().xy.length2;
   }
 
   void render(List<List<Drawable>> drawables)
   {
     gl_.viewport(0, 0, view_width_, view_height_);
     gl_.clear(webgl.RenderingContext.COLOR_BUFFER_BIT | webgl.RenderingContext.DEPTH_BUFFER_BIT);
+
+    m_worldview_ = camera_.GetMat();
 
     m_perspective_ = makePerspectiveMatrix(radians(45.0), view_width_/view_height_, 0.1, 100.0);
 
@@ -86,13 +95,16 @@ class Renderer
     {
       for(Drawable d in list)
       {
-        if(!d.isTransparent())
+        if (inViewPort(d, camera_))
         {
-          renderElement(d);
-        }
-        else
-        {
-          sorted_drawables.add(d);
+          if(!d.isTransparent())
+          {
+            renderElement(d);
+          }
+          else
+          {
+            sorted_drawables.add(d);
+          }
         }
       }
     }

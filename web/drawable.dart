@@ -11,14 +11,17 @@ import 'shader.dart';
 
 abstract class Drawable
 {
-  void Draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions);
+  void draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions);
   bool isTransparent();
   void setTransparent(bool val);
   void setPosition(Vector3 pos);
+  Vector3 getPosition();
   void move(Vector3 amount);
   void setScale(double scale);
   void setRotation(Quaternion rot);
-  void Rotate(Quaternion rot);
+  void rotate(Quaternion rot);
+  Vector3 getSize();
+  void setSize(Vector3 size);
 }
 
 class BaseDrawable implements Drawable
@@ -30,7 +33,8 @@ class BaseDrawable implements Drawable
 
   Vector3 position_ = new Vector3(0.0,0.0,0.0);
   Quaternion rotation_ = new Quaternion(0.0,0.0,0.0,1.0);
-  double size_ = 1.0;
+  double scale_ = 1.0;
+  Vector3 size_ = new Vector3(1.0, 1.0, 1.0);
 
   Shader shader_;
 
@@ -40,13 +44,13 @@ class BaseDrawable implements Drawable
 
   int vertices_;
 
-  void Draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions)
+  void draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions)
   {
     shader_.makeCurrent();
     Matrix4 m_modelview_ = new Matrix4.identity();
     m_modelview_.translate(position_);
     m_modelview_.setRotation(rotation_.asRotationMatrix());
-    m_modelview_.scale(size_, size_, size_);
+    m_modelview_.scale(scale_, scale_, scale_);
 
     gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, pos_buffer_);
     gl_.vertexAttribPointer(shader_.a_vertex_pos_, dimensions, webgl.RenderingContext.FLOAT, false, 0, 0);
@@ -80,10 +84,10 @@ class BaseDrawable implements Drawable
 
   void setScale(double scale)
   {
-    size_ = scale;
+    scale_ = scale;
   }
 
-  void Rotate(Quaternion rot)
+  void rotate(Quaternion rot)
   {
     rotation_ *= rot;
   }
@@ -98,9 +102,24 @@ class BaseDrawable implements Drawable
     position_ = pos;
   }
 
+  Vector3 getPosition()
+  {
+    return position_;
+  }
+
   void move(Vector3 amount)
   {
     position_ += amount;
+  }
+
+  Vector3 getSize()
+  {
+    return size_;
+  }
+
+  void setSize(Vector3 size)
+  {
+    size_ = size;
   }
 }
 
@@ -115,7 +134,7 @@ class AnimatedDrawable extends BaseDrawable
   Future update_timer;
   int idle_image = 0;
 
-  void Draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions)
+  void draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions)
   {
     if (current_sequence_ != null)
     {
@@ -125,7 +144,7 @@ class AnimatedDrawable extends BaseDrawable
     {
       ActivateImage(idle_image);
     }
-    super.Draw(gl_, world_view, perspective, dimensions);
+    super.draw(gl_, world_view, perspective, dimensions);
   }
 
   void SetSequence(String seq_name, [int initial])

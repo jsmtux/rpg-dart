@@ -22,12 +22,12 @@ main() {
 
   DialogueBox dialogue = new DialogueBox(querySelector("#dialogue"));
 
-  Renderer renderer = new Renderer(div, canvas);
+  Camera cur_cam = new Camera();
+
+  Renderer renderer = new Renderer(div, canvas, cur_cam);
 
   DrawableFactory drawable_factory = new DrawableFactory(renderer);
   GameState draw_state = new GameState(renderer);
-
-  Camera cur_cam = new Camera(renderer.m_worldview_);
 
   SpriteLoader loader = new SpriteLoader(drawable_factory, input, cur_cam, dialogue);
 

@@ -5,7 +5,6 @@ import 'package:vector_math/vector_math.dart';
 
 import '../portal.dart';
 import '../drawable.dart';
-import '../game_area.dart';
 
 class TerrainBehaviour extends Behaviour
 {
@@ -19,6 +18,7 @@ class TerrainBehaviour extends Behaviour
 
   void init(Drawable drawable)
   {
+    drawable.setSize(new Vector3(heights_.length * 1.0, heights_[0].length * 0.1, 0.0));
   }
 
   void update()
