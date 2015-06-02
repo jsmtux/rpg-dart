@@ -26,6 +26,7 @@ class Renderer
 
   Shader color_shader_;
   Shader texture_shader_;
+  Shader terrain_shader_;
   Shader atlas_shader_;
 
   Camera camera_;
@@ -43,6 +44,7 @@ class Renderer
     gl_ = canvas_.getContext('experimental-webgl');
     color_shader_ = createColorShader(gl_);
     texture_shader_ = createTextureShader(gl_);
+    terrain_shader_ = createTerrainShader(gl_);
     atlas_shader_ = createAtlasShader(gl_);
     m_worldview_ = new Matrix4.identity();
 
@@ -78,7 +80,7 @@ class Renderer
 
   bool inViewPort(Drawable drawable, Camera cam)
   {
-    return drawable.getPosition().xy.distanceTo(-cam.GetPos().xy) < 30.0 + drawable.getSize().xy.length2;
+    return drawable.getPosition().xy.distanceTo(-cam.GetPos().xy) < 25.0 + drawable.getSize().xy.length;
   }
 
   void render(List<List<Drawable>> drawables)

@@ -137,7 +137,7 @@ class SpriteImporter extends AsyncImporter<List<SpriteData>>
   {
     if(drawable_spec["type"]=="quad")
     {
-      res.geom_ = new TexturedGeometry(quad_vertices, quad_indices, quad_coords, drawable_spec["path"]);
+      res.geom_ = new TexturedGeometry(quad_vertices, null, quad_indices, quad_coords, drawable_spec["path"]);
       if (drawable_spec.containsKey("sequences"))
       {
         res.anim_ = new AnimationData();

@@ -19,7 +19,8 @@ class SquareTerrain
 
   BaseGeometry calculateBaseGeometry(double height)
   {
-    TexturedGeometry ret = new TexturedGeometry(new List<double>(), new List<int>(), new List<double>(), this.image_);
+    TexturedGeometry ret =
+        new TexturedGeometry(new List<double>(), new List<double>(), new List<int>(), new List<double>(), this.image_);
     int bleeding_correction_factor = 512;
     double bleeding_correction = 1/bleeding_correction_factor;
     int num_images_root = math.sqrt(num_images_).floor();
@@ -88,6 +89,13 @@ class SquareTerrain
           vc.position_.z = heights_[i+1][j-1] / map_scale_ + height;
           vd.position_.z = heights_[i+1][j+1] / map_scale_ + height;
         }
+
+        Vector3 p1 = va.position_ - vb.position_;
+        Vector3 p2 = va.position_ - vc.position_;
+
+        Vector3 normal = p1.cross(p2);
+
+        va.orientation_ = vb.orientation_ = vc.orientation_ = vd.orientation_ = normal;
 
         int ia = ret.AddVertex(va);
         int ib = ret.AddVertex(vb);

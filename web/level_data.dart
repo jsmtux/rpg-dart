@@ -75,7 +75,7 @@ class LevelData
       BaseGeometry terrain_geom = sq.calculateBaseGeometry(height);
       height += 0.005;
 
-      Drawable terrain_drawable = loader.drawable_factory_.createTexturedDrawable(terrain_geom);
+      Drawable terrain_drawable = loader.drawable_factory_.createTerrainDrawable(terrain_geom);
       area.addElement(terrain_drawable, behaviour_t);
       Quaternion rot = new Quaternion.identity();
       //rot.setAxisAngle(new Vector3(1.0, 0.0, 0.0 ), -60 * (math.PI / 180));

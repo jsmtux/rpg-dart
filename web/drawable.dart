@@ -28,6 +28,7 @@ class BaseDrawable implements Drawable
 {
   webgl.Buffer pos_buffer_;
   webgl.Buffer ind_buffer_;
+  webgl.Buffer nor_buffer_;
   webgl.Buffer color_buffer_;
   webgl.Buffer tex_buffer_;
 
@@ -65,10 +66,28 @@ class BaseDrawable implements Drawable
       gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, tex_buffer_);
       gl_.vertexAttribPointer(shader_.a_vertex_coord_, 2, webgl.RenderingContext.FLOAT, false, 0, 0);
     }
+    if(nor_buffer_ != null)
+    {
+      gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, nor_buffer_);
+      gl_.vertexAttribPointer(shader_.a_vertex_normal_, dimensions, webgl.RenderingContext.FLOAT, false, 0, 0);
+    }
 
     gl_.bindBuffer(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, ind_buffer_);
 
     shader_.setMatrixUniforms(perspective, m_modelview_, world_view);
+    if (shader_ is TerrainShader)
+    {
+      TerrainShader t_shader = shader_;
+      Matrix3 m_normal = new Matrix3.identity();
+
+      m_normal.setRow(0, m_modelview_.row0.xyz);
+      m_normal.setRow(1, m_modelview_.row1.xyz);
+      m_normal.setRow(2, m_modelview_.row2.xyz);
+      m_normal.invert();
+      m_normal.transpose();
+
+      t_shader.setNormalMatrix(m_normal);
+    }
     gl_.drawElements(webgl.RenderingContext.TRIANGLES, vertices_, webgl.RenderingContext.UNSIGNED_SHORT, 0);
   }
 

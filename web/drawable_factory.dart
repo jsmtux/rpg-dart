@@ -27,6 +27,14 @@ class DrawableFactory
     renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, new Uint16List.fromList(geometry.indices_),
         webgl.RenderingContext.STATIC_DRAW);
 
+    if (geometry.orientation_ != null)
+    {
+      drawable.nor_buffer_ = renderer_.gl_.createBuffer();
+      renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, drawable.nor_buffer_);
+      renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER,
+          new Float32List.fromList(geometry.orientation_), webgl.RenderingContext.STATIC_DRAW);
+    }
+
     drawable.vertices_ = geometry.indices_.length;
   }
 
@@ -55,6 +63,16 @@ class DrawableFactory
     initGeometry(geometry, ret);
     initTexture(geometry, ret);
     ret.shader_ = renderer_.texture_shader_;
+
+    return ret;
+  }
+
+  BaseDrawable createTerrainDrawable(TexturedGeometry geometry)
+  {
+    BaseDrawable ret = new BaseDrawable();
+    initGeometry(geometry, ret);
+    initTexture(geometry, ret);
+    ret.shader_ = renderer_.terrain_shader_;
 
     return ret;
   }
