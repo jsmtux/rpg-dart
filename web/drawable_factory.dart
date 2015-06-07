@@ -62,7 +62,14 @@ class DrawableFactory
     BaseDrawable ret = new BaseDrawable();
     initGeometry(geometry, ret);
     initTexture(geometry, ret);
-    ret.shader_ = renderer_.texture_shader_;
+    if (geometry.orientation_ == null)
+    {
+      ret.shader_ = renderer_.texture_shader_;
+    }
+    else
+    {
+      ret.shader_ = renderer_.light_shader_;
+    }
 
     return ret;
   }
@@ -72,7 +79,7 @@ class DrawableFactory
     BaseDrawable ret = new BaseDrawable();
     initGeometry(geometry, ret);
     initTexture(geometry, ret);
-    ret.shader_ = renderer_.terrain_shader_;
+    ret.shader_ = renderer_.light_shader_;
 
     return ret;
   }

@@ -23,8 +23,9 @@ class ModelImporter extends AsyncImporter<List<BaseGeometry>>
       String texture = materials[mesh['material_index']];
       List<double> positions = mesh['vertices'][0];
       List<double> textures = mesh['vertices'][1];
+      List<double> orientation = mesh['vertices'][2];
       List<int> indices = mesh['indices'];
-      BaseGeometry geom = new TexturedGeometry(positions, null, indices, textures, texture);
+      BaseGeometry geom = new TexturedGeometry(positions, orientation, indices, textures, texture);
       ret.add(geom);
     }
 

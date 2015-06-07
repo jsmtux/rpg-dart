@@ -116,6 +116,7 @@ int main(int argc, char** argv)
 				{
 					vector<float> vertices;
 					vector<float> textures;
+					vector<float> normals;
 					for (int j = 0; j < mesh->mNumVertices; j++)
 					{
 						vertices.push_back(mesh->mVertices[j].x);
@@ -125,6 +126,12 @@ int main(int argc, char** argv)
 						{
 							textures.push_back(mesh->mTextureCoords[0][j].x);
 							textures.push_back(mesh->mTextureCoords[0][j].y);
+						}
+						if (mesh->HasNormals())
+						{
+							normals.push_back(mesh->mNormals[j].x);
+							normals.push_back(mesh->mNormals[j].y);
+							normals.push_back(mesh->mNormals[j].z);
 						}
 					}
 					std::cout << std::setprecision(4) << std::fixed;
@@ -155,6 +162,21 @@ int main(int argc, char** argv)
 								 cout << ", ";
 							}
 							cout << textures[j];
+						}
+						cout << endl;
+					}
+					cout << ",";
+					{
+						JsonArray json_normals(id);
+						cout << id;
+		
+						for (unsigned int j = 0; j < normals.size(); j++)
+						{
+							if (j != 0)
+							{
+								 cout << ", ";
+							}
+							cout << normals[j];
 						}
 						cout << endl;
 					}

@@ -8,6 +8,7 @@ import 'package:vector_math/vector_math.dart';
 import 'animation.dart';
 import 'texture.dart';
 import 'shader.dart';
+import 'shader_properties.dart';
 
 abstract class Drawable
 {
@@ -47,37 +48,39 @@ class BaseDrawable implements Drawable
 
   void draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions)
   {
-    shader_.makeCurrent();
     Matrix4 m_modelview_ = new Matrix4.identity();
     m_modelview_.translate(position_);
     m_modelview_.setRotation(rotation_.asRotationMatrix());
     m_modelview_.scale(scale_, scale_, scale_);
 
+    BasicShaderProperties basic_property = shader_.getShaderProperty(BasicShaderProperties.propName);
     gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, pos_buffer_);
-    gl_.vertexAttribPointer(shader_.a_vertex_pos_, dimensions, webgl.RenderingContext.FLOAT, false, 0, 0);
+    gl_.vertexAttribPointer(basic_property.a_vertex_pos_, dimensions, webgl.RenderingContext.FLOAT, false, 0, 0);
     if(color_buffer_ != null)
     {
       gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, color_buffer_);
-      gl_.vertexAttribPointer(shader_.a_vertex_color_, 4, webgl.RenderingContext.FLOAT, false, 0, 0);
+      gl_.vertexAttribPointer(basic_property.a_vertex_color_, 4, webgl.RenderingContext.FLOAT, false, 0, 0);
     }
     if(tex_buffer_ != null)
     {
       tex_[tex_cur_ind_].makeCurrent();
       gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, tex_buffer_);
-      gl_.vertexAttribPointer(shader_.a_vertex_coord_, 2, webgl.RenderingContext.FLOAT, false, 0, 0);
+      gl_.vertexAttribPointer(basic_property.a_vertex_coord_, 2, webgl.RenderingContext.FLOAT, false, 0, 0);
     }
     if(nor_buffer_ != null)
     {
       gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, nor_buffer_);
-      gl_.vertexAttribPointer(shader_.a_vertex_normal_, dimensions, webgl.RenderingContext.FLOAT, false, 0, 0);
+      gl_.vertexAttribPointer(basic_property.a_vertex_normal_, dimensions, webgl.RenderingContext.FLOAT, false, 0, 0);
     }
 
     gl_.bindBuffer(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, ind_buffer_);
 
-    shader_.setMatrixUniforms(perspective, m_modelview_, world_view);
-    if (shader_ is TerrainShader)
+    basic_property.setMatrixUniforms(perspective, m_modelview_, world_view);
+
+    DirectionalLightShaderProperty directional_property = shader_.getShaderProperty(DirectionalLightShaderProperty.propName);
+    if (directional_property != null)
     {
-      TerrainShader t_shader = shader_;
+      LightShader t_shader = shader_;
       Matrix3 m_normal = new Matrix3.identity();
 
       m_normal.setRow(0, m_modelview_.row0.xyz);
@@ -86,8 +89,9 @@ class BaseDrawable implements Drawable
       m_normal.invert();
       m_normal.transpose();
 
-      t_shader.setNormalMatrix(m_normal);
+      directional_property.setNormalMatrix(m_normal);
     }
+    shader_.makeCurrent();
     gl_.drawElements(webgl.RenderingContext.TRIANGLES, vertices_, webgl.RenderingContext.UNSIGNED_SHORT, 0);
   }
 
@@ -229,7 +233,11 @@ class AnimatedDrawable extends BaseDrawable
     Vector2 offset = new Vector2(x/num_images_side_, y/num_images_side_);
     Vector2 size = new Vector2(1/num_images_side_, 1/num_images_side_);
 
-    shader_.setOffset(offset);
-    shader_.setSize(size);
+    AtlasTextureProperty atlas_prop = shader_.getShaderProperty(AtlasTextureProperty.propName);
+    if(atlas_prop != null)
+    {
+      atlas_prop.setOffset(offset);
+      atlas_prop.setSize(size);
+    }
   }
 }

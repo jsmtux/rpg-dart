@@ -26,7 +26,7 @@ class Renderer
 
   Shader color_shader_;
   Shader texture_shader_;
-  Shader terrain_shader_;
+  Shader light_shader_;
   Shader atlas_shader_;
 
   Camera camera_;
@@ -44,7 +44,7 @@ class Renderer
     gl_ = canvas_.getContext('experimental-webgl');
     color_shader_ = createColorShader(gl_);
     texture_shader_ = createTextureShader(gl_);
-    terrain_shader_ = createTerrainShader(gl_);
+    light_shader_ = createLightShader(gl_);
     atlas_shader_ = createAtlasShader(gl_);
     m_worldview_ = new Matrix4.identity();
 

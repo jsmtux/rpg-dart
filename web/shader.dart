@@ -1,23 +1,16 @@
 library Shader;
 
-import 'dart:math' as Math;
 import 'dart:web_gl' as webgl;
-import 'dart:typed_data';
 
 import 'package:vector_math/vector_math.dart';
+
+import 'shader_properties.dart';
 
 abstract class Shader
 {
   webgl.Program shader_program_;
-  int a_vertex_pos_;
-  int a_vertex_color_;
-  int a_vertex_coord_;
-  int a_vertex_normal_;
-  webgl.UniformLocation u_m_perspective_;
-  webgl.UniformLocation u_m_modelview_;
-  webgl.UniformLocation u_m_worldview_;
-
   webgl.RenderingContext gl_;
+  List<ShaderProperty> shader_properties_ = new List<ShaderProperty>();
 
   Shader (String vertex_source, String fragment_source, webgl.RenderingContext gl)
   {
@@ -47,58 +40,50 @@ abstract class Shader
     if (!gl.getProgramParameter(shader_program_, webgl.RenderingContext.LINK_STATUS)) {
       print(gl.getProgramInfoLog(shader_program_));
     }
-
-    a_vertex_pos_ = gl.getAttribLocation(shader_program_, "aVertexPosition");
-    gl.enableVertexAttribArray(a_vertex_pos_);
-
-    a_vertex_color_ = gl.getAttribLocation(shader_program_, "aVertexColor");
-    if (a_vertex_color_ >= 0)
-    {
-      gl.enableVertexAttribArray(a_vertex_color_);
-    }
-
-    a_vertex_normal_ = gl.getAttribLocation(shader_program_, "aVertexNormal");
-    if (a_vertex_normal_ >= 0)
-    {
-      gl.enableVertexAttribArray(a_vertex_normal_);
-    }
-
-    a_vertex_coord_ = gl.getAttribLocation(shader_program_, "aTextureCoord");
-    if (a_vertex_coord_ >= 0)
-    {
-      gl.enableVertexAttribArray(a_vertex_coord_);
-    }
-
-    u_m_perspective_ = gl.getUniformLocation(shader_program_, "uPMatrix");
-    u_m_modelview_ = gl.getUniformLocation(shader_program_, "uMVMatrix");
-    u_m_worldview_ = gl.getUniformLocation(shader_program_, "uWVMatrix");
   }
 
-  void setMatrixUniforms(Matrix4 m_perspective_, Matrix4 m_modelview_, Matrix4 m_worldview_)
+  void initProperties()
   {
-    Float32List tmpList = new Float32List(16);
-    m_perspective_.copyIntoArray(tmpList);
-    gl_.uniformMatrix4fv(u_m_perspective_, false, tmpList);
-
-    m_modelview_.copyIntoArray(tmpList);
-    gl_.uniformMatrix4fv(u_m_modelview_, false, tmpList);
-
-    m_worldview_.copyIntoArray(tmpList);
-    gl_.uniformMatrix4fv(u_m_worldview_, false, tmpList);
-  }
-
-  void makeCurrent();
-}
-
-class BasicShader extends Shader
-{
-  BasicShader(String vertex_source, String fragment_source, webgl.RenderingContext gl) : super(vertex_source, fragment_source, gl)
-  {
+    for (ShaderProperty prop in shader_properties_)
+    {
+      prop.init(gl_, shader_program_);
+    }
   }
 
   void makeCurrent()
   {
     gl_.useProgram(shader_program_);
+    for (ShaderProperty prop in shader_properties_)
+    {
+      prop.update(gl_);
+    }
+  }
+
+  ShaderProperty getShaderProperty(String name)
+  {
+    ShaderProperty ret;
+
+    for (ShaderProperty prop in shader_properties_)
+    {
+      if (prop.getName() == name)
+      {
+        ret = prop;
+        break;
+      }
+    }
+
+    return ret;
+  }
+}
+
+class BasicShader extends Shader
+{
+  BasicShaderProperties basic_properties_ = new BasicShaderProperties();
+
+  BasicShader(String vertex_source, String fragment_source, webgl.RenderingContext gl) : super(vertex_source, fragment_source, gl)
+  {
+    shader_properties_.add(basic_properties_);
+    initProperties();
   }
 }
 
@@ -187,33 +172,14 @@ void main(void) {
 
 class AtlasShader extends Shader
 {
-  webgl.UniformLocation size_p_;
-  webgl.UniformLocation offset_p_;
-
-  Vector2 size_;
-  Vector2 offset_;
+  BasicShaderProperties basic_properties_ = new BasicShaderProperties();
+  AtlasTextureProperty atlas_property_ = new AtlasTextureProperty();
 
   AtlasShader(String vertex_source, String fragment_source, webgl.RenderingContext gl) : super(vertex_source, fragment_source, gl)
   {
-    size_p_ = gl_.getUniformLocation(shader_program_, "t_size");
-    offset_p_ = gl_.getUniformLocation(shader_program_, "t_offset");
-  }
-
-  void makeCurrent()
-  {
-    gl_.useProgram(shader_program_);
-    gl_.uniform2f(size_p_, size_.x, size_.y);
-    gl_.uniform2f(offset_p_, offset_.x, offset_.y);
-  }
-
-  void setOffset(Vector2 offset)
-  {
-    offset_ = offset;
-  }
-
-  void setSize(Vector2 size)
-  {
-    size_ = size;
+    shader_properties_.add(basic_properties_);
+    shader_properties_.add(atlas_property_);
+    initProperties();
   }
 }
 
@@ -257,48 +223,18 @@ void main(void) {
 }
 """;
 
-class TerrainShader extends BasicShader
+class LightShader extends Shader
 {
-  webgl.UniformLocation u_v3_directional_dir_;
-  webgl.UniformLocation u_v3_directional_color_;
-  webgl.UniformLocation u_v3_ambient_color_;
-  webgl.UniformLocation u_m_normal_;
-  Vector3 light_dir_;
-  Vector3 ambient_color_ = new Vector3(.0, .0, .0);
-  Vector3 directional_color_ = new Vector3(1.0, 1.0, 1.0);
-  Vector3 directional_dir_ = new Vector3(0.0, -1.0, 0.0);
+  BasicShaderProperties basic_properties_ = new BasicShaderProperties();
+  DirectionalLightShaderProperty light_property_ = new DirectionalLightShaderProperty();
 
-
-  Matrix3 m_normal_ = new Matrix3.identity();
-
-  TerrainShader(String vertex_source, String fragment_source, webgl.RenderingContext gl)
+  LightShader(String vertex_source, String fragment_source, webgl.RenderingContext gl)
     : super(vertex_source, fragment_source, gl)
   {
-    Quaternion directional_rotation = new Quaternion.axisAngle(new Vector3(1.0, 0.0, 0.0), 45.0 * Math.PI / 180);
-    directional_rotation.rotate(directional_dir_);
-    directional_rotation = new Quaternion.axisAngle(new Vector3(0.0, 1.0, 0.0), 45.0 * Math.PI / 180);
-    directional_rotation.rotate(directional_dir_);
-    u_v3_directional_color_ = gl.getUniformLocation(shader_program_, "uDirectionalColor");
-    u_v3_directional_dir_ = gl.getUniformLocation(shader_program_, "uLightingDirection");
-    u_v3_ambient_color_ = gl_.getUniformLocation(shader_program_, "uAmbientLight");
-    u_m_normal_ = gl_.getUniformLocation(shader_program_, "uNMatrix");
-  }
-
-  void setNormalMatrix(Matrix3 normal_mat)
-  {
-    m_normal_ = normal_mat;
-  }
-
-  void makeCurrent()
-  {
-    super.makeCurrent();
-    gl_.uniform3f(u_v3_ambient_color_, ambient_color_.x, ambient_color_.y, ambient_color_.z);
-    gl_.uniform3f(u_v3_directional_color_, directional_color_.x, directional_color_.y, directional_color_.z);
-    gl_.uniform3f(u_v3_directional_dir_, directional_dir_.x, directional_dir_.y, directional_dir_.z);
-    Float32List tmpList = new Float32List(9);
-    m_normal_.copyIntoArray(tmpList);
-    gl_.uniformMatrix3fv(u_m_normal_, false, tmpList);
+    shader_properties_.add(basic_properties_);
+    shader_properties_.add(light_property_);
+    initProperties();
   }
 }
 
-Shader createTerrainShader(webgl.RenderingContext gl) => new TerrainShader(terrain_vs_source, terrain_fs_source, gl);
+Shader createLightShader(webgl.RenderingContext gl) => new LightShader(terrain_vs_source, terrain_fs_source, gl);
