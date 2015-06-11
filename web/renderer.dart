@@ -73,11 +73,6 @@ class Renderer
 
   }
 
-  void renderElement(Drawable d)
-  {
-    d.draw(gl_, m_worldview_, m_perspective_, dimensions_);
-  }
-
   bool inViewPort(Drawable drawable, Camera cam)
   {
     return drawable.getPosition().xy.distanceTo(-cam.GetPos().xy) < 25.0 + drawable.getSize().xy.length;
@@ -101,7 +96,7 @@ class Renderer
         {
           if(!d.isTransparent())
           {
-            renderElement(d);
+            d.draw(gl_, m_worldview_, m_perspective_, dimensions_);
           }
           else
           {
@@ -115,7 +110,7 @@ class Renderer
     gl_.depthMask(false);
     for(Drawable d in sorted_drawables)
     {
-      renderElement(d);
+      d.draw(gl_, m_worldview_, m_perspective_, dimensions_);
     }
     gl_.depthMask(true);
   }

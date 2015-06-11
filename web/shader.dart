@@ -186,7 +186,7 @@ class AtlasShader extends Shader
 Shader createAtlasShader(webgl.RenderingContext gl) => new AtlasShader(texture_part_vs_source, texture_part_fs_source, gl);
 
 
-String terrain_vs_source = """
+String lighting_vs_source = """
 precision mediump float;
 attribute vec3 aVertexPosition;
 attribute vec3 aVertexNormal;
@@ -196,27 +196,49 @@ uniform mat4 uMVMatrix;
 uniform mat4 uWVMatrix;
 uniform mat4 uPMatrix;
 uniform mat3 uNMatrix;
+
 uniform vec3 uAmbientLight;
 uniform vec3 uLightingDirection;
 uniform vec3 uDirectionalColor;
+uniform vec3 uPointLightPos;
+uniform vec3 uPointLightColor;
 
 varying vec2 vTextureCoord;
 varying vec3 vLightWeighting;
+varying vec3 vVertexPos;
+
+vec3 calcLightInternal(vec3 vertex_normal, vec3 light_dir, vec3 color)
+{
+  vec3 trans_normal = uNMatrix * vertex_normal;
+  float lightWeighting = max(dot(trans_normal, normalize(light_dir)), 0.0);
+  return color * lightWeighting;
+}
+
+vec3 calcDirLight(vec3 vertex_normal)
+{
+  return calcLightInternal(vertex_normal, uLightingDirection, uDirectionalColor);
+}
 
 void main(void) {
   gl_Position = uPMatrix * uWVMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+
   vTextureCoord = aTextureCoord;
-  vec3 trans_normal = uNMatrix * aVertexNormal;
-  float directionalLightWeighting = max(dot(trans_normal, uLightingDirection), 0.0);
-  vLightWeighting = uAmbientLight + uDirectionalColor * directionalLightWeighting;
+
+  vec3 vertex_pos = (uMVMatrix * vec4(aVertexPosition, 1.0)).xyz;
+  vec3 light_dir = uPointLightPos - vertex_pos;
+  float distance = length(light_dir) / 10.0;
+  vec3 Color = calcLightInternal(aVertexNormal, light_dir, vec3(0.5, 0.5, 0.5)) / distance;
+  vLightWeighting = uAmbientLight + calcDirLight(aVertexNormal) + Color;
 }
 """;
 
-String terrain_fs_source = """
+String lighting_fs_source = """
 precision mediump float;
 varying vec2 vTextureCoord;
 varying vec3 vLightWeighting;
+varying vec3 vVertexPos;
 uniform sampler2D uSampler;
+
 void main(void) {
   vec4 texture_color = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
   gl_FragColor = vec4(texture_color.xyz * vLightWeighting, texture_color.a);
@@ -226,7 +248,7 @@ void main(void) {
 class LightShader extends Shader
 {
   BasicShaderProperties basic_properties_ = new BasicShaderProperties();
-  DirectionalLightShaderProperty light_property_ = new DirectionalLightShaderProperty();
+  LightingShaderProperty light_property_ = new LightingShaderProperty();
 
   LightShader(String vertex_source, String fragment_source, webgl.RenderingContext gl)
     : super(vertex_source, fragment_source, gl)
@@ -237,4 +259,4 @@ class LightShader extends Shader
   }
 }
 
-Shader createLightShader(webgl.RenderingContext gl) => new LightShader(terrain_vs_source, terrain_fs_source, gl);
+Shader createLightShader(webgl.RenderingContext gl) => new LightShader(lighting_vs_source, lighting_fs_source, gl);

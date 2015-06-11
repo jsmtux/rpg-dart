@@ -77,10 +77,9 @@ class BaseDrawable implements Drawable
 
     basic_property.setMatrixUniforms(perspective, m_modelview_, world_view);
 
-    DirectionalLightShaderProperty directional_property = shader_.getShaderProperty(DirectionalLightShaderProperty.propName);
-    if (directional_property != null)
+    LightingShaderProperty lighting_property = shader_.getShaderProperty(LightingShaderProperty.propName);
+    if (lighting_property != null)
     {
-      LightShader t_shader = shader_;
       Matrix3 m_normal = new Matrix3.identity();
 
       m_normal.setRow(0, m_modelview_.row0.xyz);
@@ -89,7 +88,7 @@ class BaseDrawable implements Drawable
       m_normal.invert();
       m_normal.transpose();
 
-      directional_property.setNormalMatrix(m_normal);
+      lighting_property.setNormalMatrix(m_normal);
     }
     shader_.makeCurrent();
     gl_.drawElements(webgl.RenderingContext.TRIANGLES, vertices_, webgl.RenderingContext.UNSIGNED_SHORT, 0);
