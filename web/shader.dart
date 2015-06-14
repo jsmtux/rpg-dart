@@ -2,8 +2,6 @@ library Shader;
 
 import 'dart:web_gl' as webgl;
 
-import 'package:vector_math/vector_math.dart';
-
 import 'shader_properties.dart';
 
 abstract class Shader
@@ -188,6 +186,9 @@ Shader createAtlasShader(webgl.RenderingContext gl) => new AtlasShader(texture_p
 
 String lighting_vs_source = """
 precision mediump float;
+
+const int MAX_POINT_LIGHTS = 2;
+
 attribute vec3 aVertexPosition;
 attribute vec3 aVertexNormal;
 attribute vec2 aTextureCoord;
@@ -197,11 +198,19 @@ uniform mat4 uWVMatrix;
 uniform mat4 uPMatrix;
 uniform mat3 uNMatrix;
 
-uniform vec3 uAmbientLight;
-uniform vec3 uLightingDirection;
+uniform vec3 uAmbientColor;
+
+uniform vec3 uDirectionalDir;
 uniform vec3 uDirectionalColor;
-uniform vec3 uPointLightPos;
-uniform vec3 uPointLightColor;
+
+struct PointLight
+{
+  vec3 uPos;
+  vec3 uColor;
+  vec3 uAttenuation;
+};
+
+uniform PointLight lights[MAX_POINT_LIGHTS];
 
 varying vec2 vTextureCoord;
 varying vec3 vLightWeighting;
@@ -216,7 +225,14 @@ vec3 calcLightInternal(vec3 vertex_normal, vec3 light_dir, vec3 color)
 
 vec3 calcDirLight(vec3 vertex_normal)
 {
-  return calcLightInternal(vertex_normal, uLightingDirection, uDirectionalColor);
+  return calcLightInternal(vertex_normal, uDirectionalDir, uDirectionalColor);
+}
+
+vec3 calcPointLight(vec3 vertex_normal, vec3 vertex_pos, int index)
+{
+  vec3 light_dir = lights[index].uPos - vertex_pos;
+  float distance = length(light_dir) / 10.0;
+  return calcLightInternal(vertex_normal, light_dir, lights[index].uColor) / distance * lights[index].uAttenuation.x;  
 }
 
 void main(void) {
@@ -225,10 +241,8 @@ void main(void) {
   vTextureCoord = aTextureCoord;
 
   vec3 vertex_pos = (uMVMatrix * vec4(aVertexPosition, 1.0)).xyz;
-  vec3 light_dir = uPointLightPos - vertex_pos;
-  float distance = length(light_dir) / 10.0;
-  vec3 Color = calcLightInternal(aVertexNormal, light_dir, vec3(0.5, 0.5, 0.5)) / distance;
-  vLightWeighting = uAmbientLight + calcDirLight(aVertexNormal) + Color;
+
+  vLightWeighting = uAmbientColor + calcDirLight(aVertexNormal) + calcPointLight(aVertexNormal, vertex_pos, 0);
 }
 """;
 
