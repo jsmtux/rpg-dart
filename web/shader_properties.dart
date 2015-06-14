@@ -1,11 +1,11 @@
 library ShaderProperties;
 
 import 'dart:web_gl' as webgl;
-import 'dart:math' as Math;
 
 import 'package:vector_math/vector_math.dart';
 
 import 'shader_elements.dart';
+import 'scene_lights.dart';
 
 abstract class ShaderProperty
 {
@@ -111,14 +111,14 @@ class AtlasTextureProperty extends ShaderProperty
   }
 }
 
-class PointLight
+class PointLightUniform
 {
 Vector3Uniform point_pos_;
 Vector3Uniform point_color_;
 Vector3Uniform point_attenuation_;
 }
 
-class LightingShaderProperty implements ShaderProperty
+class LightingShaderProperty implements ShaderProperty, SceneLightsController
 {
   Vector3Uniform directional_dir_;
   Vector3Uniform directional_color_;
@@ -129,13 +129,13 @@ class LightingShaderProperty implements ShaderProperty
   double angle_ = 45.0;
   static const int NUM_LIGHTS = 2;
 
-  List<PointLight> lights_ = new List<PointLight>(NUM_LIGHTS);
+  List<PointLightUniform> lights_ = new List<PointLightUniform>(NUM_LIGHTS);
 
   void init(webgl.RenderingContext gl, webgl.Program shader_program)
   {
-    directional_dir_ = new Vector3Uniform(gl, shader_program, "uDirectionalDir", new Vector3(0.0, 1.0, 0.0));
-    directional_color_ = new Vector3Uniform(gl, shader_program, "uDirectionalColor", new Vector3(0.3, 0.0, 0.3));
-    ambient_color_ = new Vector3Uniform(gl, shader_program, "uAmbientColor", new Vector3(.2, .2, .2));
+    directional_dir_ = new Vector3Uniform(gl, shader_program, "uDirectionalDir");
+    directional_color_ = new Vector3Uniform(gl, shader_program, "uDirectionalColor");
+    ambient_color_ = new Vector3Uniform(gl, shader_program, "uAmbientColor");
     normal_ = new Matrix3Uniform(gl, shader_program, "uNMatrix");
     initializePointLights(gl, shader_program, NUM_LIGHTS);
   }
@@ -144,7 +144,7 @@ class LightingShaderProperty implements ShaderProperty
   {
     for(int i = 0; i < number; i++)
     {
-      lights_[i] = new PointLight();
+      lights_[i] = new PointLightUniform();
       lights_[i].point_pos_ = new Vector3Uniform(gl, shader_program, "lights[$i].uPos");
       lights_[i].point_color_ = new Vector3Uniform(gl, shader_program, "lights[$i].uColor");
       lights_[i].point_attenuation_ = new Vector3Uniform(gl, shader_program, "lights[$i].uAttenuation");
@@ -153,12 +153,6 @@ class LightingShaderProperty implements ShaderProperty
 
   void update(webgl.RenderingContext gl)
   {
-    Vector3 dir = new Vector3(0.0, 1.0, 0.0);
-    Quaternion directional_rotation = new Quaternion.axisAngle(new Vector3(-1.0, 0.0, 0.0),45.0 * Math.PI / 180);
-    directional_rotation.rotate(dir);
-    directional_rotation = new Quaternion.axisAngle(new Vector3(0.0, 0.0, 1.0), angle_ * Math.PI / 180);
-    directional_rotation.rotate(dir);
-    directional_dir_.setData(dir);
     directional_dir_.update();
 
     directional_color_.update();
@@ -171,8 +165,6 @@ class LightingShaderProperty implements ShaderProperty
       lights_[i].point_color_.update();
       lights_[i].point_attenuation_.update();
     }
-
-    angle_ = (angle_ + 0.01) % 360;
   }
 
   void setNormalMatrix(Matrix3 normal_mat)
@@ -180,11 +172,22 @@ class LightingShaderProperty implements ShaderProperty
     normal_.setData(normal_mat);
   }
 
-  void setPointLightPos(Vector3 pos)
+  void SetAmbientLight(BaseLight light)
   {
-    lights_[0].point_pos_.setData(pos);
-    lights_[0].point_color_.setData(new Vector3(0.5, 0.5, 0.5));
-    lights_[0].point_attenuation_.setData(new Vector3(1.0, 1.0, 1.0));
+    ambient_color_.setData(light.color_);
+  }
+
+  void SetDirectionalLight(DirectionalLight light)
+  {
+    directional_color_.setData(light.color_);
+    directional_dir_.setData(light.dir_);
+  }
+
+  void SetPointLight(PointLight light, int index)
+  {
+    lights_[index].point_color_.setData(light.color_);
+    lights_[index].point_pos_.setData(light.pos_);
+    lights_[index].point_attenuation_.setData(light.attenuation_);
   }
 
   static String propName = "LightingShaderProperty";

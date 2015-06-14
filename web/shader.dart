@@ -231,7 +231,7 @@ vec3 calcDirLight(vec3 vertex_normal)
 vec3 calcPointLight(vec3 vertex_normal, vec3 vertex_pos, int index)
 {
   vec3 light_dir = lights[index].uPos - vertex_pos;
-  float distance = length(light_dir) / 10.0;
+  float distance = length(light_dir);
   return calcLightInternal(vertex_normal, light_dir, lights[index].uColor) / distance * lights[index].uAttenuation.x;  
 }
 

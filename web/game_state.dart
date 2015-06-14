@@ -4,19 +4,29 @@ import 'dart:html';
 import 'dart:async';
 
 import 'package:game_loop/game_loop_html.dart';
+import 'package:vector_math/vector_math.dart';
 
 import 'drawable.dart';
 import 'renderer.dart';
 import 'sprite_importer.dart';
 import 'game_area.dart';
+import 'scene_lights.dart';
 
 class GameState extends SimpleHtmlState
 {
   Renderer renderer_;
+  SceneLightsController lights_controller_;
 
   Map<String, GameArea> areas_ = new Map<String, GameArea>();
   List<GameArea> visible_areas_ = new List<GameArea>();
   List<GameArea> updated_areas_ = new List<GameArea>();
+
+  GameState(this.renderer_)
+  {
+    lights_controller_ = renderer_.getLightsController();
+    lights_controller_.SetAmbientLight(new BaseLight(new Vector3(0.4, 0.4, 0.4)));
+    lights_controller_.SetDirectionalLight(new DirectionalLight(new Vector3(0.5,-0.3,1.0), new Vector3(0.6,0.6,0.6)));
+  }
 
   Future loadArea(String name, String level_path, String behaviour_path, SpriteLoader loader)
   {
@@ -62,10 +72,5 @@ class GameState extends SimpleHtmlState
   }
 
   void onKeyDown(KeyboardEvent event) {
-  }
-
-  GameState(Renderer renderer)
-  {
-    renderer_ = renderer;
   }
 }

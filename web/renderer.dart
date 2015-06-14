@@ -2,12 +2,14 @@ library Renderer;
 
 import 'dart:html';
 import 'dart:web_gl' as webgl;
-import 'shader.dart';
 
 import 'package:vector_math/vector_math.dart';
 
 import 'camera.dart';
 import 'drawable.dart';
+import 'scene_lights.dart';
+import 'shader.dart';
+import 'shader_properties.dart';
 
 class Renderer
 {
@@ -52,6 +54,12 @@ class Renderer
     gl_.enable(webgl.RenderingContext.DEPTH_TEST);
     gl_.blendFunc(webgl.RenderingContext.SRC_ALPHA, webgl.RenderingContext.ONE_MINUS_SRC_ALPHA);
     gl_.enable(webgl.RenderingContext.BLEND);
+  }
+
+  SceneLightsController getLightsController()
+  {
+    LightingShaderProperty lighting_property = light_shader_.getShaderProperty(LightingShaderProperty.propName);
+    return lighting_property;
   }
 
   void setSize()

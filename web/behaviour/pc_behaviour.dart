@@ -6,7 +6,6 @@ import '../camera.dart';
 import '../game_state.dart';
 import '../game_area.dart';
 import '../input.dart';
-import '../shader_properties.dart';
 import 'behaviour.dart';
 import 'enemy_behaviour.dart';
 import 'directions.dart';
@@ -25,9 +24,6 @@ class PCNormalState extends WalkingBehaviourState
   void update()
   {
     PCBehaviour element = element_;
-    var shader = element.state_.renderer_.light_shader_;
-    LightingShaderProperty lighting_property = shader.getShaderProperty(LightingShaderProperty.propName);
-    lighting_property.setPointLightPos(element.drawable_.getPosition());
     if(element.input_.isDown(Input.JUMP) && element.on_ground_)
     {
       element.z_accel_ = 0.15;
