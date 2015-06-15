@@ -149,7 +149,7 @@ class LevelData
       Quaternion rot = new Quaternion.axisAngle(new Vector3(0.0, 0.0, 1.0 ), info.description_.rotation_ * Math.PI / 180);
       toAdd.rotate(rot);
       toAdd.setScale(1/3);
-      area.addElement(toAdd , new Tile3dBehaviour(x, y, info.description_.height_, area));
+      area.addElement(toAdd , new Tile3dBehaviour(new Vector2(x, y), info.description_.height_, area));
     }
     SpriteImporter sprite_importer = new SpriteImporter(loader);
     for(BehaviourDescription desc in behaviour_descriptions_)

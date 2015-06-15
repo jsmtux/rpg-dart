@@ -1,5 +1,7 @@
 library sign_behaviour;
 
+import 'package:vector_math/vector_math.dart';
+
 import "terrain_element_behaviour.dart";
 import "behaviour.dart";
 import "pc_behaviour.dart";
@@ -13,7 +15,7 @@ class SignBehaviour extends Tile3dBehaviour
   String text_;
   bool set_ = false;
 
-  SignBehaviour(double x, double y, GameArea area, this.text_, this.text_output_) : super(x, y, 1.0, area);
+  SignBehaviour(Vector2 position, GameArea area, this.text_, this.text_output_) : super(position, 1.0, area);
 
   void update()
   {

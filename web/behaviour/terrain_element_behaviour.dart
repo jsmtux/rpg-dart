@@ -12,28 +12,22 @@ import 'directions.dart';
 
 abstract class TerrainElementBehaviour extends Behaviour
 {
-  double x_, y_= 0.0;
+  Vector2 position_ = new Vector2.zero();
   GameArea area_;
   Quaternion rotation_;
   Vector3 offset_ = new Vector3.zero();
 
-  TerrainElementBehaviour(this.x_, this.y_, this.area_);
+  TerrainElementBehaviour(this.position_, this.area_);
 
   void init(Drawable drawable)
   {
     super.init(drawable);
-    setPos(x_, y_);
-  }
-
-  void setPos(double x, double y)
-  {
-    Vector2 pos = new Vector2(x, y);
-    double height = area_.terrain_.getHeight(pos);
+    double height = area_.terrain_.getHeight(position_);
     if (height == null)
     {
       height = 0.0;
     }
-    drawable_.setPosition(new Vector3((x_ + offset_.x)*1.0, (y_ + offset_.y)*1.0, height + offset_.z));
+    drawable_.setPosition(new Vector3((position_.x + offset_.x)*1.0, (position_.y + offset_.y)*1.0, height + offset_.z));
   }
 
 
@@ -51,12 +45,12 @@ abstract class TerrainElementBehaviour extends Behaviour
 class Tile3dBehaviour extends TerrainElementBehaviour
 {
   double height_;
-  Tile3dBehaviour(double x, double y, this.height_, GameArea area) : super(x, y, area);
+  Tile3dBehaviour(Vector2 position, this.height_, GameArea area) : super(position, area);
 
   void init(Drawable drawable)
   {
     super.init(drawable);
-    area_.terrain_.addObstacle(new Vector2(x_, y_), height_);
+    area_.terrain_.addObstacle(position_, height_);
   }
 
   void update()
@@ -96,7 +90,7 @@ abstract class WalkingBehaviourState extends BehaviourState
       angle += 2*math.PI;
     }
     Vector2 movement = dir.normalized() * vel_;
-    element_.move(element_.x_ + movement.y, element_.y_ - movement.x);
+    element_.move(element_.position_ + new Vector2(movement.y, -movement.x));
     if (angle < math.PI / 2)
     {
       look(Directions.RIGHT);
@@ -121,16 +115,16 @@ abstract class WalkingBehaviourState extends BehaviourState
     switch(dir)
     {
       case Directions.UP:
-        element_.move(element_.x_, element_.y_+ vel_);
+        element_.move(element_.position_ + new Vector2(0.0 , vel_));
         break;
       case Directions.DOWN:
-        element_.move(element_.x_, element_.y_- vel_);
+        element_.move(element_.position_ + new Vector2(0.0 , -vel_));
         break;
       case Directions.LEFT:
-        element_.move(element_.x_- vel_, element_.y_);
+        element_.move(element_.position_ + new Vector2(-vel_, 0.0));
         break;
       case Directions.RIGHT:
-        element_.move(element_.x_+ vel_, element_.y_);
+        element_.move(element_.position_ + new Vector2(vel_, 0.0));
         break;
     }
   }
@@ -168,19 +162,18 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
   double height_;
   bool on_ground_ = true;
 
-  SpriteBehaviour(double x, double y, GameArea area) : super(x, y, area)
+  SpriteBehaviour(Vector2 pos, GameArea area) : super(pos, area)
   {
-    height_ = area.terrain_.getHeight(new Vector2(x,y));
+    height_ = area.terrain_.getHeight(pos);
     Quaternion rot = new Quaternion.identity();
     rot.setAxisAngle(new Vector3(1.0, 0.0, 0.0 ), -100 * (math.PI / 180));
     rotation_ = rot;
     setOffset(new Vector3(-1.0, 0.0, 2.0));
   }
 
-  bool move(double x, double y)
+  bool move(Vector2 pos)
   {
     bool ret = false;
-    Vector2 pos = new Vector2(x, y);
     double height = area_.terrain_.getHeight(pos);
 
     on_ground_ = false;
@@ -191,8 +184,7 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
       {
         p.transport(area_.terrain_, this);
       }
-      x_ = x;
-      y_ = y;
+      position_ = pos;
       if (rotation_ != null)
       {
         drawable_.setRotation(rotation_);
@@ -210,7 +202,7 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
         }
       }
       ret = true;
-      drawable_.setPosition(new Vector3((x_ + offset_.x)*1.0, (y_ + offset_.y)*1.0, height_ + offset_.z));
+      drawable_.setPosition(new Vector3((position_.x + offset_.x)*1.0, (position_.y + offset_.y)*1.0, height_ + offset_.z));
     }
     return ret;
   }
@@ -241,7 +233,7 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
       z_accel_ = gravity;
     }
     height_ += z_accel_;
-    move(x_, y_);
+    move(position_);
     if (cur_state_ != null)
     {
       cur_state_.update();
@@ -250,8 +242,8 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
 
   double squareDistance(TerrainElementBehaviour sprite)
   {
-    double diff_x = x_ - sprite.x_ - 0.5;
-    double diff_y = y_ - sprite.y_ - 0.5;
+    double diff_x = position_.x - sprite.position_.x - 0.5;
+    double diff_y = position_.y - sprite.position_.y - 0.5;
     return diff_x * diff_x + diff_y * diff_y;
   }
 

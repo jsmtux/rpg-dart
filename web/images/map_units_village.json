@@ -82,15 +82,15 @@
 	  		"posy":50.0
 		}
 	},
-	"guard_entrance":{
+	"sheep_1":{
 		"drawable":{
 			"type":"quad",
-			"path":"images/guard.png"
+			"path":"images/sheep.png"
 	  	},
 		"behaviour":{
-	  		"type":"GuardBehaviour",
-	  		"posx":60.0,
-	  		"posy":127.0
+	  		"type":"SheepBehaviour",
+	  		"posx":45.0,
+	  		"posy":53.0
 		}
 	}
 }

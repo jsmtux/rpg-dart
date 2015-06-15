@@ -56,7 +56,7 @@ class PCNormalState extends WalkingBehaviourState
       }
     }
 
-    element.camera_.SetPos(new Vector2(-element.x_, -element.y_));
+    element.camera_.SetPos(-element.position_);
   }
 }
 
@@ -142,7 +142,7 @@ class PCBehaviour extends SpriteBehaviour
   PCAttackingState attacking_state_;
   PCDeadState dead_state_;
 
-  PCBehaviour(double x, double y, GameArea area, this.input_, this.camera_, this.state_) : super(x, y, area)
+  PCBehaviour(Vector2 position, GameArea area, this.input_, this.camera_, this.state_) : super(position, area)
   {
     normal_state_ = new PCNormalState(this);
     attacking_state_ = new PCAttackingState(this);

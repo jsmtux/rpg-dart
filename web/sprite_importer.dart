@@ -21,7 +21,7 @@ import 'behaviour/pc_behaviour.dart';
 import 'behaviour/terrain_behaviour.dart';
 import 'behaviour/sign_behaviour.dart';
 import 'behaviour/enemy_behaviour.dart';
-import 'behaviour/guard_behaviour.dart';
+import 'behaviour/sheep_behaviour.dart';
 
 class SpriteData
 {
@@ -61,40 +61,40 @@ class EnemyBehaviourDefinition implements BehaviourDefinition
   }
 }
 
-class GuardBehaviourDefinition implements BehaviourDefinition
-{
-  String path_name_;
-  double x_, y_;
-  GuardBehaviourDefinition(this.x_, this.y_);
-
-  Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state)
-  {
-    return new GuardBehaviour(area, new Vector2(x_, y_), loader.text_output_);
-  }
-}
-
 class PCBehaviourDefinition implements BehaviourDefinition
 {
-  double x_, y_;
+  Vector2 position_;
 
-  PCBehaviourDefinition(this.x_, this.y_);
+  PCBehaviourDefinition(this.position_);
 
   Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state)
   {
-    return new PCBehaviour(x_, y_, area, loader.input_, loader.cur_cam_, state);
+    return new PCBehaviour(position_, area, loader.input_, loader.cur_cam_, state);
   }
 }
 
 class SignBehaviourDefinition implements BehaviourDefinition
 {
   String text_;
-  double x_, y_;
+  Vector2 position_;
 
-  SignBehaviourDefinition(this.text_, this.x_, this.y_);
+  SignBehaviourDefinition(this.text_, this.position_);
 
   Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state)
   {
-    return new SignBehaviour(x_, y_, area, text_, loader.text_output_);
+    return new SignBehaviour(position_, area, text_, loader.text_output_);
+  }
+}
+
+class SheepBehaviourDefinition implements BehaviourDefinition
+{
+  Vector2 position_;
+
+  SheepBehaviourDefinition(this.position_);
+
+  Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state)
+  {
+    return new SheepBehaviour(position_, area);
   }
 }
 
@@ -166,13 +166,13 @@ class SpriteImporter extends AsyncImporter<List<SpriteData>>
         res.behaviour_ = new EnemyBehaviourDefinition(behaviour_spec["path"]);
         break;
       case "PCBehaviour":
-        res.behaviour_ = new PCBehaviourDefinition(behaviour_spec["posx"], behaviour_spec["posy"]);
+        res.behaviour_ = new PCBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
         break;
       case "SignBehaviour":
-        res.behaviour_ = new SignBehaviourDefinition(behaviour_spec["text"], behaviour_spec["posx"], behaviour_spec["posy"]);
+        res.behaviour_ = new SignBehaviourDefinition(behaviour_spec["text"], new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
         break;
-      case "GuardBehaviour":
-        res.behaviour_ = new GuardBehaviourDefinition(behaviour_spec["posx"], behaviour_spec["posy"]);
+      case "SheepBehaviour":
+        res.behaviour_ = new SheepBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
         break;
     }
   }

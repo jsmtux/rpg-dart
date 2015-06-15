@@ -1,8 +1,10 @@
 library enemy_behaviour;
 
+import 'package:vector_math/vector_math.dart';
+
 import '../game_area.dart';
-import 'path_follower.dart';
 import '../path.dart';
+import 'path_follower.dart';
 import 'behaviour.dart';
 import 'terrain_element_behaviour.dart';
 import 'pc_behaviour.dart';
@@ -98,7 +100,7 @@ class EnemyBehaviour extends SpriteBehaviour
   EnemyNormalState normal_state_;
 
   EnemyBehaviour(GameArea area, Path path)
-    : super(path.points[0].x.floorToDouble(), path.points[0].y.floorToDouble(), area)
+    : super(new Vector2(path.points[0].x.floorToDouble(), path.points[0].y.floorToDouble()), area)
   {
     dead_state_ = new EnemyDeadState(this);
     normal_state_ = new EnemyNormalState(this, path);

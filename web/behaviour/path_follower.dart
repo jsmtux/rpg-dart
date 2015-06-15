@@ -60,37 +60,36 @@ class SpriteFollower implements PathFollower
 
   void updateWalk(WalkingBehaviourState behaviour)
   {
-    double diff_x = behaviour.element_.x_ - following_.x_;
-    double diff_y = behaviour.element_.y_ - following_.y_;
+    Vector2 diff = behaviour.element_.position_ - following_.position_;
     double threshold = 0.2;
 
-    same_line_ = diff_x.abs() < threshold || diff_y.abs() < threshold;
+    same_line_ = diff.x.abs() < threshold || diff.y.abs() < threshold;
 
     if (same_line_ ||
-        ((diff_x - diff_x.floor()).abs() < 0.1 && walk_horizontal_) ||
-        ((diff_y - diff_y.floor()).abs() < 0.1 && !walk_horizontal_))
+        ((diff.x - diff.x.floor()).abs() < 0.1 && walk_horizontal_) ||
+        ((diff.y - diff.y.floor()).abs() < 0.1 && !walk_horizontal_))
     {
-      walk_horizontal_ = diff_x.abs() > diff_y.abs();
+      walk_horizontal_ = diff.x.abs() > diff.y.abs();
     }
 
     if(walk_horizontal_)
     {
-      if (diff_x > threshold)
+      if (diff.x > threshold)
       {
         difference_ = Directions.LEFT;
       }
-      else if (diff_x < -threshold)
+      else if (diff.x < -threshold)
       {
         difference_ = Directions.RIGHT;
       }
     }
     else
     {
-      if (diff_y < -threshold)
+      if (diff.y < -threshold)
       {
         difference_ = Directions.UP;
       }
-      else if (diff_y > threshold)
+      else if (diff.y > threshold)
       {
         difference_ = Directions.DOWN;
       }
@@ -121,8 +120,8 @@ class MapPathFollower implements PathFollower
     int x = position.x.floor();
     int y = position.y.floor();
 
-    Vector2 b_pos = new Vector2(behaviour.element_.x_.floorToDouble(),
-        behaviour.element_.y_.floorToDouble());
+    Vector2 b_pos = new Vector2(behaviour.element_.position_.x.floorToDouble(),
+        behaviour.element_.position_.y.floorToDouble());
 
     if (b_pos.x != x)
     {
