@@ -83,7 +83,8 @@ class Renderer
 
   bool inViewPort(Drawable drawable, Camera cam)
   {
-    return drawable.getPosition().xy.distanceTo(-cam.GetPos().xy) < 25.0 + drawable.getSize().xy.length;
+    //return drawable.getPosition().xy.distanceTo(-cam.GetPos().xy) < 25.0 + drawable.getSize().xy.length;
+    return true;
   }
 
   void render(List<List<Drawable>> drawables)

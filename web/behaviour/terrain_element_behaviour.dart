@@ -77,35 +77,46 @@ abstract class BehaviourState
 
 abstract class WalkingBehaviourState extends BehaviourState
 {
-  Directions dir_;
+  Directions dir_ = Directions.UP;
   double vel_;
 
   WalkingBehaviourState(SpriteBehaviour element, this.vel_) : super (element);
 
   void walkDir(Vector2 dir)
   {
+    Vector2 movement = dir.normalized() * vel_;
+    if(element_.move(element_.position_ + movement))
+    {
+    }
+    else if (element_.move(element_.position_ + new Vector2(movement.x, 0.0)))
+    {
+
+    }
+    else
+    {
+      element_.move(element_.position_ + new Vector2(0.0, movement.y));
+    }
+
     double angle = math.atan2(dir.y, dir.x) - math.PI / 4;
     if(angle < 0)
     {
       angle += 2*math.PI;
     }
-    Vector2 movement = dir.normalized() * vel_;
-    element_.move(element_.position_ + new Vector2(movement.y, -movement.x));
     if (angle < math.PI / 2)
-    {
-      look(Directions.RIGHT);
-    }
-    else if (angle < math.PI)
     {
       look(Directions.UP);
     }
-    else if (angle < 3 * math.PI / 2)
+    else if (angle < math.PI)
     {
       look(Directions.LEFT);
     }
-    else
+    else if (angle < 3 * math.PI / 2)
     {
       look(Directions.DOWN);
+    }
+    else
+    {
+      look(Directions.RIGHT);
     }
   }
 
@@ -242,9 +253,7 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
 
   double squareDistance(TerrainElementBehaviour sprite)
   {
-    double diff_x = position_.x - sprite.position_.x - 0.5;
-    double diff_y = position_.y - sprite.position_.y - 0.5;
-    return diff_x * diff_x + diff_y * diff_y;
+    return (position_ + offset_.xy).distanceToSquared(sprite.position_ + sprite.offset_.xy);
   }
 
   void setState(BehaviourState state)

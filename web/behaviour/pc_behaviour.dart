@@ -7,7 +7,7 @@ import '../game_state.dart';
 import '../game_area.dart';
 import '../input.dart';
 import 'behaviour.dart';
-import 'enemy_behaviour.dart';
+import 'sheep_behaviour.dart';
 import 'directions.dart';
 import 'terrain_element_behaviour.dart';
 
@@ -30,8 +30,8 @@ class PCNormalState extends WalkingBehaviourState
     }
     if(element.input_.isDown(Input.ATTACK))
     {
-      element.attacking_state_.dir_ = dir_;
-      element.setState(element.attacking_state_);
+      element.calling_state_.dir_ = dir_;
+      element.setState(element.calling_state_);
     }
     else if(element.input_.getAxis(Input.X) != 0 || element.input_.getAxis(Input.Y) != 0 )
     {
@@ -60,9 +60,9 @@ class PCNormalState extends WalkingBehaviourState
   }
 }
 
-class PCAttackingState extends WalkingBehaviourState
+class PCCallingState extends WalkingBehaviourState
 {
-  PCAttackingState(SpriteBehaviour element) : super(element, 0.0);
+  PCCallingState(SpriteBehaviour element) : super(element, 0.0);
 
   void begin()
   {
@@ -95,12 +95,13 @@ class PCAttackingState extends WalkingBehaviourState
     PCBehaviour this_element = element_;
     for (Behaviour behaviour in element_.area_.behaviours_)
     {
-      if (behaviour is EnemyBehaviour)
+      if (behaviour is SheepBehaviour)
       {
-        EnemyBehaviour enemy = behaviour;
-        if (enemy.squareDistance(this_element) < 1.0)
+        SheepBehaviour sheep = behaviour;
+        if (!sheep.isFollowing() && sheep.squareDistance(this_element) < 1.0)
         {
-          enemy.hit(this_element);
+          sheep.hit(element_);
+          break;
         }
       }
     }
@@ -129,7 +130,7 @@ class PCDeadState extends BehaviourState
   }
 }
 
-class PCBehaviour extends SpriteBehaviour
+class PCBehaviour extends SpriteBehaviour implements Followable
 {
   bool attacking_ = false;
   bool attack_pressed = false;
@@ -137,17 +138,31 @@ class PCBehaviour extends SpriteBehaviour
   Camera camera_;
   bool dead_ = false;
   GameState state_;
+  SheepBehaviour follower_;
 
   PCNormalState normal_state_;
-  PCAttackingState attacking_state_;
+  PCCallingState calling_state_;
   PCDeadState dead_state_;
 
   PCBehaviour(Vector2 position, GameArea area, this.input_, this.camera_, this.state_) : super(position, area)
   {
     normal_state_ = new PCNormalState(this);
-    attacking_state_ = new PCAttackingState(this);
+    calling_state_ = new PCCallingState(this);
     dead_state_ = new PCDeadState(this);
     cur_state_ = normal_state_;
+  }
+
+  Followable getFollower()
+  {
+    return follower_;
+  }
+
+  void setFollower(SpriteBehaviour follower)
+  {
+    if (follower_ == null)
+    {
+      follower_ = follower;
+    }
   }
 }
 

@@ -41,22 +41,22 @@ class KeyboardInput implements Input
   double getAxis(int axis)
   {
     double ret = 0.0;
-    if(axis == Input.X)
+    if(axis == Input.Y)
     {
       if (keyboard_.isDown(Keyboard.UP))
       {
-        ret = -1.0;
+        ret = 1.0;
       }
       else if (keyboard_.isDown(Keyboard.DOWN))
       {
-        ret = 1.0;
+        ret = -1.0;
       }
       if(keyboard_.isDown(Keyboard.LEFT) || keyboard_.isDown(Keyboard.RIGHT))
       {
         ret *= 0.55;
       }
     }
-    else if(axis == Input.Y)
+    else if(axis == Input.X)
     {
       if (keyboard_.isDown(Keyboard.RIGHT))
       {

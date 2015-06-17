@@ -78,20 +78,22 @@
 		"behaviour":
 		{
 	  		"type":"PCBehaviour",
-	  		"posx":45.0,
-	  		"posy":50.0
+	  		"posx":10.0,
+	  		"posy":10.0
 		}
 	},
-	"sheep_1":{
-		"drawable":{
+	"wolf1":
+	{
+		"drawable":
+		{
 			"type":"quad",
-			"path":"images/sheep.png"
-	  	},
-		"behaviour":{
-	  		"type":"SheepBehaviour",
-	  		"posx":45.0,
-	  		"posy":53.0
+			"path":"images/wolf.png"
+		},
+		"behaviour":
+		{
+			"type":"EnemyBehaviour",
+			"path":"wolf1"
 		}
-	}
+	}	
 }
 

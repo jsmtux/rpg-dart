@@ -28,7 +28,7 @@ class EnemyNormalState extends WalkingBehaviourState
   void update()
   {
     bool walking = true;
-    EnemyBehaviour this_element = element_;
+    /*EnemyBehaviour this_element = element_;
     for (Behaviour behaviour in element_.area_.behaviours_)
     {
       if (behaviour is PCBehaviour)
@@ -67,7 +67,7 @@ class EnemyNormalState extends WalkingBehaviourState
           path_follower_ = new SpriteFollower(enemy);
         }
       }
-    }
+    }*/
     if (walking)
     {
       path_follower_.updateWalk(this);

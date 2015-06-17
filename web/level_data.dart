@@ -155,7 +155,7 @@ class LevelData
     for(BehaviourDescription desc in behaviour_descriptions_)
     {
       Map drawable_spec = new Map();
-      drawable_spec["type"] = "model";
+      drawable_spec["type"] = "quad";
       drawable_spec["path"] = desc.model_path_;
       Map behaviour_spec = new Map();
       behaviour_spec["type"] = desc.behaviour_type_;
