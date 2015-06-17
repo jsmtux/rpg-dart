@@ -7,8 +7,7 @@ import '../path.dart';
 import 'path_follower.dart';
 import 'behaviour.dart';
 import 'terrain_element_behaviour.dart';
-import 'pc_behaviour.dart';
-import 'directions.dart';
+import 'sheep_behaviour.dart';
 
 class EnemyNormalState extends WalkingBehaviourState
 {
@@ -28,49 +27,47 @@ class EnemyNormalState extends WalkingBehaviourState
   void update()
   {
     bool walking = true;
-    /*EnemyBehaviour this_element = element_;
     for (Behaviour behaviour in element_.area_.behaviours_)
     {
-      if (behaviour is PCBehaviour)
+      double min_distance;
+      SheepBehaviour closest_sheep;
+      if (behaviour is SheepBehaviour && ! behaviour.isDead())
       {
-        PCBehaviour enemy = behaviour;
-        double dist = enemy.squareDistance(this_element);
-        if (dist < 2)
+        double dist = element_.squareDistance(behaviour);
+        if (min_distance == null || dist < min_distance)
         {
-          SpriteFollower sprite_follower = path_follower_;
-          if(sprite_follower.canAttack())
-          {
-            walking = false;
-            switch(sprite_follower.getOrientation())
-            {
-              case Directions.UP:
-                this_element.anim_drawable_.SetSequence("stab_t");
-                break;
-              case Directions.DOWN:
-                this_element.anim_drawable_.SetSequence("stab_b");
-                break;
-              case Directions.LEFT:
-                this_element.anim_drawable_.SetSequence("stab_l");
-                break;
-              case Directions.RIGHT:
-                this_element.anim_drawable_.SetSequence("stab_r");
-                break;
-            }
-          }
-          if (this_element.anim_drawable_.current_in_sequence_ == 4)
-          {
-            enemy.hit(this_element);
-          }
-        }
-        else if (dist < 16.0 && !(path_follower_ is SpriteFollower))
-        {
-          path_follower_ = new SpriteFollower(enemy);
+          min_distance = dist;
+          closest_sheep = behaviour;
         }
       }
-    }*/
+      if (closest_sheep != null && min_distance < 4)
+      {
+        element_.setState(new EnemyFollowState(element_, closest_sheep));
+      }
+    }
     if (walking)
     {
       path_follower_.updateWalk(this);
+    }
+  }
+}
+
+class EnemyFollowState extends WalkingBehaviourState
+{
+  SheepBehaviour follow_;
+
+  EnemyFollowState(SpriteBehaviour element, this.follow_) : super(element, 0.05);
+  void hit(SpriteBehaviour sprite){}
+
+  void update()
+  {
+    Vector2 diff = (follow_.position_ - element_.position_);
+    walkDir(diff);
+    if (diff.length2 < 0.1)
+    {
+      follow_.hit(element_);
+      EnemyBehaviour this_element = element_;
+      element_.setState(this_element.normal_state_);
     }
   }
 }

@@ -6,11 +6,17 @@ import 'dart:math' as Math;
 import '../game_area.dart';
 import 'terrain_element_behaviour.dart';
 import 'pc_behaviour.dart';
+import 'enemy_behaviour.dart';
 
 abstract class Followable implements SpriteBehaviour
 {
   Followable getFollower();
   void setFollower(SpriteBehaviour follower);
+}
+
+abstract class Follower implements Followable
+{
+  void stopFollowing();
 }
 
 class SheepNormalState extends WalkingBehaviourState
@@ -31,24 +37,27 @@ class SheepNormalState extends WalkingBehaviourState
 
   void hit(SpriteBehaviour sprite)
   {
-    Followable toFollow;
-
-    if (sprite is SheepBehaviour)
+    if (sprite is EnemyBehaviour)
     {
-      toFollow = sprite;
+      element_.setState(new SheepDeadState(element_));
     }
-    if (sprite is PCBehaviour)
+    else
     {
-      toFollow = sprite;
-    }
+      Followable toFollow;
 
-    while (toFollow.getFollower() != null)
-    {
-      toFollow = toFollow.getFollower();
-    }
+      if (sprite is PCBehaviour)
+      {
+        toFollow = sprite;
+      }
 
-    toFollow.setFollower(element_);
-    element_.setState(new SheepFollowerBehaviour(element_, toFollow));
+      while (toFollow.getFollower() != null)
+      {
+        toFollow = toFollow.getFollower();
+      }
+
+      toFollow.setFollower(element_);
+      element_.setState(new SheepFollowerState(element_, toFollow));
+    }
   }
 
   void update()
@@ -83,13 +92,45 @@ class SheepNormalState extends WalkingBehaviourState
   }
 }
 
-class SheepFollowerBehaviour extends WalkingBehaviourState
+class SheepFollowerState extends WalkingBehaviourState
 {
-  SpriteBehaviour follow_;
+  Followable follow_;
 
-  SheepFollowerBehaviour(SpriteBehaviour element, this.follow_) : super(element, 0.05)
+  SheepFollowerState(SpriteBehaviour element, this.follow_) : super(element, 0.05)
   {
     element_ = element;
+  }
+
+  void hit(SpriteBehaviour sprite)
+  {
+    if (sprite is EnemyBehaviour)
+    {
+      SheepBehaviour element = element_;
+      follow_.setFollower(null);
+      if (element.follower_ != null)
+      {
+        element.follower_.stopFollowing();
+      }
+      element_.setState(new SheepDeadState(element_));
+    }
+  }
+
+  void update()
+  {
+    if (follow_.squareDistance(element_) > 2)
+    {
+      Vector2 diff = (follow_.position_ - element_.position_).normalize();
+      walkDir(diff);
+    }
+  }
+}
+
+class SheepDeadState extends BehaviourState
+{
+  SheepDeadState(SpriteBehaviour element) : super(element);
+
+  void begin()
+  {
   }
 
   void hit(SpriteBehaviour sprite)
@@ -98,15 +139,10 @@ class SheepFollowerBehaviour extends WalkingBehaviourState
 
   void update()
   {
-    if (follow_.squareDistance(element_) > 1)
-    {
-      Vector2 diff = (follow_.position_ - element_.position_).normalize();
-      walkDir(diff);
-    }
   }
 }
 
-class SheepBehaviour extends SpriteBehaviour implements Followable
+class SheepBehaviour extends SpriteBehaviour implements Follower
 {
   SheepNormalState normal_state_;
   SheepBehaviour follower_;
@@ -119,12 +155,30 @@ class SheepBehaviour extends SpriteBehaviour implements Followable
 
   bool isFollowing()
   {
-    return cur_state_ is SheepFollowerBehaviour;
+    return cur_state_ is SheepFollowerState;
+  }
+
+  bool isDead()
+  {
+    return cur_state_ is SheepDeadState;
   }
 
   Followable getFollower()
   {
     return follower_;
+  }
+
+  void stopFollowing()
+  {
+    if (cur_state_ is SheepFollowerState)
+    {
+      setState(new SheepNormalState(this));
+      if (follower_ != null)
+      {
+        follower_.stopFollowing();
+        follower_ = null;
+      }
+    }
   }
 
   void setFollower(SpriteBehaviour follower)

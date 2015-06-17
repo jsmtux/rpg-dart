@@ -94,6 +94,54 @@
 			"type":"EnemyBehaviour",
 			"path":"wolf1"
 		}
-	}	
+	},
+	"wolf2":
+	{
+		"parent":"wolf1",
+		"behaviour":
+		{
+			"path":"wolf2"
+		}
+	},
+	"wolf3":
+	{
+		"parent":"wolf1",
+		"behaviour":
+		{
+			"path":"wolf3"
+		}
+	},
+	"wolf4":
+	{
+		"parent":"wolf1",
+		"behaviour":
+		{
+			"path":"wolf4"
+		}
+	},
+	"wolf5":
+	{
+		"parent":"wolf1",
+		"behaviour":
+		{
+			"path":"wolf5"
+		}
+	},
+	"wolf6":
+	{
+		"parent":"wolf1",
+		"behaviour":
+		{
+			"path":"wolf6"
+		}
+	},
+	"wolf7":
+	{
+		"parent":"wolf1",
+		"behaviour":
+		{
+			"path":"wolf7"
+		}
+	}
 }
 

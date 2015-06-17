@@ -63,9 +63,11 @@ class PCNormalState extends WalkingBehaviourState
 class PCCallingState extends WalkingBehaviourState
 {
   PCCallingState(SpriteBehaviour element) : super(element, 0.0);
+  bool picked_;
 
   void begin()
   {
+    picked_ = false;
     PCBehaviour this_element = element_;
     switch(dir_)
     {
@@ -93,15 +95,19 @@ class PCCallingState extends WalkingBehaviourState
   void update()
   {
     PCBehaviour this_element = element_;
-    for (Behaviour behaviour in element_.area_.behaviours_)
+    if (!picked_)
     {
-      if (behaviour is SheepBehaviour)
+      for (Behaviour behaviour in element_.area_.behaviours_)
       {
-        SheepBehaviour sheep = behaviour;
-        if (!sheep.isFollowing() && sheep.squareDistance(this_element) < 1.0)
+        if (behaviour is SheepBehaviour)
         {
-          sheep.hit(element_);
-          break;
+          SheepBehaviour sheep = behaviour;
+          if (!sheep.isDead() && !sheep.isFollowing() && sheep.squareDistance(this_element) < 1.0)
+          {
+            sheep.hit(element_);
+            picked_ = true;
+            break;
+          }
         }
       }
     }
@@ -159,10 +165,7 @@ class PCBehaviour extends SpriteBehaviour implements Followable
 
   void setFollower(SpriteBehaviour follower)
   {
-    if (follower_ == null)
-    {
-      follower_ = follower;
-    }
+    follower_ = follower;
   }
 }
 
