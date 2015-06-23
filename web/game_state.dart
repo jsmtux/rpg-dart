@@ -24,8 +24,8 @@ class GameState extends SimpleHtmlState
   GameState(this.renderer_)
   {
     lights_controller_ = renderer_.getLightsController();
-    lights_controller_.SetAmbientLight(new BaseLight(new Vector3(0.4, 0.4, 0.4)));
-    lights_controller_.SetDirectionalLight(new DirectionalLight(new Vector3(0.5,-0.3,1.0), new Vector3(0.6,0.6,0.6)));
+    lights_controller_.SetAmbientLight(new BaseLight(new Vector3(0.7, 0.7, 0.7)));
+    lights_controller_.SetDirectionalLight(new DirectionalLight(new Vector3(0.5,-0.3,1.0), new Vector3(0.3,0.3,0.3)));
   }
 
   Future loadArea(String name, String level_path, String behaviour_path, SpriteLoader loader)
@@ -35,6 +35,14 @@ class GameState extends SimpleHtmlState
     toAdd.LoadGameArea(level_path, behaviour_path, loader, this).then((bool ok){areas_[name] = toAdd; ret.complete(ok);});
     areas_[name] = toAdd;
     return ret.future;
+  }
+
+  void unLoadArea(String name)
+  {
+    visible_areas_.remove(areas_[name]);
+    updated_areas_.remove(areas_[name]);
+    areas_.remove(areas_[name]);
+
   }
 
   void setVisible(String areaName, bool visible)

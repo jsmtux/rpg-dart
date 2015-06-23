@@ -98,6 +98,18 @@ class SheepBehaviourDefinition implements BehaviourDefinition
   }
 }
 
+class GoldSheepBehaviourDefinition implements BehaviourDefinition
+{
+  Vector2 position_;
+
+  GoldSheepBehaviourDefinition(this.position_);
+
+  Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state)
+  {
+    return new GoldSheepBehaviour(position_, area);
+  }
+}
+
 class SpriteLoader
 {
   DrawableFactory drawable_factory_;
@@ -173,6 +185,10 @@ class SpriteImporter extends AsyncImporter<List<SpriteData>>
         break;
       case "SheepBehaviour":
         res.behaviour_ = new SheepBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
+        break;
+      case "GoldSheepBehaviour":
+      case "CoolSheepBehaviour":
+        res.behaviour_ = new GoldSheepBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
         break;
     }
   }

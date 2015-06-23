@@ -280,7 +280,7 @@ class LevelImporter extends AsyncImporter<LevelData>
 
         Tileset current_tileset = getTileset(parsed_tilesets, layer);
 
-        if (current_tileset.name == "models_layer" || current_tileset.name == "heights_layer")
+        if (current_tileset.name == "models_layer" || current_tileset.name == "heights_layer" || current_tileset.name == "behaviours_layer")
         {
 
         }

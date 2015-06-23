@@ -40,7 +40,7 @@ class EnemyNormalState extends WalkingBehaviourState
           closest_sheep = behaviour;
         }
       }
-      if (closest_sheep != null && min_distance < 4)
+      if (closest_sheep != null && min_distance < 12)
       {
         element_.setState(new EnemyFollowState(element_, closest_sheep));
       }
@@ -63,10 +63,14 @@ class EnemyFollowState extends WalkingBehaviourState
   {
     Vector2 diff = (follow_.position_ - element_.position_);
     walkDir(diff);
+    EnemyBehaviour this_element = element_;
     if (diff.length2 < 0.1)
     {
       follow_.hit(element_);
-      EnemyBehaviour this_element = element_;
+      element_.setState(this_element.normal_state_);
+    }
+    if (diff.length2 > 20)
+    {
       element_.setState(this_element.normal_state_);
     }
   }

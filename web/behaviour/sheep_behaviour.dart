@@ -21,9 +21,9 @@ abstract class Follower implements Followable
 
 class SheepNormalState extends WalkingBehaviourState
 {
-  SheepBehaviour element_;
+  BaseSheepBehaviour element_;
   Math.Random rng = new Math.Random();
-  int wait_time_ = 300;
+  int wait_time_;
   Vector2 random_position_;
   Vector2 initial_position_;
   Vector2 walk_initial_position_ = new Vector2(0.0,0.0);
@@ -32,7 +32,7 @@ class SheepNormalState extends WalkingBehaviourState
   {
     element_ = element;
     initial_position_ = element_.position_;
-    rng.nextInt(300);
+    wait_time_ = rng.nextInt(300);
   }
 
   void hit(SpriteBehaviour sprite)
@@ -47,10 +47,13 @@ class SheepNormalState extends WalkingBehaviourState
 
       if (sprite is PCBehaviour)
       {
-        toFollow = sprite;
+        if (element_.checkWillFollow(sprite))
+        {
+          toFollow = sprite;
+        }
       }
 
-      while (toFollow.getFollower() != null)
+      while (toFollow != null && toFollow.getFollower() != null)
       {
         toFollow = toFollow.getFollower();
       }
@@ -142,12 +145,12 @@ class SheepDeadState extends BehaviourState
   }
 }
 
-class SheepBehaviour extends SpriteBehaviour implements Follower
+abstract class BaseSheepBehaviour extends SpriteBehaviour implements Follower
 {
   SheepNormalState normal_state_;
-  SheepBehaviour follower_;
+  BaseSheepBehaviour follower_;
 
-  SheepBehaviour(Vector2 position, GameArea area) : super(position, area)
+  BaseSheepBehaviour(Vector2 position, GameArea area) : super(position, area)
   {
     normal_state_ = new SheepNormalState(this);
     cur_state_ = normal_state_;
@@ -168,6 +171,8 @@ class SheepBehaviour extends SpriteBehaviour implements Follower
     return follower_;
   }
 
+  bool checkWillFollow(PCBehaviour pc);
+
   void stopFollowing()
   {
     if (cur_state_ is SheepFollowerState)
@@ -187,6 +192,37 @@ class SheepBehaviour extends SpriteBehaviour implements Follower
     {
       follower_ = follower;
     }
+  }
+}
+
+class SheepBehaviour extends BaseSheepBehaviour
+{
+  SheepBehaviour(Vector2 position, GameArea area) : super(position, area)
+  {
+  }
+
+  bool checkWillFollow(PCBehaviour pc)
+  {
+    return true;
+  }
+}
+
+class GoldSheepBehaviour extends BaseSheepBehaviour
+{
+  GoldSheepBehaviour(Vector2 position, GameArea area) : super(position, area)
+  {
+  }
+
+  bool checkWillFollow(PCBehaviour pc)
+  {
+    int num_sheep = 0;
+    Followable tmp_follower = pc;
+
+    while((tmp_follower = tmp_follower.getFollower()) != null)
+    {
+      num_sheep++;
+    }
+    return num_sheep >= 2;
   }
 }
 

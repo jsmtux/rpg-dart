@@ -64,7 +64,7 @@ class TerrainBehaviour extends Behaviour
     int x = position.x.floor() - offset_.x.floor();
     int y = heights_[0].length - (position.y.floor() - offset_.y.floor());
     double height;
-    if (x > 0 && y > 0 && heights_.length > x && heights_[y].length > y)
+    if (x > 1 && y > 0 && heights_.length > x +1 && heights_[y].length > y+1)
     {
       double obstacle_height = 0.0;
 

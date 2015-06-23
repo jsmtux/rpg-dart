@@ -99,9 +99,9 @@ class PCCallingState extends WalkingBehaviourState
     {
       for (Behaviour behaviour in element_.area_.behaviours_)
       {
-        if (behaviour is SheepBehaviour)
+        if (behaviour is BaseSheepBehaviour)
         {
-          SheepBehaviour sheep = behaviour;
+          BaseSheepBehaviour sheep = behaviour;
           if (!sheep.isDead() && !sheep.isFollowing() && sheep.squareDistance(this_element) < 1.0)
           {
             sheep.hit(element_);
