@@ -6,7 +6,7 @@ class Camera
 {
   Matrix4 cam_mat_ = new Matrix4.zero();
   Vector3 pos_ = new Vector3(0.0, 0.0, 0.0);
-  Vector3 offset_ = new Vector3(0.0, 22.0, -23.0);
+  Vector3 offset_ = new Vector3(0.0, 20.0, -20.0);
 
   Camera()
   {

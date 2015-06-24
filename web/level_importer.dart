@@ -41,9 +41,21 @@ class LevelImporter extends AsyncImporter<LevelData>
     return parsed_tilesets;
   }
 
-  Tileset getTileset(List tilesets, Map layer)
+  Tileset getTileTileset(List tilesets, int num)
   {
     Tileset ret_tileset = tilesets[0];
+    for(Tileset tileset in tilesets)
+    {
+      if (tileset.first_gid <= num && tileset.first_gid > ret_tileset.first_gid)
+      {
+        ret_tileset = tileset;
+      }
+    }
+    return ret_tileset;
+  }
+
+  Tileset getTileset(List tilesets, Map layer)
+  {
     List<int> data = layer["data"];
     int first_nonzero = 0;
     for(int num in data)
@@ -55,59 +67,62 @@ class LevelImporter extends AsyncImporter<LevelData>
       }
     }
 
-    for(Tileset tileset in tilesets)
+    return getTileTileset(tilesets, first_nonzero);
+  }
+
+  List<ModelDescription> readModelDescriptions(List tilesets)
+  {
+    List<ModelDescription> ret = new List<ModelDescription>();
+    for (Tileset current_tileset in tilesets)
     {
-      if (tileset.first_gid <= first_nonzero && tileset.first_gid > ret_tileset.first_gid)
+      if (current_tileset.properties != null)
       {
-        ret_tileset = tileset;
+        for (int i = 0; i < current_tileset.properties.length; i++)
+        {
+          if (current_tileset.properties.containsKey("${i}") && current_tileset.properties["${i}"].containsKey("path"))
+          {
+            String name = current_tileset.properties["${i}"]["path"];
+            if (name.endsWith(".model"))
+            {
+              ModelDescription toAdd = new ModelDescription();
+              toAdd.path_ = name;
+              if(current_tileset.properties["${i}"].containsKey("height"))
+              {
+                toAdd.height_ = double.parse(current_tileset.properties["${i}"]["height"]);
+              }
+              if(current_tileset.properties["${i}"].containsKey("rotation"))
+              {
+                toAdd.rotation_ = int.parse(current_tileset.properties["${i}"]["rotation"]);
+              }
+              ret.add(toAdd);
+            }
+          }
+        }
       }
     }
 
-    return ret_tileset;
+    return ret;
   }
 
-  List<ModelInstance> readModelData(List<ModelDescription> model_descriptions, List layers, List<Tileset> parsed_tilesets, Vector2 size)
+  List<ModelInstance> readModelData(List<ModelDescription> model_descriptions, Map layer, Tileset current_tileset, Vector2 size)
   {
     List<ModelInstance> model_data = new List<ModelInstance>();
 
-    for (Map layer in layers)
+    if (layer.containsKey("data"))
     {
-      if (layer.containsKey("data"))
+      List<int> data = layer["data"];
+
+      for (int i = 0; i < size.x; i++)
       {
-        List<int> data = layer["data"];
-
-        Tileset current_tileset = getTileset(parsed_tilesets, layer);
-
-        if (current_tileset.name == "models_layer")
+        for (int j = 0; j < size.y; j++)
         {
-          for (int i = 0; i < current_tileset.properties.length; i++)
+          int texture = data[(i + j*size.x).floor()] - current_tileset.first_gid;
+          if (texture >= 0)
           {
-            ModelDescription toAdd = new ModelDescription();
-            toAdd.path_ = (current_tileset.properties["${i}"]["name"]);
-            if(current_tileset.properties["${i}"].containsKey("height"))
-            {
-              toAdd.height_ = double.parse(current_tileset.properties["${i}"]["height"]);
-            }
-            if(current_tileset.properties["${i}"].containsKey("rotation"))
-            {
-              toAdd.rotation_ = int.parse(current_tileset.properties["${i}"]["rotation"]);
-            }
-            model_descriptions.add(toAdd);
-          }
-
-          for (int i = 0; i < size.x; i++)
-          {
-            for (int j = 0; j < size.y; j++)
-            {
-              int texture = data[(i + j*size.x).floor()] - current_tileset.first_gid;
-              if (texture >= 0)
-              {
-                ModelInstance model = new ModelInstance();
-                model.position_ = new Vector2(i*1.0,size.y - j*1.0);
-                model.description_ = model_descriptions[texture];
-                model_data.add(model);
-              }
-            }
+            ModelInstance model = new ModelInstance();
+            model.position_ = new Vector2(i*1.0,size.y - j*1.0);
+            model.description_ = model_descriptions[texture];
+            model_data.add(model);
           }
         }
       }
@@ -116,41 +131,36 @@ class LevelImporter extends AsyncImporter<LevelData>
     return model_data;
   }
 
-  List<BehaviourDescription> readBehaviourData(List layers, List<Tileset> parsed_tilesets, Vector2 size)
+  List<BehaviourDescription> readBehaviourData(Map layer, Tileset current_tileset, Vector2 size, List<ModelDescription> model_descriptions)
   {
     List<BehaviourDescription> ret = new List<BehaviourDescription>();
-    for (Map layer in layers)
+    if (layer.containsKey("data"))
     {
-      if (layer.containsKey("data"))
+      List<int> data = layer["data"];
+      List<String> behaviour_names = new List<String>();
+      List<String> model_paths = new List<String>();
+
+      if (current_tileset.name == "behaviours_layer")
       {
-        List<int> data = layer["data"];
-        List<String> behaviour_names = new List<String>();
-        List<String> model_paths = new List<String>();
-
-        Tileset current_tileset = getTileset(parsed_tilesets, layer);
-
-        if (current_tileset.name == "behaviours_layer")
+        for (int i = 0; i < current_tileset.properties.length; i++)
         {
-          for (int i = 0; i < current_tileset.properties.length; i++)
+          String new_name = current_tileset.properties["${i}"]["type"];
+          String model_path = current_tileset.properties["${i}"]["path"];
+          behaviour_names.add(new_name);
+          model_paths.add(model_path);
+        }
+        for (int i = 0; i < size.x; i++)
+        {
+          for (int j = 0; j < size.y; j++)
           {
-            String new_name = current_tileset.properties["${i}"]["type"];
-            String model_path = current_tileset.properties["${i}"]["path"];
-            behaviour_names.add(new_name);
-            model_paths.add(model_path);
-          }
-          for (int i = 0; i < size.x; i++)
-          {
-            for (int j = 0; j < size.y; j++)
+            int id = data[(i + j*size.x).floor()] - current_tileset.first_gid;
+            if (id >= 0)
             {
-              int id = data[(i + j*size.x).floor()] - current_tileset.first_gid;
-              if (id >= 0)
-              {
-                BehaviourDescription desc = new BehaviourDescription();
-                desc.position_ = new Vector2(i*1.0, size.y - j*1.0);
-                desc.model_path_ = model_paths[id];
-                desc.behaviour_type_ = behaviour_names[id];
-                ret.add(desc);
-              }
+              BehaviourDescription desc = new BehaviourDescription();
+              desc.position_ = new Vector2(i*1.0, size.y - j*1.0);
+              desc.model_path_ = model_paths[id];
+              desc.behaviour_type_ = behaviour_names[id];
+              ret.add(desc);
             }
           }
         }
@@ -265,12 +275,10 @@ class LevelImporter extends AsyncImporter<LevelData>
 
     List layers = jsonData["layers"];
 
-    List<ModelDescription> model_descriptions = new List<ModelDescription>();
-    List<ModelInstance> models = readModelData(model_descriptions, layers, parsed_tilesets, size);
-
-    List<BehaviourDescription> behaviours = readBehaviourData(layers, parsed_tilesets, size);
-
+    List<ModelDescription> model_descriptions = readModelDescriptions(parsed_tilesets);
     List<List<int>> heights = readHeightData(layers, parsed_tilesets, size);
+    List<ModelInstance> models = new List<ModelInstance>();
+    List<BehaviourDescription> behaviours;
 
     for (Map layer in layers)
     {
@@ -280,9 +288,17 @@ class LevelImporter extends AsyncImporter<LevelData>
 
         Tileset current_tileset = getTileset(parsed_tilesets, layer);
 
-        if (current_tileset.name == "models_layer" || current_tileset.name == "heights_layer" || current_tileset.name == "behaviours_layer")
+        if (current_tileset.name == "heights_layer")
         {
 
+        }
+        else if (current_tileset.name == "behaviours_layer")
+        {
+          behaviours = readBehaviourData(layer, current_tileset, size, model_descriptions);
+        }
+        else if (current_tileset.name == "models_layer")
+        {
+          models.addAll(readModelData(model_descriptions, layer, current_tileset, size));
         }
         else
         {
@@ -302,42 +318,58 @@ class LevelImporter extends AsyncImporter<LevelData>
       }
       else
       {
-        if (layer.containsKey("objects") && layer["name"] == "paths")
+        if (layer.containsKey("objects"))
         {
           for (Map object in layer["objects"])
           {
-            double path_scale = 0.0625;
-            String name = object["name"];
-            Vector2 pos = new Vector2.zero();
-            pos.x = object["x"] * 1.0;
-            pos.y = object["y"] * 1.0;
-            List<Vector2> points = new List<Vector2>();
-            for (Map point in object["polyline"])
+            if (object.containsKey("polyline"))
             {
-              Vector2 p_pos = new Vector2.zero();
-              p_pos.x = ((point["x"] + pos.x) * path_scale).floorToDouble();
-              p_pos.y = size.y - ((point["y"] + pos.y ) * path_scale).floorToDouble();
-              points.add(p_pos);
-            }
-            Map properties = object["properties"];
-            if (properties.length != 0)
-            {
-              PortalDescription current_portal = new PortalDescription();
-              current_portal.map_name_ = properties["map"];
-              if (properties.containsKey("hide"))
+              double path_scale = 0.0625;
+              String name = object["name"];
+              Vector2 pos = new Vector2.zero();
+              pos.x = object["x"] * 1.0;
+              pos.y = object["y"] * 1.0;
+              List<Vector2> points = new List<Vector2>();
+              for (Map point in object["polyline"])
               {
-                current_portal.map_hide_.add(properties["hide"]);
+                Vector2 p_pos = new Vector2.zero();
+                p_pos.x = ((point["x"] + pos.x) * path_scale).floorToDouble();
+                p_pos.y = size.y - ((point["y"] + pos.y ) * path_scale).floorToDouble();
+                points.add(p_pos);
               }
-              if(properties.containsKey("show"))
+              Map properties = object["properties"];
+              if (properties.length != 0)
               {
-                current_portal.map_show_.add(properties["show"]);
+                PortalDescription current_portal = new PortalDescription();
+                current_portal.map_name_ = properties["map"];
+                if (properties.containsKey("hide"))
+                {
+                  current_portal.map_hide_.add(properties["hide"]);
+                }
+                if(properties.containsKey("show"))
+                {
+                  current_portal.map_show_.add(properties["show"]);
+                }
+                current_portal.points_ = points;
+                portals.add(current_portal);
               }
-              current_portal.points_ = points;
-              portals.add(current_portal);
+              else
+              {
+                paths[name] = new Path(name, points);
+              }
             }
-            else
+            else if (object.containsKey("gid"))
             {
-              paths[name] = new Path(name, points);
+              int gid = object["gid"];
+              Tileset tileset = getTileTileset(parsed_tilesets, gid);
+              gid -= tileset.first_gid;
+              BehaviourDescription desc = new BehaviourDescription();
+              double x = object["x"] / object ["width"];
+              double y = object["y"] / object ["height"];
+              desc.position_ = new Vector2(x, size.y - y);
+              desc.model_path_ = tileset.properties["$gid"]["path"];
+              desc.behaviour_type_ = tileset.properties["$gid"]["type"];
+              behaviours.add(desc);
             }
           }
         }

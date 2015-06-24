@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" nextobjectid="24">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" nextobjectid="31">
  <tileset firstgid="1" name="models_layer" tilewidth="16" tileheight="16">
   <image source="3d_tiles_template.png" width="80" height="80"/>
   <tile id="0">
    <properties>
-    <property name="name" value="images/tree.model"/>
+    <property name="path" value="images/tree.model"/>
    </properties>
   </tile>
   <tile id="1">
    <properties>
-    <property name="name" value="images/mushroom0.model"/>
+    <property name="path" value="images/mushroom0.model"/>
    </properties>
   </tile>
   <tile id="2">
    <properties>
-    <property name="name" value="images/boulder1.model"/>
+    <property name="path" value="images/boulder1.model"/>
    </properties>
   </tile>
   <tile id="3">
    <properties>
-    <property name="name" value="images/fence.model"/>
+    <property name="path" value="images/fence.model"/>
    </properties>
   </tile>
  </tileset>
@@ -44,6 +44,12 @@
    <properties>
     <property name="path" value="images/sheep_cool.png"/>
     <property name="type" value="CoolSheepBehaviour"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="path" value="images/square_button.model"/>
+    <property name="type" value="ButtonBehaviour"/>
    </properties>
   </tile>
  </tileset>
@@ -86,10 +92,10 @@
  </layer>
  <layer name="behaviours" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJzt0jEKACEMBEDfo/f/94lgd02QFSxmIF0gCdnWAAAA4K/vSvmKfSM4c0ndUd3/luQ/Tm9J/Cadq6p0rgAAAAAAeNMEK4UCVg==
+   eJzt0rEJwDAMBEDPEzv7rxcM7tyI8MEp7kCdQBL61gAAAGB3rUoZxb4enDml7qju/5XkP97ekvhNOldV6Vzxf/fpBQAAAACAIx60ngKD
   </data>
  </layer>
- <layer name="height" width="50" height="50" opacity="0.34">
+ <layer name="height" width="50" height="50">
   <data encoding="base64" compression="zlib">
    eJztwQENAAAAwqD3T20ON6AAAAAAAAAAAADg3wAnEAAB
   </data>
@@ -110,5 +116,6 @@
   <object id="22" name="wolf5" x="534" y="366">
    <polyline points="0,0 3,88 247,86 243,105 -12,105 -12,-2"/>
   </object>
+  <object id="30" gid="45" x="225" y="304" width="16" height="16"/>
  </objectgroup>
 </map>

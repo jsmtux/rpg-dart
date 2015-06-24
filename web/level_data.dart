@@ -143,19 +143,25 @@ class LevelData
     loader.addModels(models_geometry_);
     for (ModelInstance info in models_)
     {
-      double x = info.position_.x + offset_.x + 0.5;
-      double y = info.position_.y + offset_.y + 0.5;
+      double x = info.position_.x + offset_.x;
+      double y = info.position_.y + offset_.y;
       Drawable toAdd = loader.drawable_factory_.createTexturedDrawable(models_geometry_[info.description_.path_]);
       Quaternion rot = new Quaternion.axisAngle(new Vector3(0.0, 0.0, 1.0 ), info.description_.rotation_ * Math.PI / 180);
       toAdd.rotate(rot);
-      toAdd.setScale(1/3);
       area.addElement(toAdd , new Tile3dBehaviour(new Vector2(x, y), info.description_.height_, area));
     }
     SpriteImporter sprite_importer = new SpriteImporter(loader);
     for(BehaviourDescription desc in behaviour_descriptions_)
     {
       Map drawable_spec = new Map();
-      drawable_spec["type"] = "quad";
+      if (desc.model_path_.endsWith(".model"))
+      {
+        drawable_spec["type"] = "model";
+      }
+      else
+      {
+        drawable_spec["type"] = "quad";
+      }
       drawable_spec["path"] = desc.model_path_;
       Map behaviour_spec = new Map();
       behaviour_spec["type"] = desc.behaviour_type_;

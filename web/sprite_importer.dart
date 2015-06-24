@@ -22,6 +22,7 @@ import 'behaviour/terrain_behaviour.dart';
 import 'behaviour/sign_behaviour.dart';
 import 'behaviour/enemy_behaviour.dart';
 import 'behaviour/sheep_behaviour.dart';
+import 'behaviour/button_behaviour.dart';
 
 class SpriteData
 {
@@ -40,6 +41,10 @@ class SpriteData
     else
     {
       drawable = loader.drawable_factory_.createTexturedDrawable(geom_);
+    }
+    if (behaviour_ == null)
+    {
+      print("crap!");
     }
     area.addElement(drawable , behaviour_.getBehaviour(area, loader, state));
   }
@@ -107,6 +112,18 @@ class GoldSheepBehaviourDefinition implements BehaviourDefinition
   Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state)
   {
     return new GoldSheepBehaviour(position_, area);
+  }
+}
+
+class ButtonBehaviourDefinition implements BehaviourDefinition
+{
+  Vector2 position_;
+
+  ButtonBehaviourDefinition(this.position_);
+
+  Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state)
+  {
+    return new ButtonBehaviour(position_, area);
   }
 }
 
@@ -190,6 +207,11 @@ class SpriteImporter extends AsyncImporter<List<SpriteData>>
       case "CoolSheepBehaviour":
         res.behaviour_ = new GoldSheepBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
         break;
+      case "ButtonBehaviour":
+        res.behaviour_ = new ButtonBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
+        break;
+      default:
+        print("Behaviour type " + behaviour_spec["type"] + " not found");
     }
   }
 

@@ -19,6 +19,11 @@ abstract class TerrainElementBehaviour extends Behaviour
 
   TerrainElementBehaviour(this.position_, this.area_);
 
+  double squareDistance(TerrainElementBehaviour sprite)
+  {
+    return (position_ + offset_.xy).distanceToSquared(sprite.position_ + sprite.offset_.xy);
+  }
+
   void init(Drawable drawable)
   {
     super.init(drawable);
@@ -50,6 +55,8 @@ class Tile3dBehaviour extends TerrainElementBehaviour
   void init(Drawable drawable)
   {
     super.init(drawable);
+    drawable.setScale(1/3);
+    drawable.move(new Vector3(0.5,0.5,0.0));
     area_.terrain_.addObstacle(position_, height_);
   }
 
@@ -249,11 +256,6 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
     {
       cur_state_.update();
     }
-  }
-
-  double squareDistance(TerrainElementBehaviour sprite)
-  {
-    return (position_ + offset_.xy).distanceToSquared(sprite.position_ + sprite.offset_.xy);
   }
 
   void setState(BehaviourState state)

@@ -350,19 +350,19 @@
             {
              "0":
                 {
-                 "name":"images\/tree.model"
+                 "path":"images\/tree.model"
                 },
              "1":
                 {
-                 "name":"images\/mushroom0.model"
+                 "path":"images\/mushroom0.model"
                 },
              "2":
                 {
-                 "name":"images\/boulder1.model"
+                 "path":"images\/boulder1.model"
                 },
              "3":
                 {
-                 "name":"images\/fence.model"
+                 "path":"images\/fence.model"
                 }
             },
          "tilewidth":16

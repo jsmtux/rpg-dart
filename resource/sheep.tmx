@@ -4,22 +4,22 @@
   <image source="3d_tiles_template.png" width="80" height="80"/>
   <tile id="0">
    <properties>
-    <property name="name" value="images/tree.model"/>
+    <property name="path" value="images/tree.model"/>
    </properties>
   </tile>
   <tile id="1">
    <properties>
-    <property name="name" value="images/mushroom0.model"/>
+    <property name="path" value="images/mushroom0.model"/>
    </properties>
   </tile>
   <tile id="2">
    <properties>
-    <property name="name" value="images/boulder1.model"/>
+    <property name="path" value="images/boulder1.model"/>
    </properties>
   </tile>
   <tile id="3">
    <properties>
-    <property name="name" value="images/fence.model"/>
+    <property name="path" value="images/fence.model"/>
    </properties>
   </tile>
  </tileset>

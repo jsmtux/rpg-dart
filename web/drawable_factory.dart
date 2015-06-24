@@ -60,6 +60,10 @@ class DrawableFactory
   BaseDrawable createTexturedDrawable(TexturedGeometry geometry)
   {
     BaseDrawable ret = new BaseDrawable();
+    if(geometry == null)
+    {
+      print('crap');
+    }
     initGeometry(geometry, ret);
     initTexture(geometry, ret);
     if (geometry.orientation_ == null)
