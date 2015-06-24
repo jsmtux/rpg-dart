@@ -4,6 +4,8 @@ import 'dart:web_gl' as webgl;
 
 import 'shader_properties.dart';
 
+const String precision_type = 'highp';
+
 abstract class Shader
 {
   webgl.Program shader_program_;
@@ -102,7 +104,7 @@ void main(void) {
 """;
 
 String color_fs_source = """
-precision mediump float;
+precision $precision_type float;
 varying vec4 vColor;
 void main(void) {
   gl_FragColor = vColor;
@@ -128,7 +130,7 @@ void main(void) {
 """;
 
 String texture_fs_source = """
-precision mediump float;
+precision $precision_type float;
 varying vec2 vTextureCoord;
 uniform sampler2D uSampler;
 void main(void) {
@@ -139,7 +141,7 @@ void main(void) {
 Shader createTextureShader(webgl.RenderingContext gl) => new BasicShader(texture_vs_source, texture_fs_source, gl);
 
 String texture_part_vs_source = """
-precision mediump float;
+precision $precision_type float;
 
 attribute vec3 aVertexPosition;
 attribute vec2 aTextureCoord;
@@ -159,7 +161,7 @@ void main(void) {
 """;
 
 String texture_part_fs_source = """
-precision mediump float;
+precision $precision_type float;
 varying vec2 vTextureCoord;
 
 uniform sampler2D uSampler;
@@ -185,7 +187,7 @@ Shader createAtlasShader(webgl.RenderingContext gl) => new AtlasShader(texture_p
 
 
 String lighting_vs_source = """
-precision mediump float;
+precision $precision_type float;
 
 const int MAX_POINT_LIGHTS = 2;
 
@@ -247,7 +249,7 @@ void main(void) {
 """;
 
 String lighting_fs_source = """
-precision mediump float;
+precision $precision_type float;
 varying vec2 vTextureCoord;
 varying vec3 vLightWeighting;
 varying vec3 vVertexPos;
