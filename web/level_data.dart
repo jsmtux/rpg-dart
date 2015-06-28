@@ -67,6 +67,7 @@ class LevelData
 
   Future<TerrainBehaviour> AddToGameState(GameArea area, GameState state, SpriteLoader loader)
   {
+    area.offset_ = offset_;
     Completer completer = new Completer();
     TerrainBehaviour behaviour_t = new TerrainBehaviour(heights_, offset_);
     area.terrain_ = behaviour_t;
@@ -80,7 +81,6 @@ class LevelData
       Drawable terrain_drawable = loader.drawable_factory_.createTerrainDrawable(terrain_geom);
       area.addElement(terrain_drawable, behaviour_t);
       Quaternion rot = new Quaternion.identity();
-      //rot.setAxisAngle(new Vector3(1.0, 0.0, 0.0 ), -60 * (math.PI / 180));
       terrain_drawable.rotate(rot);
       terrain_drawable.setPosition(offset_);
     }
@@ -108,14 +108,17 @@ class LevelData
       ModelImporter importer = new ModelImporter();
       for (ModelDescription model_desc in model_descriptions_)
       {
-        if (!models_geometry_.containsKey(model_desc.path_) && !requested_models_.contains(model_desc.path_))
+        for(String path in model_desc.path_.split(";"))
         {
-          requested_models_.add(model_desc.path_);
-          importer.RequestFile(model_desc.path_)
-            .then((List<BaseGeometry> model)
-                => checkFinished(area, model, model_desc.path_, completer, loader, behaviour_t));
-        }else{
-          checkFinished(area, null, null, completer, loader, behaviour_t);
+          if (!models_geometry_.containsKey(path) && !requested_models_.contains(path))
+          {
+            requested_models_.add(path);
+            importer.RequestFile(path)
+              .then((List<BaseGeometry> model)
+                  => checkFinished(area, model, path, completer, loader, behaviour_t));
+          }else{
+            checkFinished(area, null, null, completer, loader, behaviour_t);
+          }
         }
       }
     }
@@ -148,33 +151,43 @@ class LevelData
       double x = info.position_.x + offset_.x;
       double y = info.position_.y + offset_.y;
       Drawable toAdd = loader.drawable_factory_.createTexturedDrawable(models_geometry_[info.description_.path_]);
-      Quaternion rot = new Quaternion.axisAngle(new Vector3(0.0, 0.0, 1.0 ), info.description_.rotation_ * Math.PI / 180);
-      toAdd.rotate(rot);
       area.addElement(toAdd , new Tile3dBehaviour(new Vector2(x, y), info.description_.height_, area));
     }
-    SpriteImporter sprite_importer = new SpriteImporter(loader);
+    SpriteImporter sprite_importer = new SpriteImporter(loader, offset_);
     for(BehaviourDescription desc in behaviour_descriptions_)
     {
       Map drawable_spec = new Map();
-      if (desc.model_path_.endsWith(".model"))
+      if (desc.model_path_.contains(";"))
       {
-        drawable_spec["type"] = "model";
+        drawable_spec["type"] = "animation";
+        List<String> paths = desc.model_path_.split(";");
+        for (int i = 0; i < paths.length; i++)
+        {
+          drawable_spec["path$i"] = paths[i];
+        }
       }
       else
       {
-        drawable_spec["type"] = "quad";
+        if (desc.model_path_.endsWith(".model"))
+        {
+          drawable_spec["type"] = "model";
+        }
+        else
+        {
+          drawable_spec["type"] = "quad";
+        }
+        drawable_spec["path"] = desc.model_path_;
       }
-      drawable_spec["path"] = desc.model_path_;
       Map behaviour_spec = new Map();
       behaviour_spec["name"] = desc.name_;
       behaviour_spec["type"] = desc.behaviour_type_;
-      behaviour_spec["posx"] = desc.position_.x;
-      behaviour_spec["posy"] = desc.position_.y;
+      behaviour_spec["posx"] = desc.position_.x + offset_.x;
+      behaviour_spec["posy"] = desc.position_.y + offset_.y;
       behaviour_spec["properties"] = desc.properties_;
 
       SpriteData data = new SpriteData();
-      sprite_importer.processBehaviour(behaviour_spec, data);
       sprite_importer.processDrawable(drawable_spec, data);
+      sprite_importer.processBehaviour(behaviour_spec, data);
       data.AddToGameState(loader, area.terrain_, area, null);
     }
     completer.complete(behaviour_t);

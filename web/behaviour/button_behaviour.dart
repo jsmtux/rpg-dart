@@ -18,7 +18,7 @@ class ButtonBehaviour extends Tile3dBehaviour
   void init(Drawable drawable)
   {
     super.init(drawable);
-    offset_ = new Vector3(-0.5, 0.5, 0.0);
+    offset_ = new Vector3(0.0, 0.5, 0.0);
     initial_pos_ = drawable_.getPosition();
   }
 

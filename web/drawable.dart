@@ -25,13 +25,21 @@ abstract class Drawable
   void setSize(Vector3 size);
 }
 
-class BaseDrawable implements Drawable
+class BaseDrawableBuffers
 {
   webgl.Buffer pos_buffer_;
   webgl.Buffer ind_buffer_;
   webgl.Buffer nor_buffer_;
   webgl.Buffer color_buffer_;
   webgl.Buffer tex_buffer_;
+  Texture tex_;
+  int vertices_;
+}
+
+class BaseDrawable implements Drawable
+{
+  List<BaseDrawableBuffers> buffers_ = new List<BaseDrawableBuffers>();
+  BaseDrawableBuffers current_buffer_;
 
   Vector3 position_ = new Vector3(0.0,0.0,0.0);
   Quaternion rotation_ = new Quaternion(0.0,0.0,0.0,1.0);
@@ -40,11 +48,23 @@ class BaseDrawable implements Drawable
 
   Shader shader_;
 
-  List<Texture> tex_ = new List<Texture>();
-  int tex_cur_ind_ = 0;
   bool transparent_ = false;
 
-  int vertices_;
+  BaseDrawable(BaseDrawableBuffers buffer)
+  {
+    buffers_.add(buffer);
+    current_buffer_ = buffer;
+  }
+
+  void addBuffer(BaseDrawableBuffers buffer)
+  {
+    buffers_.add(buffer);
+  }
+
+  void setBuffer(int id)
+  {
+    current_buffer_ = buffers_.elementAt(id);
+  }
 
   void draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions)
   {
@@ -54,26 +74,26 @@ class BaseDrawable implements Drawable
     m_modelview_.scale(scale_, scale_, scale_);
 
     BasicShaderProperties basic_property = shader_.getShaderProperty(BasicShaderProperties.propName);
-    gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, pos_buffer_);
+    gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, current_buffer_.pos_buffer_);
     gl_.vertexAttribPointer(basic_property.a_vertex_pos_, dimensions, webgl.RenderingContext.FLOAT, false, 0, 0);
-    if(color_buffer_ != null)
+    if(current_buffer_.color_buffer_ != null)
     {
-      gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, color_buffer_);
+      gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, current_buffer_.color_buffer_);
       gl_.vertexAttribPointer(basic_property.a_vertex_color_, 4, webgl.RenderingContext.FLOAT, false, 0, 0);
     }
-    if(tex_buffer_ != null)
+    if(current_buffer_.tex_buffer_ != null)
     {
-      tex_[tex_cur_ind_].makeCurrent();
-      gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, tex_buffer_);
+      current_buffer_.tex_.makeCurrent();
+      gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, current_buffer_.tex_buffer_);
       gl_.vertexAttribPointer(basic_property.a_vertex_coord_, 2, webgl.RenderingContext.FLOAT, false, 0, 0);
     }
-    if(nor_buffer_ != null)
+    if(current_buffer_.nor_buffer_ != null)
     {
-      gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, nor_buffer_);
+      gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, current_buffer_.nor_buffer_);
       gl_.vertexAttribPointer(basic_property.a_vertex_normal_, dimensions, webgl.RenderingContext.FLOAT, false, 0, 0);
     }
 
-    gl_.bindBuffer(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, ind_buffer_);
+    gl_.bindBuffer(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, current_buffer_.ind_buffer_);
 
     basic_property.setMatrixUniforms(perspective, m_modelview_, world_view);
 
@@ -91,7 +111,7 @@ class BaseDrawable implements Drawable
       lighting_property.setNormalMatrix(m_normal);
     }
     shader_.makeCurrent();
-    gl_.drawElements(webgl.RenderingContext.TRIANGLES, vertices_, webgl.RenderingContext.UNSIGNED_SHORT, 0);
+    gl_.drawElements(webgl.RenderingContext.TRIANGLES, current_buffer_.vertices_, webgl.RenderingContext.UNSIGNED_SHORT, 0);
   }
 
   bool isTransparent()
@@ -145,26 +165,26 @@ class BaseDrawable implements Drawable
   }
 }
 
-class AnimatedDrawable extends BaseDrawable
+class AnimatedBaseDrawable extends BaseDrawable
 {
-  int num_images_side_;
   Map<String, AnimationSequence> sequences_;
-  AtlasShader shader_;
   AnimationSequence current_sequence_;
   String current_sequence_name_;
   int current_in_sequence_;
   Future update_timer;
-  int idle_image = 0;
+  int idle_image_ = 0;
+
+  AnimatedBaseDrawable(BaseDrawableBuffers buffers_) : super(buffers_);
 
   void draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions)
   {
     if (current_sequence_ != null)
     {
-      ActivateImage(current_sequence_.images[current_in_sequence_]);
+      activateModel(current_sequence_.images[current_in_sequence_]);
     }
     else
     {
-      ActivateImage(idle_image);
+      activateModel(idle_image_);
     }
     super.draw(gl_, world_view, perspective, dimensions);
   }
@@ -184,7 +204,7 @@ class AnimatedDrawable extends BaseDrawable
   {
     if (current_sequence_ != null)
     {
-      idle_image = current_sequence_.images.first;
+      idle_image_ = current_sequence_.images.first;
       current_sequence_ = null;
       current_sequence_name_ = null;
     }
@@ -224,7 +244,36 @@ class AnimatedDrawable extends BaseDrawable
     UpdateSequenceCounter();
   }
 
-  void ActivateImage(int i)
+  void activateModel(int i) {}
+}
+
+class AnimatedGeometry extends AnimatedBaseDrawable
+{
+  AnimatedGeometry(List<BaseDrawableBuffers> buffers) : super(buffers.first)
+  {
+    buffers_ = buffers;
+    idle_image_ = 1;
+  }
+
+  void setModel(int i)
+  {
+    idle_image_ = i;
+  }
+
+  void activateModel(int i)
+  {
+    setBuffer(i);
+  }
+}
+
+class AnimatedSprite extends AnimatedBaseDrawable
+{
+  int num_images_side_;
+  AtlasShader shader_;
+
+  AnimatedSprite(BaseDrawableBuffers buffers) : super(buffers);
+
+  void activateModel(int i)
   {
     int y = (i / num_images_side_).floor();
     int x = i - y * num_images_side_;

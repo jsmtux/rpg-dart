@@ -3,13 +3,14 @@ library terrain_behaviour;
 import 'behaviour.dart';
 import 'package:vector_math/vector_math.dart';
 
+import 'terrain_element_behaviour.dart';
 import '../portal.dart';
 import '../drawable.dart';
 
 class TerrainBehaviour extends Behaviour
 {
   List<List<int>> heights_;
-  Map<Vector2, double> obstacles_ = new Map<Vector2, double>();
+  Map<Vector2, Tile3dBehaviour> obstacles_ = new Map<Vector2, Tile3dBehaviour>();
   List<Vector3> portal_positions_ = new List<Vector3>();
   Vector3 offset_;
   List<Portal> portals_ = new List<Portal>();
@@ -34,11 +35,11 @@ class TerrainBehaviour extends Behaviour
     }
   }
 
-  void addObstacle(Vector2 position, double height)
+  void addObstacle(Vector2 position, Tile3dBehaviour obstacle)
   {
     int x = position.x.floor() - offset_.x.floor();
     int y = heights_[0].length - (position.y.floor() - offset_.y.floor());
-    obstacles_[new Vector2(x *1.0, y*1.0)] = height;
+    obstacles_[new Vector2(x *1.0, y*1.0)] = obstacle;
   }
 
   Portal getPortal(Vector2 position)
@@ -68,11 +69,11 @@ class TerrainBehaviour extends Behaviour
     {
       double obstacle_height = 0.0;
 
-      obstacles_.forEach((pos, height)
+      obstacles_.forEach((pos, obstacle)
       {
         if (pos.x == x && pos.y == y)
         {
-          obstacle_height = height;
+          obstacle_height = obstacle.getHeight();
         }
       });
 

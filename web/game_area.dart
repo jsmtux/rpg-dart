@@ -2,6 +2,8 @@ library game_area;
 
 import 'dart:async';
 
+import 'package:vector_math/vector_math.dart';
+
 import 'path.dart';
 import 'level_importer.dart';
 import 'level_data.dart';
@@ -23,6 +25,7 @@ class GameArea
   Map<String, Path> paths_ = new Map<String, Path>();
   TerrainBehaviour terrain_;
   bool iterating_ = false;
+  Vector3 offset_;
 
   Future<bool> LoadGameArea(String level_path, String behaviour_path, SpriteLoader loader, GameState state)
   {
@@ -63,7 +66,7 @@ class GameArea
 
   void initBehaviour(String behaviour_path, TerrainBehaviour terrain, SpriteLoader loader, GameState state)
   {
-    SpriteImporter sprite_importer = new SpriteImporter(loader);
+    SpriteImporter sprite_importer = new SpriteImporter(loader, offset_);
     sprite_importer.RequestFile(behaviour_path).then(
       (sprites)
       {

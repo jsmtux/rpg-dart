@@ -57,7 +57,12 @@ class Tile3dBehaviour extends TerrainElementBehaviour
     super.init(drawable);
     drawable.setScale(1/3);
     drawable.move(new Vector3(0.5,0.5,0.0));
-    area_.terrain_.addObstacle(position_, height_);
+    area_.terrain_.addObstacle(position_ + new Vector2(0.5,0.5), this);
+  }
+
+  double getHeight()
+  {
+    return height_;
   }
 
   void update()
@@ -150,7 +155,7 @@ abstract class WalkingBehaviourState extends BehaviourState
   void look(Directions dir)
   {
     dir_ = dir;
-    if (element_.drawable_ is AnimatedDrawable)
+    if (element_.drawable_ is AnimatedSprite)
     {
       switch(dir)
       {
@@ -174,7 +179,7 @@ abstract class WalkingBehaviourState extends BehaviourState
 abstract class SpriteBehaviour extends TerrainElementBehaviour
 {
   BehaviourState cur_state_ = null;
-  AnimatedDrawable anim_drawable_;
+  AnimatedSprite anim_drawable_;
   static const double gravity = -0.1;
   double z_accel_ = gravity;
   double height_;
@@ -186,7 +191,7 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
     Quaternion rot = new Quaternion.identity();
     rot.setAxisAngle(new Vector3(1.0, 0.0, 0.0 ), -100 * (math.PI / 180));
     rotation_ = rot;
-    setOffset(new Vector3(-1.0, 0.0, 2.0));
+    setOffset(new Vector3(-0.5, 0.0, 1.0));
   }
 
   bool move(Vector2 pos)
@@ -229,10 +234,11 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
   {
     super.init(drawable);
     drawable_.setTransparent(true);
-    if (drawable is AnimatedDrawable)
+    if (drawable is AnimatedSprite)
     {
       anim_drawable_ = drawable;
     }
+    drawable_.setScale(1/2);
   }
 
   void hit(SpriteBehaviour sprite)

@@ -366,8 +366,8 @@ class LevelImporter extends AsyncImporter<LevelData>
               gid -= tileset.first_gid;
               BehaviourDescription desc = new BehaviourDescription();
               double x = object["x"] / object ["width"];
-              double y = object["y"] / object ["height"];
-              desc.position_ = new Vector2(x, size.y - y);
+              double y = object["y"] / object ["height"] - 0.5;
+              desc.position_ = new Vector2(x.round() * 1.0, size.y - (y.round() - 1.0) * 1.0);
               desc.model_path_ = tileset.properties["$gid"]["path"];
               desc.behaviour_type_ = tileset.properties["$gid"]["type"];
               desc.properties_ = object["properties"];

@@ -120,10 +120,23 @@ class SheepFollowerState extends WalkingBehaviourState
 
   void update()
   {
-    if (follow_.squareDistance(element_) > 2)
+    if (follow_.squareDistance(element_) > 0.8)
     {
-      Vector2 diff = (follow_.position_ - element_.position_).normalize();
-      walkDir(diff);
+      if (follow_.squareDistance(element_) > 10)
+      {
+        follow_.setFollower(null);
+        SheepBehaviour element = element_;
+        if (element.follower_ != null)
+        {
+          element.follower_.stopFollowing();
+        }
+        element_.setState(new SheepNormalState(element_));
+      }
+      else
+      {
+        Vector2 diff = (follow_.position_ - element_.position_).normalize();
+        walkDir(diff);
+      }
     }
   }
 }
@@ -147,13 +160,11 @@ class SheepDeadState extends BehaviourState
 
 abstract class BaseSheepBehaviour extends SpriteBehaviour implements Follower
 {
-  SheepNormalState normal_state_;
   BaseSheepBehaviour follower_;
 
   BaseSheepBehaviour(Vector2 position, GameArea area) : super(position, area)
   {
-    normal_state_ = new SheepNormalState(this);
-    cur_state_ = normal_state_;
+    cur_state_ = new SheepNormalState(this);
   }
 
   bool isFollowing()

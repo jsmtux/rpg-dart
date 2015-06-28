@@ -54,7 +54,7 @@
   </tile>
   <tile id="4">
    <properties>
-    <property name="path" value="images/fence_closed.model"/>
+    <property name="path" value="images/fence_closed.model;images/fence_opened.model"/>
     <property name="type" value="DoorBehaviour"/>
    </properties>
   </tile>
@@ -93,12 +93,12 @@
  </layer>
  <layer name="models" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJztl0sOgCAMBTF6/zO7YkNKIvT1Q32TsJOWAam1NULIKpfh8F6/dXyrXJ77JeVF5Y5wGPNr16CJgbwjCI+IuehYER7S2ZzoIc2Nvh+avIg4s5ge88a5f/H4Wv+yeqx+J7XrmeXy6MkeYex6WD7vRRWPe/F5tAfqvYr2QMWu4pHpfqDq7lgrvf9vM/Xf2tyo/cpUVzVOmTw6Oy4ZPTor55PZo4Pq7U7Aur89gUoe1VwqO1W9T4QQQgghhFTnBXnkAPk=
+   eJztl9kKwzAMBBPa///mPAmMsSGqVofVHQjpg3WMEzvudRFCtNyOV3T/3vm9akXO16ouqnaGw1zf2oMlB3KNIDwyYtG5MjxWz+ZEj1Vs9vqw1EXk2eWMiJtj/8Xj7f63yvMd7vNvubw9tN/JcdzY59vYXa2IM9k8t9r+x149x0fRxeOjHI/2sL5PQrYHKncXj0rrw+qx2yuj/99WOn9ba6Pmq9K+anGq5CH84lLRQ9A8n8oeAupsdwLe59sT6OTRzaWzU9f1RAghhBBCSHcefV8BKQ==
   </data>
  </layer>
  <layer name="behaviours" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJzt0jEKACEMBEDfo/f/94lgd02QFSxmIF0gCdnWAAAA4K/vSvmKfSM4c0ndUd3/luQ/Tm9J/Cadq6p0rgAAAAAAeNMEK4UCVg==
+   eJzt0rEJACAMBEDnUfefz8pWRBJEuYN0Kf5JSgEAAIB8fXOvpaY4t5v/BaddIm5TF5Mp+q9u9Yj2Sw8AAAAAgGkA2pIEeA==
   </data>
  </layer>
  <layer name="height" width="50" height="50">
@@ -122,14 +122,14 @@
   <object id="22" name="wolf5" x="534" y="366">
    <polyline points="0,0 3,88 247,86 243,105 -12,105 -12,-2"/>
   </object>
-  <object id="30" gid="45" x="225" y="304" width="16" height="16">
+  <object id="30" gid="45" x="144" y="306" width="16" height="16">
    <properties>
     <property name="object" value="door1"/>
    </properties>
   </object>
   <object id="31" name="door1" gid="46" x="145" y="257" width="16" height="16"/>
   <object id="33" name="door2" gid="46" x="193" y="258" width="16" height="16"/>
-  <object id="34" gid="45" x="194" y="353" width="16" height="16">
+  <object id="34" gid="45" x="193" y="304" width="16" height="16">
    <properties>
     <property name="object" value="door2"/>
    </properties>

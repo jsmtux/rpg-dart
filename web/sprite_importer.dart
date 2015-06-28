@@ -27,21 +27,24 @@ import 'behaviour/door_behaviour.dart';
 
 class SpriteData
 {
-  BaseGeometry geom_;
+  List<BaseGeometry> geom_ = new List<BaseGeometry>();
   AnimationData anim_;
   BehaviourDefinition behaviour_;
 
   void AddToGameState(SpriteLoader loader, TerrainBehaviour terrain, GameArea area, GameState state)
   {
     BaseDrawable drawable;
-
-    if (anim_ != null)
+    if (geom_.length > 1)
     {
-      drawable = loader.drawable_factory_.createAnimatedDrawable(geom_, anim_);
+      drawable = loader.drawable_factory_.createAnimatedDrawable(geom_);
+    }
+    else if (anim_ != null)
+    {
+      drawable = loader.drawable_factory_.createSpriteDrawable(geom_.first, anim_);
     }
     else
     {
-      drawable = loader.drawable_factory_.createTexturedDrawable(geom_);
+      drawable = loader.drawable_factory_.createTexturedDrawable(geom_.first);
     }
     if (behaviour_ == null)
     {
@@ -174,14 +177,15 @@ class SpriteLoader
 class SpriteImporter extends AsyncImporter<List<SpriteData>>
 {
   SpriteLoader loader_;
+  Vector3 offset_;
 
-  SpriteImporter(this.loader_);
+  SpriteImporter(this.loader_, this.offset_);
 
   void processDrawable(Map drawable_spec, SpriteData res)
   {
     if(drawable_spec["type"]=="quad")
     {
-      res.geom_ = new TexturedGeometry(quad_vertices, null, quad_indices, quad_coords, drawable_spec["path"]);
+      res.geom_.add(new TexturedGeometry(quad_vertices, null, quad_indices, quad_coords, drawable_spec["path"]));
       if (drawable_spec.containsKey("sequences"))
       {
         res.anim_ = new AnimationData();
@@ -196,9 +200,18 @@ class SpriteImporter extends AsyncImporter<List<SpriteData>>
         }
       }
     }
-    else
+    else if (drawable_spec["type"] == "model")
     {
-      res.geom_ = loader_.getModelGeometry(drawable_spec["path"]);
+      res.geom_.add(loader_.getModelGeometry(drawable_spec["path"]));
+    }
+    else if (drawable_spec["type"] == "animation")
+    {
+      int i = 0;
+      while(drawable_spec.containsKey("path$i"))
+      {
+        res.geom_.add(loader_.getModelGeometry(drawable_spec["path$i"]));
+        i++;
+      }
     }
   }
 
@@ -210,17 +223,17 @@ class SpriteImporter extends AsyncImporter<List<SpriteData>>
         res.behaviour_ = new EnemyBehaviourDefinition(behaviour_spec["path"]);
         break;
       case "PCBehaviour":
-        res.behaviour_ = new PCBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
+        res.behaviour_ = new PCBehaviourDefinition(offset_.xy + new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
         break;
       case "SignBehaviour":
-        res.behaviour_ = new SignBehaviourDefinition(behaviour_spec["text"], new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
+        res.behaviour_ = new SignBehaviourDefinition(behaviour_spec["text"], offset_.xy + new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
         break;
       case "SheepBehaviour":
-        res.behaviour_ = new SheepBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
+        res.behaviour_ = new SheepBehaviourDefinition(offset_.xy + new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
         break;
       case "GoldSheepBehaviour":
       case "CoolSheepBehaviour":
-        res.behaviour_ = new GoldSheepBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
+        res.behaviour_ = new GoldSheepBehaviourDefinition(offset_.xy + new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
         break;
       case "ButtonBehaviour":
         String object;
@@ -228,10 +241,10 @@ class SpriteImporter extends AsyncImporter<List<SpriteData>>
         {
           object = behaviour_spec["properties"]["object"];
         }
-        res.behaviour_ = new ButtonBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]), object);
+        res.behaviour_ = new ButtonBehaviourDefinition(offset_.xy + new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]), object);
         break;
       case "DoorBehaviour":
-        res.behaviour_ = new DoorBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]), behaviour_spec["name"]);
+        res.behaviour_ = new DoorBehaviourDefinition(offset_.xy + new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]), behaviour_spec["name"]);
         break;
       default:
         print("Behaviour type " + behaviour_spec["type"] + " not found");

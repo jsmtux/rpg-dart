@@ -15,43 +15,45 @@ class DrawableFactory
   Renderer renderer_;
   AssetManager<Texture> texture_manager_;
 
-  void initGeometry(BaseGeometry geometry, BaseDrawable drawable)
+  void initGeometry(BaseGeometry geometry, BaseDrawableBuffers buffers)
   {
-    drawable.pos_buffer_ = renderer_.gl_.createBuffer();
-    renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, drawable.pos_buffer_);
+
+    buffers.pos_buffer_ = renderer_.gl_.createBuffer();
+    renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, buffers.pos_buffer_);
     renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER,
         new Float32List.fromList(geometry.vertices_), webgl.RenderingContext.STATIC_DRAW);
 
-    drawable.ind_buffer_ = renderer_.gl_.createBuffer();
-    renderer_.gl_.bindBuffer(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, drawable.ind_buffer_);
+    buffers.ind_buffer_ = renderer_.gl_.createBuffer();
+    renderer_.gl_.bindBuffer(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, buffers.ind_buffer_);
     renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ELEMENT_ARRAY_BUFFER, new Uint16List.fromList(geometry.indices_),
         webgl.RenderingContext.STATIC_DRAW);
 
     if (geometry.orientation_ != null)
     {
-      drawable.nor_buffer_ = renderer_.gl_.createBuffer();
-      renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, drawable.nor_buffer_);
+      buffers.nor_buffer_ = renderer_.gl_.createBuffer();
+      renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, buffers.nor_buffer_);
       renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER,
           new Float32List.fromList(geometry.orientation_), webgl.RenderingContext.STATIC_DRAW);
     }
 
-    drawable.vertices_ = geometry.indices_.length;
+    buffers.vertices_ = geometry.indices_.length;
   }
 
-  void initTexture(TexturedGeometry geometry, BaseDrawable drawable)
+  void initTexture(TexturedGeometry geometry, BaseDrawableBuffers buffers)
   {
-    drawable.tex_buffer_ = renderer_.gl_.createBuffer();
-    renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, drawable.tex_buffer_);
+    buffers.tex_buffer_ = renderer_.gl_.createBuffer();
+    renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, buffers.tex_buffer_);
     renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER,
         new Float32List.fromList(geometry.text_coords_), webgl.RenderingContext.STATIC_DRAW);
 
-    drawable.tex_.add(texture_manager_.getAsset(geometry.image_));
+    buffers.tex_ = texture_manager_.getAsset(geometry.image_);
   }
 
   BaseDrawable createBaseDrawable(BaseGeometry geometry)
   {
-    BaseDrawable ret = new BaseDrawable();
-    initGeometry(geometry, ret);
+    BaseDrawableBuffers buffers = new BaseDrawableBuffers();
+    initGeometry(geometry, buffers);
+    BaseDrawable ret = new BaseDrawable(buffers);
     ret.shader_ = renderer_.texture_shader_;
 
     return ret;
@@ -59,14 +61,42 @@ class DrawableFactory
 
   BaseDrawable createTexturedDrawable(TexturedGeometry geometry)
   {
-    BaseDrawable ret = new BaseDrawable();
+    BaseDrawableBuffers buffers = new BaseDrawableBuffers();
     if(geometry == null)
     {
-      print('crap');
+      print('Uninitialised geometry in TexturedDrawable');
     }
-    initGeometry(geometry, ret);
-    initTexture(geometry, ret);
+    initGeometry(geometry, buffers);
+    initTexture(geometry, buffers);
+    BaseDrawable ret = new BaseDrawable(buffers);
     if (geometry.orientation_ == null)
+    {
+      ret.shader_ = renderer_.texture_shader_;
+    }
+    else
+    {
+      ret.shader_ = renderer_.light_shader_;
+    }
+
+    return ret;
+  }
+
+  AnimatedBaseDrawable createAnimatedDrawable(List<BaseGeometry> geometry)
+  {
+    List<BaseDrawableBuffers> buffers = new List<BaseDrawableBuffers>();
+    if(geometry == null)
+    {
+      print('Uninitialised geometry in TexturedDrawable');
+    }
+    for (TexturedGeometry g in geometry)
+    {
+      BaseDrawableBuffers buff = new BaseDrawableBuffers();
+      initGeometry(g, buff);
+      initTexture(g, buff);
+      buffers.add(buff);
+    }
+    BaseDrawable ret = new AnimatedGeometry(buffers);
+    if (geometry.first.orientation_ == null)
     {
       ret.shader_ = renderer_.texture_shader_;
     }
@@ -80,19 +110,21 @@ class DrawableFactory
 
   BaseDrawable createTerrainDrawable(TexturedGeometry geometry)
   {
-    BaseDrawable ret = new BaseDrawable();
-    initGeometry(geometry, ret);
-    initTexture(geometry, ret);
+    BaseDrawableBuffers buffers = new BaseDrawableBuffers();
+    initGeometry(geometry, buffers);
+    initTexture(geometry, buffers);
+    BaseDrawable ret = new BaseDrawable(buffers);
     ret.shader_ = renderer_.light_shader_;
 
     return ret;
   }
 
-  AnimatedDrawable createAnimatedDrawable(TexturedGeometry geometry, AnimationData animation)
+  AnimatedSprite createSpriteDrawable(TexturedGeometry geometry, AnimationData animation)
   {
-    AnimatedDrawable ret = new AnimatedDrawable();
-    initGeometry(geometry, ret);
-    initTexture(geometry, ret);
+    BaseDrawableBuffers buffers = new BaseDrawableBuffers();
+    initGeometry(geometry, buffers);
+    initTexture(geometry, buffers);
+    AnimatedSprite ret = new AnimatedSprite(buffers);
 
     ret.sequences_ = animation.sequences_;
     ret.num_images_side_ = animation.num_images_side_;
