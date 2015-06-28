@@ -43,6 +43,8 @@ class BehaviourDescription
   Vector2 position_;
   String model_path_;
   String behaviour_type_;
+  String name_;
+  Map properties_;
 }
 
 
@@ -164,9 +166,12 @@ class LevelData
       }
       drawable_spec["path"] = desc.model_path_;
       Map behaviour_spec = new Map();
+      behaviour_spec["name"] = desc.name_;
       behaviour_spec["type"] = desc.behaviour_type_;
       behaviour_spec["posx"] = desc.position_.x;
       behaviour_spec["posy"] = desc.position_.y;
+      behaviour_spec["properties"] = desc.properties_;
+
       SpriteData data = new SpriteData();
       sprite_importer.processBehaviour(behaviour_spec, data);
       sprite_importer.processDrawable(drawable_spec, data);

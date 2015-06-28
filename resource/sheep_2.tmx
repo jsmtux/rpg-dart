@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" nextobjectid="31">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" nextobjectid="35">
  <tileset firstgid="1" name="models_layer" tilewidth="16" tileheight="16">
   <image source="3d_tiles_template.png" width="80" height="80"/>
   <tile id="0">
@@ -52,6 +52,12 @@
     <property name="type" value="ButtonBehaviour"/>
    </properties>
   </tile>
+  <tile id="4">
+   <properties>
+    <property name="path" value="images/fence_closed.model"/>
+    <property name="type" value="DoorBehaviour"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="67" name="terrain" tilewidth="16" tileheight="16">
   <image source="terrain.png" width="1024" height="1024"/>
@@ -92,7 +98,7 @@
  </layer>
  <layer name="behaviours" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJzt0rEJwDAMBEDPEzv7rxcM7tyI8MEp7kCdQBL61gAAAGB3rUoZxb4enDml7qju/5XkP97ekvhNOldV6Vzxf/fpBQAAAACAIx60ngKD
+   eJzt0jEKACEMBEDfo/f/94lgd02QFSxmIF0gCdnWAAAA4K/vSvmKfSM4c0ndUd3/luQ/Tm9J/Cadq6p0rgAAAAAAeNMEK4UCVg==
   </data>
  </layer>
  <layer name="height" width="50" height="50">
@@ -116,6 +122,17 @@
   <object id="22" name="wolf5" x="534" y="366">
    <polyline points="0,0 3,88 247,86 243,105 -12,105 -12,-2"/>
   </object>
-  <object id="30" gid="45" x="225" y="304" width="16" height="16"/>
+  <object id="30" gid="45" x="225" y="304" width="16" height="16">
+   <properties>
+    <property name="object" value="door1"/>
+   </properties>
+  </object>
+  <object id="31" name="door1" gid="46" x="145" y="257" width="16" height="16"/>
+  <object id="33" name="door2" gid="46" x="193" y="258" width="16" height="16"/>
+  <object id="34" gid="45" x="194" y="353" width="16" height="16">
+   <properties>
+    <property name="object" value="door2"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

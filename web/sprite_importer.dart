@@ -23,6 +23,7 @@ import 'behaviour/sign_behaviour.dart';
 import 'behaviour/enemy_behaviour.dart';
 import 'behaviour/sheep_behaviour.dart';
 import 'behaviour/button_behaviour.dart';
+import 'behaviour/door_behaviour.dart';
 
 class SpriteData
 {
@@ -44,7 +45,7 @@ class SpriteData
     }
     if (behaviour_ == null)
     {
-      print("crap!");
+      print("Behaviour is null!");
     }
     area.addElement(drawable , behaviour_.getBehaviour(area, loader, state));
   }
@@ -118,12 +119,26 @@ class GoldSheepBehaviourDefinition implements BehaviourDefinition
 class ButtonBehaviourDefinition implements BehaviourDefinition
 {
   Vector2 position_;
+  String object_;
 
-  ButtonBehaviourDefinition(this.position_);
+  ButtonBehaviourDefinition(this.position_, this.object_);
 
   Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state)
   {
-    return new ButtonBehaviour(position_, area);
+    return new ButtonBehaviour(position_, area, object_);
+  }
+}
+
+class DoorBehaviourDefinition implements BehaviourDefinition
+{
+  Vector2 position_;
+  String name_;
+
+  DoorBehaviourDefinition(this.position_, this.name_);
+
+  Behaviour getBehaviour(GameArea area, SpriteLoader loader, GameState state)
+  {
+    return new DoorBehaviour(position_, area, name_);
   }
 }
 
@@ -208,7 +223,15 @@ class SpriteImporter extends AsyncImporter<List<SpriteData>>
         res.behaviour_ = new GoldSheepBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
         break;
       case "ButtonBehaviour":
-        res.behaviour_ = new ButtonBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]));
+        String object;
+        if (behaviour_spec["properties"] != null)
+        {
+          object = behaviour_spec["properties"]["object"];
+        }
+        res.behaviour_ = new ButtonBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]), object);
+        break;
+      case "DoorBehaviour":
+        res.behaviour_ = new DoorBehaviourDefinition(new Vector2(behaviour_spec["posx"], behaviour_spec["posy"]), behaviour_spec["name"]);
         break;
       default:
         print("Behaviour type " + behaviour_spec["type"] + " not found");

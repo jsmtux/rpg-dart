@@ -160,6 +160,7 @@ class LevelImporter extends AsyncImporter<LevelData>
               desc.position_ = new Vector2(i*1.0, size.y - j*1.0);
               desc.model_path_ = model_paths[id];
               desc.behaviour_type_ = behaviour_names[id];
+              desc.properties_ = new Map();
               ret.add(desc);
             }
           }
@@ -369,6 +370,8 @@ class LevelImporter extends AsyncImporter<LevelData>
               desc.position_ = new Vector2(x, size.y - y);
               desc.model_path_ = tileset.properties["$gid"]["path"];
               desc.behaviour_type_ = tileset.properties["$gid"]["type"];
+              desc.properties_ = object["properties"];
+              desc.name_ = object["name"];
               behaviours.add(desc);
             }
           }
