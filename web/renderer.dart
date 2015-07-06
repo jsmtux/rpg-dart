@@ -2,6 +2,7 @@ library Renderer;
 
 import 'dart:html';
 import 'dart:web_gl' as webgl;
+import 'dart:typed_data';
 
 import 'package:vector_math/vector_math.dart';
 
@@ -31,6 +32,12 @@ class Renderer
   Shader light_shader_;
   Shader atlas_shader_;
 
+  Uint8List last_captured_colour_map_;
+
+  webgl.Framebuffer picking_buffer_;
+
+  Vector2 mouse_pos_;
+
   Camera camera_;
 
   Renderer(DivElement div, this.canvas_, this.camera_)
@@ -43,12 +50,31 @@ class Renderer
     window.onDeviceOrientation.listen((event) {
       setSize();
     });
+
+    window.onMouseMove.listen((event){mouse_pos_ = new Vector2(event.client.x *1.0, event.client.y * 1.0);});
+    last_captured_colour_map_ = new Uint8List(view_width_ * view_height_ * 4);
     gl_ = canvas_.getContext('experimental-webgl');
     color_shader_ = createColorShader(gl_);
     texture_shader_ = createTextureShader(gl_);
     light_shader_ = createLightShader(gl_);
     atlas_shader_ = createAtlasShader(gl_);
     m_worldview_ = new Matrix4.identity();
+
+    picking_buffer_ = gl_.createFramebuffer();
+    gl_.bindFramebuffer(webgl.FRAMEBUFFER, picking_buffer_);
+    var texture = gl_.createTexture();
+    gl_.bindTexture(webgl.TEXTURE_2D, texture);
+    gl_.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MAG_FILTER, webgl.NEAREST);
+    gl_.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.NEAREST);
+    gl_.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, canvas_.width, canvas_.height, 0, webgl.RGBA, webgl.UNSIGNED_BYTE, null);
+    var renderbuffer = gl_.createRenderbuffer();
+    gl_.bindRenderbuffer(webgl.RENDERBUFFER, renderbuffer);
+    gl_.renderbufferStorage(webgl.RENDERBUFFER, webgl.DEPTH_COMPONENT16, canvas_.width, canvas_.height);
+    gl_.framebufferTexture2D(webgl.FRAMEBUFFER, webgl.COLOR_ATTACHMENT0, webgl.TEXTURE_2D, texture, 0);
+    gl_.framebufferRenderbuffer(webgl.FRAMEBUFFER, webgl.DEPTH_ATTACHMENT, webgl.RENDERBUFFER, renderbuffer);
+    gl_.bindTexture(webgl.TEXTURE_2D, null);
+    gl_.bindRenderbuffer(webgl.RENDERBUFFER, null);
+    gl_.bindFramebuffer(webgl.FRAMEBUFFER, null);
 
     gl_.clearColor(1.0, 1.0, 1.0, 1.0);
     gl_.enable(webgl.RenderingContext.DEPTH_TEST);
@@ -83,8 +109,59 @@ class Renderer
 
   bool inViewPort(Drawable drawable, Camera cam)
   {
-    //return drawable.getPosition().xy.distanceTo(-cam.GetPos().xy) < 25.0 + drawable.getSize().xy.length;
-    return true;
+    return drawable.getPosition().xy.distanceTo(-cam.GetPos().xy) < 25.0 + drawable.getSize().xy.length;
+    //return true;
+  }
+
+  List<int> GetColourMapColour(Vector2 pos)
+  {
+    List<int> ret;
+    if (pos.x >= view_width_ || pos.y >= view_height_ || pos.x < 0 || pos.y < 0)
+    {
+      print("invalid mouse coordinates");
+    }
+    else if (last_captured_colour_map_ == null)
+    {
+      print("Colour map not captured");
+    }
+    else
+    {
+      var first_address = (view_height_ - 1 - pos.y.floor()) * view_width_ * 4 + pos.x.floor() * 4;
+      ret = new List<int>();
+      ret.add(last_captured_colour_map_[first_address]);
+      ret.add(last_captured_colour_map_[first_address + 1]);
+      ret.add(last_captured_colour_map_[first_address + 2]);
+    }
+    return ret;
+  }
+
+  Vector2 renderPicking(List<List<Drawable>> drawables, Vector2 mouse_pos)
+  {
+    gl_.bindFramebuffer(webgl.FRAMEBUFFER, picking_buffer_);
+    gl_.viewport(0, 0, view_width_, view_height_);
+
+    gl_.clear(webgl.RenderingContext.COLOR_BUFFER_BIT | webgl.RenderingContext.DEPTH_BUFFER_BIT);
+
+    m_worldview_ = camera_.GetMat();
+
+    m_perspective_ = makePerspectiveMatrix(radians(45.0), view_width_/view_height_, 0.1, 100.0);
+    for(List<Drawable> list in drawables)
+    {
+      for(Drawable d in list)
+      {
+        if (inViewPort(d, camera_))
+        {
+          if(!d.isTransparent() && d.pickable())
+          {
+            d.drawPick(gl_, m_worldview_, m_perspective_, dimensions_);
+          }
+        }
+      }
+    }
+    gl_.readPixels(0, 0, view_width_, view_height_, webgl.RGBA, webgl.UNSIGNED_BYTE, last_captured_colour_map_);
+    List<int> colour = this.GetColourMapColour(mouse_pos);
+    gl_.bindFramebuffer(webgl.FRAMEBUFFER, null);
+    return new Vector2(colour[0] / 255, colour[1] / 255);
   }
 
   void render(List<List<Drawable>> drawables)

@@ -21,6 +21,7 @@ class SquareTerrain
   {
     TexturedGeometry ret =
         new TexturedGeometry(new List<double>(), new List<double>(), new List<int>(), new List<double>(), this.image_);
+    ret.colors_ = new List<double>();
     int bleeding_correction_factor = 512;
     double bleeding_correction = 1/bleeding_correction_factor;
     int num_images_root = math.sqrt(num_images_).floor();
@@ -42,24 +43,33 @@ class SquareTerrain
 
         Vertex va = new Vertex.zero();
         va.position_.x = i*1.0;
+        va.color_.x = va.position_.x / size_.x;
         va.position_.y = size_.y - (j-1)*1.0;
         va.text_coord_.x = tex_offset.x;
         va.text_coord_.y = tex_offset.y;
+        va.color_.x = va.position_.x / size_.x;
+        va.color_.y = va.position_.y / size_.y;
         Vertex vb = new Vertex.zero();
         vb.position_.x = i*1.0;
         vb.position_.y = size_.y - j*1.0;
         vb.text_coord_.x = tex_offset.x;
         vb.text_coord_.y = tex_offset.y + tex_size.y;
+        vb.color_.x = vb.position_.x / size_.x;
+        vb.color_.y = vb.position_.y / size_.y;
         Vertex vc = new Vertex.zero();
         vc.position_.x = (i+1)*1.0;
         vc.position_.y = size_.y - (j-1)*1.0;
         vc.text_coord_.x = tex_offset.x + tex_size.x;
         vc.text_coord_.y = tex_offset.y;
+        vc.color_.x = vc.position_.x / size_.x;
+        vc.color_.y = vc.position_.y / size_.y;
         Vertex vd = new Vertex.zero();
         vd.position_.x = (i+1)*1.0;
         vd.position_.y = size_.y - j*1.0;
         vd.text_coord_.x = tex_offset.x + tex_size.x;
         vd.text_coord_.y = tex_offset.y + tex_size.y;
+        vd.color_.x = vd.position_.x / size_.x;
+        vd.color_.y = vd.position_.y / size_.y;
 
         if (heights_[i][j] >= 0)
         {

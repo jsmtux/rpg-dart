@@ -6,14 +6,19 @@ import '../camera.dart';
 import '../game_state.dart';
 import '../game_area.dart';
 import '../input.dart';
+import '../base_geometry.dart';
+import '../geometry_data.dart';
 import 'behaviour.dart';
 import 'sheep_behaviour.dart';
 import 'directions.dart';
 import 'terrain_element_behaviour.dart';
+import 'grass_behaviour.dart';
 
 class PCNormalState extends WalkingBehaviourState
 {
   PCNormalState(SpriteBehaviour element) : super(element, 0.05);
+
+  bool moved_ = false;
 
   void hit(SpriteBehaviour sprite)
   {
@@ -24,6 +29,21 @@ class PCNormalState extends WalkingBehaviourState
   void update()
   {
     PCBehaviour element = element_;
+    if(element.input_.isDown(Input.ACTION))
+    {
+      if (!moved_)
+      {
+        Vector2 absolute = element.area_.terrain_.getAbsolutePos(element.state_.getPointClicked());
+        element.area_.addElement(element.state_.drawable_factory_.createTexturedDrawable(
+            new TexturedGeometry(quad_vertices, null, quad_indices, quad_coords, "images/grass.png"))
+            , new GrassBehaviour(element.area_, absolute));
+        moved_ = true;
+      }
+    }
+    else
+    {
+      moved_ = false;
+    }
     if(element.input_.isDown(Input.JUMP) && element.on_ground_)
     {
       element.z_accel_ = 0.15;

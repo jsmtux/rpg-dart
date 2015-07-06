@@ -7,6 +7,8 @@ import '../game_area.dart';
 import 'terrain_element_behaviour.dart';
 import 'pc_behaviour.dart';
 import 'enemy_behaviour.dart';
+import 'behaviour.dart';
+import 'grass_behaviour.dart';
 
 abstract class Followable implements SpriteBehaviour
 {
@@ -28,7 +30,7 @@ class SheepNormalState extends WalkingBehaviourState
   Vector2 initial_position_;
   Vector2 walk_initial_position_ = new Vector2(0.0,0.0);
 
-  SheepNormalState(SpriteBehaviour element) : super(element, 0.05)
+  SheepNormalState(SpriteBehaviour element) : super(element, 0.01)
   {
     element_ = element;
     initial_position_ = element_.position_;
@@ -58,12 +60,15 @@ class SheepNormalState extends WalkingBehaviourState
         toFollow = toFollow.getFollower();
       }
 
-      toFollow.setFollower(element_);
-      element_.setState(new SheepFollowerState(element_, toFollow));
+      if (toFollow != null)
+      {
+        toFollow.setFollower(element_);
+        element_.setState(new SheepFollowerState(element_, toFollow));
+      }
     }
   }
 
-  void update()
+  void randomWalk()
   {
     if(random_position_ == null)
     {
@@ -88,9 +93,47 @@ class SheepNormalState extends WalkingBehaviourState
       }
       else
       {
-        Vector2 diff = (random_position_ - walk_initial_position_)/100.0;
+        Vector2 diff = (random_position_ - walk_initial_position_)/500.0;
         element_.move(element_.position_ + diff);
       }
+    }
+  }
+
+  void update()
+  {
+    bool updated = false;
+    for (Behaviour behaviour in element_.area_.behaviours_)
+    {
+      double min_distance;
+      GrassBehaviour closest_grass;
+      if (behaviour is GrassBehaviour)
+      {
+        double dist = element_.squareDistance(behaviour);
+        if (min_distance == null || dist < min_distance)
+        {
+          min_distance = dist;
+          closest_grass = behaviour;
+        }
+      }
+      if (closest_grass != null)
+      {
+        if (min_distance < 0.05)
+        {
+          updated = true;
+          break;
+        }
+        else if (min_distance < 1)
+        {
+          Vector2 diff = (closest_grass.position_ - element_.position_).normalize();
+          walkDir(diff);
+          updated = true;
+          break;
+        }
+      }
+    }
+    if (!updated)
+    {
+      randomWalk();
     }
   }
 }
@@ -108,7 +151,7 @@ class SheepFollowerState extends WalkingBehaviourState
   {
     if (sprite is EnemyBehaviour)
     {
-      SheepBehaviour element = element_;
+      BaseSheepBehaviour element = element_;
       follow_.setFollower(null);
       if (element.follower_ != null)
       {
@@ -122,17 +165,17 @@ class SheepFollowerState extends WalkingBehaviourState
   {
     if (follow_.squareDistance(element_) > 0.8)
     {
-      if (follow_.squareDistance(element_) > 10)
+      /*if (follow_.squareDistance(element_) > 10)
       {
         follow_.setFollower(null);
-        SheepBehaviour element = element_;
+        BaseSheepBehaviour element = element_;
         if (element.follower_ != null)
         {
           element.follower_.stopFollowing();
         }
-        element_.setState(new SheepNormalState(element_));
+        element.setState(new SheepNormalState(element));
       }
-      else
+      else*/
       {
         Vector2 diff = (follow_.position_ - element_.position_).normalize();
         walkDir(diff);
@@ -199,10 +242,7 @@ abstract class BaseSheepBehaviour extends SpriteBehaviour implements Follower
 
   void setFollower(SpriteBehaviour follower)
   {
-    if (follower_ == null)
-    {
-      follower_ = follower;
-    }
+    follower_ = follower;
   }
 }
 

@@ -12,6 +12,7 @@ abstract class Input
 
   static const int ATTACK = 0;
   static const int JUMP = 1;
+  static const int ACTION = 2;
 
   bool isDown(int key);
 
@@ -21,8 +22,9 @@ abstract class Input
 class KeyboardInput implements Input
 {
   Keyboard keyboard_;
+  Mouse mouse_;
 
-  KeyboardInput(this.keyboard_);
+  KeyboardInput(this.keyboard_, this.mouse_);
 
   bool isDown(int key)
   {
@@ -34,6 +36,10 @@ class KeyboardInput implements Input
     else if (key == Input.JUMP)
     {
       ret = keyboard_.isDown(Keyboard.C);
+    }
+    else if (key == Input.ACTION)
+    {
+      ret = mouse_.isDown(0);
     }
     return ret;
   }
@@ -162,10 +168,10 @@ class CombinedInput implements Input
   TouchInput touch_input_;
   KeyboardInput key_input_;
 
-  CombinedInput(CanvasElement canvas, DivElement analog_control, Keyboard keyboard)
+  CombinedInput(CanvasElement canvas, DivElement analog_control, Keyboard keyboard, Mouse mouse)
   {
     touch_input_ = new TouchInput(canvas, analog_control);
-    key_input_ = new KeyboardInput(keyboard);
+    key_input_ = new KeyboardInput(keyboard, mouse);
   }
 
   bool isDown(int key)

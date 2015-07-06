@@ -49,6 +49,17 @@ class DrawableFactory
     buffers.tex_ = texture_manager_.getAsset(geometry.image_);
   }
 
+  void initColors(TexturedGeometry geometry, BaseDrawableBuffers buffers)
+  {
+    if (geometry.colors_ != null)
+    {
+      buffers.color_buffer_ = renderer_.gl_.createBuffer();
+      renderer_.gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, buffers.color_buffer_);
+      renderer_.gl_.bufferDataTyped(webgl.RenderingContext.ARRAY_BUFFER,
+          new Float32List.fromList(geometry.colors_), webgl.RenderingContext.STATIC_DRAW);
+    }
+  }
+
   BaseDrawable createBaseDrawable(BaseGeometry geometry)
   {
     BaseDrawableBuffers buffers = new BaseDrawableBuffers();
@@ -113,8 +124,10 @@ class DrawableFactory
     BaseDrawableBuffers buffers = new BaseDrawableBuffers();
     initGeometry(geometry, buffers);
     initTexture(geometry, buffers);
+    initColors(geometry, buffers);
     BaseDrawable ret = new BaseDrawable(buffers);
     ret.shader_ = renderer_.light_shader_;
+    ret.pick_shader_ = renderer_.color_shader_;
 
     return ret;
   }

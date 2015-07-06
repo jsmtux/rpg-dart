@@ -19,7 +19,7 @@ void startGame(String map, String sprites)
   gameLoop.pointerLock.lockOnClick = false;
   Input input;
 
-  input = new CombinedInput(canvas, div_analog, gameLoop.keyboard);
+  input = new CombinedInput(canvas, div_analog, gameLoop.keyboard, gameLoop.mouse);
 
   DialogueBox dialogue = new DialogueBox(querySelector("#dialogue"));
 
@@ -28,7 +28,7 @@ void startGame(String map, String sprites)
   Renderer renderer = new Renderer(div, canvas, cur_cam);
 
   DrawableFactory drawable_factory = new DrawableFactory(renderer);
-  GameState draw_state = new GameState(renderer);
+  GameState draw_state = new GameState(renderer, drawable_factory);
 
   SpriteLoader loader = new SpriteLoader(drawable_factory, input, cur_cam, dialogue);
 

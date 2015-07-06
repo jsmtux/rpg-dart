@@ -13,6 +13,7 @@ import 'shader_properties.dart';
 abstract class Drawable
 {
   void draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions);
+  void drawPick(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions);
   bool isTransparent();
   void setTransparent(bool val);
   void setPosition(Vector3 pos);
@@ -23,6 +24,7 @@ abstract class Drawable
   void rotate(Quaternion rot);
   Vector3 getSize();
   void setSize(Vector3 size);
+  bool pickable();
 }
 
 class BaseDrawableBuffers
@@ -47,6 +49,7 @@ class BaseDrawable implements Drawable
   Vector3 size_ = new Vector3(1.0, 1.0, 1.0);
 
   Shader shader_;
+  Shader pick_shader_;
 
   bool transparent_ = false;
 
@@ -66,28 +69,28 @@ class BaseDrawable implements Drawable
     current_buffer_ = buffers_.elementAt(id);
   }
 
-  void draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions)
+  void baseDraw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions, Shader cur_shader)
   {
     Matrix4 m_modelview_ = new Matrix4.identity();
     m_modelview_.translate(position_);
     m_modelview_.setRotation(rotation_.asRotationMatrix());
     m_modelview_.scale(scale_, scale_, scale_);
 
-    BasicShaderProperties basic_property = shader_.getShaderProperty(BasicShaderProperties.propName);
+    BasicShaderProperties basic_property = cur_shader.getShaderProperty(BasicShaderProperties.propName);
     gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, current_buffer_.pos_buffer_);
     gl_.vertexAttribPointer(basic_property.a_vertex_pos_, dimensions, webgl.RenderingContext.FLOAT, false, 0, 0);
-    if(current_buffer_.color_buffer_ != null)
+    if(current_buffer_.color_buffer_ != null && basic_property.a_vertex_color_ != -1)
     {
       gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, current_buffer_.color_buffer_);
-      gl_.vertexAttribPointer(basic_property.a_vertex_color_, 4, webgl.RenderingContext.FLOAT, false, 0, 0);
+      gl_.vertexAttribPointer(basic_property.a_vertex_color_, dimensions, webgl.RenderingContext.FLOAT, false, 0, 0);
     }
-    if(current_buffer_.tex_buffer_ != null)
+    if(current_buffer_.tex_buffer_ != null && basic_property.a_vertex_coord_ != -1)
     {
       current_buffer_.tex_.makeCurrent();
       gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, current_buffer_.tex_buffer_);
       gl_.vertexAttribPointer(basic_property.a_vertex_coord_, 2, webgl.RenderingContext.FLOAT, false, 0, 0);
     }
-    if(current_buffer_.nor_buffer_ != null)
+    if(current_buffer_.nor_buffer_ != null && basic_property.a_vertex_normal_ != -1)
     {
       gl_.bindBuffer(webgl.RenderingContext.ARRAY_BUFFER, current_buffer_.nor_buffer_);
       gl_.vertexAttribPointer(basic_property.a_vertex_normal_, dimensions, webgl.RenderingContext.FLOAT, false, 0, 0);
@@ -97,7 +100,7 @@ class BaseDrawable implements Drawable
 
     basic_property.setMatrixUniforms(perspective, m_modelview_, world_view);
 
-    LightingShaderProperty lighting_property = shader_.getShaderProperty(LightingShaderProperty.propName);
+    LightingShaderProperty lighting_property = cur_shader.getShaderProperty(LightingShaderProperty.propName);
     if (lighting_property != null)
     {
       Matrix3 m_normal = new Matrix3.identity();
@@ -110,8 +113,18 @@ class BaseDrawable implements Drawable
 
       lighting_property.setNormalMatrix(m_normal);
     }
-    shader_.makeCurrent();
+    cur_shader.makeCurrent();
     gl_.drawElements(webgl.RenderingContext.TRIANGLES, current_buffer_.vertices_, webgl.RenderingContext.UNSIGNED_SHORT, 0);
+  }
+
+  void draw(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions)
+  {
+    baseDraw(gl_, world_view, perspective, dimensions, shader_);
+  }
+
+  void drawPick(webgl.RenderingContext gl_, Matrix4 world_view, Matrix4 perspective, int dimensions)
+  {
+    baseDraw(gl_, world_view, perspective, dimensions, pick_shader_);
   }
 
   bool isTransparent()
@@ -162,6 +175,11 @@ class BaseDrawable implements Drawable
   void setSize(Vector3 size)
   {
     size_ = size;
+  }
+
+  bool pickable()
+  {
+    return pick_shader_ != null;
   }
 }
 

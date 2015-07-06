@@ -11,17 +11,19 @@ import 'renderer.dart';
 import 'sprite_importer.dart';
 import 'game_area.dart';
 import 'scene_lights.dart';
+import 'drawable_factory.dart';
 
 class GameState extends SimpleHtmlState
 {
   Renderer renderer_;
   SceneLightsController lights_controller_;
+  DrawableFactory drawable_factory_;
 
   Map<String, GameArea> areas_ = new Map<String, GameArea>();
   List<GameArea> visible_areas_ = new List<GameArea>();
   List<GameArea> updated_areas_ = new List<GameArea>();
 
-  GameState(this.renderer_)
+  GameState(this.renderer_, this.drawable_factory_)
   {
     lights_controller_ = renderer_.getLightsController();
     lights_controller_.SetAmbientLight(new BaseLight(new Vector3(0.7, 0.7, 0.7)));
@@ -80,5 +82,16 @@ class GameState extends SimpleHtmlState
   }
 
   void onKeyDown(KeyboardEvent event) {
+  }
+
+  Vector2 getPointClicked()
+  {
+    List<List<Drawable>> list = new List<List<Drawable>>();
+    for(GameArea area in visible_areas_)
+    {
+      list.add(area.drawables_);
+    };
+
+    return renderer_.renderPicking(list, renderer_.mouse_pos_);
   }
 }

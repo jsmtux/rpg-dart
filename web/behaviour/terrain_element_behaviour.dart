@@ -182,7 +182,7 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
   AnimatedSprite anim_drawable_;
   static const double gravity = -0.1;
   double z_accel_ = gravity;
-  double height_;
+  double height_ = 0.0;
   bool on_ground_ = true;
 
   SpriteBehaviour(Vector2 pos, GameArea area) : super(pos, area)
