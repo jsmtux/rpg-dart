@@ -106,7 +106,7 @@ class SheepNormalState extends WalkingBehaviourState
     {
       double min_distance;
       GrassBehaviour closest_grass;
-      if (behaviour is GrassBehaviour)
+      if (behaviour is GrassBehaviour && !behaviour.eaten_)
       {
         double dist = element_.squareDistance(behaviour);
         if (min_distance == null || dist < min_distance)
@@ -119,6 +119,7 @@ class SheepNormalState extends WalkingBehaviourState
       {
         if (min_distance < 0.05)
         {
+          closest_grass.hit(element_);
           updated = true;
           break;
         }

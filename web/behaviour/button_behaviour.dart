@@ -5,6 +5,7 @@ import 'package:vector_math/vector_math.dart';
 import 'terrain_element_behaviour.dart';
 import 'door_behaviour.dart';
 import 'behaviour.dart';
+import 'grass_behaviour.dart';
 import "../game_area.dart";
 import '../drawable.dart';
 
@@ -68,7 +69,7 @@ class ButtonBehaviour extends Tile3dBehaviour
     bool activated = false;
     for (Behaviour behaviour in area_.behaviours_)
     {
-      if (behaviour is TerrainElementBehaviour && !(behaviour is ButtonBehaviour))
+      if (behaviour is TerrainElementBehaviour && !(behaviour is ButtonBehaviour) && !(behaviour is GrassBehaviour))
       {
         TerrainElementBehaviour element = behaviour;
 
