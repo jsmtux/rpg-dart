@@ -63,6 +63,7 @@ class Tile3dBehaviour extends TerrainElementBehaviour
   double getHeight()
   {
     return height_;
+    //return 0.0;
   }
 
   void update()

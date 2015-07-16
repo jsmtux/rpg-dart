@@ -84,4 +84,6 @@ main() {
       (event){startGame("images/sheep_map.json", "images/map_units_sheep.json"); level_window.classes.remove("show");});
   addGridButton("02", level_menu).onClick.listen(
       (event){startGame("images/sheep_2.json", "images/map_units_sheep_2.json"); level_window.classes.remove("show");});
+  addGridButton("03", level_menu).onClick.listen(
+      (event){startGame("images/sheep_3.json", "images/map_units_sheep_3.json"); level_window.classes.remove("show");});
 }

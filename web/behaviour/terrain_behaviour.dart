@@ -132,7 +132,12 @@ class TerrainBehaviour extends Behaviour
 
   Vector2 getAbsolutePos(Vector2 pos)
   {
-    Vector2 size = new Vector2(heights_.length * 1.0, heights_[0].length * 1.0);
+    Vector2 size = getSize();
     return new Vector2(size.x * pos.x, size.y * pos.y);
+  }
+
+  Vector2 getSize()
+  {
+    return new Vector2(heights_.length * 1.0, heights_[0].length * 1.0);
   }
 }

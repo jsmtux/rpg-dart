@@ -51,7 +51,7 @@ class Renderer
       setSize();
     });
 
-    window.onMouseMove.listen((event){mouse_pos_ = new Vector2(event.client.x *1.0, event.client.y * 1.0);});
+    window.onMouseDown.listen((event){mouse_pos_ = new Vector2(event.client.x *1.0, event.client.y * 1.0);});
     last_captured_colour_map_ = new Uint8List(view_width_ * view_height_ * 4);
     gl_ = canvas_.getContext('experimental-webgl');
     color_shader_ = createColorShader(gl_);

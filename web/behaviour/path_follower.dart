@@ -9,6 +9,7 @@ import '../path.dart';
 abstract class PathFollower
 {
   void updateWalk(WalkingBehaviourState behaviour);
+  Vector2 getNextNode();
 }
 
 class SquarePathFollower implements PathFollower
@@ -39,6 +40,11 @@ class SquarePathFollower implements PathFollower
     }
     num_steps_++;
     behaviour.walk(walking_dir_);
+  }
+
+  Vector2 getNextNode()
+  {
+    return new Vector2.zero();
   }
 }
 
@@ -101,21 +107,23 @@ class SpriteFollower implements PathFollower
   {
     return difference_;
   }
+
+  Vector2 getNextNode()
+  {
+    return following_.position_;
+  }
 }
 
 class MapPathFollower implements PathFollower
 {
   Path path_;
   int cur_path_point_ = 0;
+  Function callback_;
 
   MapPathFollower(this.path_);
 
   void updateWalk(WalkingBehaviourState behaviour)
   {
-    if (cur_path_point_ >= path_.points.length)
-    {
-      cur_path_point_ = 0;
-    }
     Vector2 position = path_.points[cur_path_point_];
     int x = position.x.floor();
     int y = position.y.floor();
@@ -149,5 +157,22 @@ class MapPathFollower implements PathFollower
     {
       cur_path_point_ ++;
     }
+
+    if (cur_path_point_ >= path_.points.length)
+    {
+      if (callback_ == null)
+      {
+        cur_path_point_ = 0;
+      }
+      else
+      {
+        callback_();
+      }
+    }
+  }
+
+  Vector2 getNextNode()
+  {
+    return path_.points[cur_path_point_];
   }
 }

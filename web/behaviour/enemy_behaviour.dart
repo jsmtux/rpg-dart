@@ -8,6 +8,7 @@ import 'path_follower.dart';
 import 'behaviour.dart';
 import 'terrain_element_behaviour.dart';
 import 'sheep_behaviour.dart';
+import 'a_star_algorithm.dart';
 
 class EnemyNormalState extends WalkingBehaviourState
 {
@@ -26,7 +27,6 @@ class EnemyNormalState extends WalkingBehaviourState
 
   void update()
   {
-    bool walking = true;
     for (Behaviour behaviour in element_.area_.behaviours_)
     {
       double min_distance;
@@ -42,21 +42,25 @@ class EnemyNormalState extends WalkingBehaviourState
       }
       if (closest_sheep != null && min_distance < 12)
       {
-        element_.setState(new EnemyFollowState(element_, closest_sheep));
+        element_.setState(new EnemyFollowState(element_, closest_sheep, path_follower_.getNextNode()));
       }
     }
-    if (walking)
-    {
-      path_follower_.updateWalk(this);
-    }
+    path_follower_.updateWalk(this);
+  }
+
+  void whenFinished(Function fun)
+  {
+    MapPathFollower path_follower = path_follower_;
+    path_follower.callback_ = fun;
   }
 }
 
 class EnemyFollowState extends WalkingBehaviourState
 {
   SheepBehaviour follow_;
+  Vector2 origin_pos_;
 
-  EnemyFollowState(SpriteBehaviour element, this.follow_) : super(element, 0.05);
+  EnemyFollowState(SpriteBehaviour element, this.follow_, this.origin_pos_) : super(element, 0.05);
   void hit(SpriteBehaviour sprite){}
 
   void update()
@@ -67,11 +71,15 @@ class EnemyFollowState extends WalkingBehaviourState
     if (diff.length2 < 0.1)
     {
       follow_.hit(element_);
-      element_.setState(this_element.normal_state_);
+      //element_.setState(this_element.normal_state_);
+      EnemyNormalState getBack = new EnemyNormalState(this_element,
+          aStar(this_element.area_.terrain_.obstacles_, this_element.area_.terrain_.getSize(), this_element.position_, origin_pos_));
+      getBack.whenFinished((){element_.setState(this_element.normal_state_);});
+      element_.setState(getBack);
     }
     if (diff.length2 > 20)
     {
-      element_.setState(this_element.normal_state_);
+      //element_.setState(this_element.normal_state_);
     }
   }
 }

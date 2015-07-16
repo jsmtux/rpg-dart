@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" nextobjectid="35">
+ <tileset firstgid="1" name="models_layer" tilewidth="16" tileheight="16">
+  <image source="3d_tiles_template.png" width="80" height="80"/>
+  <tile id="0">
+   <properties>
+    <property name="path" value="images/tree.model"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="path" value="images/mushroom0.model"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="path" value="images/boulder1.model"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="path" value="images/fence.model"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="26" name="heights_layer" tilewidth="16" tileheight="16">
+  <image source="height_template.png" width="64" height="64"/>
+ </tileset>
+ <tileset firstgid="42" name="behaviours_layer" tilewidth="16" tileheight="16">
+  <image source="sprites_template.png" width="80" height="80"/>
+  <tile id="0">
+   <properties>
+    <property name="path" value="images/sheep.png"/>
+    <property name="type" value="SheepBehaviour"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="path" value="images/sheep_gold.png"/>
+    <property name="type" value="GoldSheepBehaviour"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="path" value="images/sheep_cool.png"/>
+    <property name="type" value="CoolSheepBehaviour"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="path" value="images/square_button.model"/>
+    <property name="type" value="ButtonBehaviour"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="path" value="images/fence_closed.model;images/fence_opened.model"/>
+    <property name="type" value="DoorBehaviour"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="67" name="terrain" tilewidth="16" tileheight="16">
+  <image source="terrain.png" width="1024" height="1024"/>
+  <tile id="924">
+   <properties>
+    <property name="height" value="2"/>
+    <property name="name" value="images/tree.model"/>
+   </properties>
+  </tile>
+  <tile id="925">
+   <properties>
+    <property name="height" value="2"/>
+    <property name="name" value="images/tree.model"/>
+   </properties>
+  </tile>
+  <tile id="966">
+   <properties>
+    <property name="height" value="2"/>
+    <property name="name" value="images/tree.model"/>
+   </properties>
+  </tile>
+  <tile id="967">
+   <properties>
+    <property name="height" value="2"/>
+    <property name="name" value="images/tree.model"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="terrain" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJzt0cENgDAQxMCTgPTfUygMurAj+bHyf2c/M++/fXivNXOv80v/mEce5tI/5pGHufSPeeRhLv1jHnmYS/+YRx7m0j/mkYe59I955GEu/WMeeZhL/5hHHubSP+aRh7n0j3nkYS79Yx55mPsBDMIBoQ==
+  </data>
+ </layer>
+ <layer name="models" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztl9kKwzAMBBPa///mPAmMsSGqVofVHQjpg3WMEzvudRFCtNyOV3T/3vm9akXO16ouqnaGw1zf2oMlB3KNIDwyYtG5MjxWz+ZEj1Vs9vqw1EXk2eWMiJtj/8Xj7f63yvMd7vNvubw9tN/JcdzY59vYXa2IM9k8t9r+x149x0fRxeOjHI/2sL5PQrYHKncXj0rrw+qx2yuj/99WOn9ba6Pmq9K+anGq5CH84lLRQ9A8n8oeAupsdwLe59sT6OTRzaWzU9f1RAghhBBCSHcefV8BKQ==
+  </data>
+ </layer>
+ <layer name="behaviours" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJzt0rEJACAMBEDnUfefz8pWRBJEuYN0Kf5JSgEAAIB8fXOvpaY4t5v/BaddIm5TF5Mp+q9u9Yj2Sw8AAAAAgGkA2pIEeA==
+  </data>
+ </layer>
+ <layer name="height" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztwQENAAAAwqD3T20ON6AAAAAAAAAAAADg3wAnEAAB
+  </data>
+ </layer>
+ <objectgroup name="paths">
+  <object id="17" name="wolf1" x="293" y="246">
+   <polyline points="-1,-14 173,-13"/>
+  </object>
+  <object id="18" name="wolf2" x="462.78" y="207">
+   <polyline points="12.2195,-43 -154.78,-42"/>
+  </object>
+  <object id="20" name="wolf3" x="237" y="200">
+   <polyline points="0,0 -138,-1 -144,-85 6,-82 -1,-1"/>
+  </object>
+  <object id="21" name="wolf4" x="188" y="95">
+   <polyline points="0,0 7,135 66,135 70,-5 1,0"/>
+  </object>
+  <object id="22" name="wolf5" x="534" y="366">
+   <polyline points="0,0 3,88 247,86 243,105 -12,105 -12,-2"/>
+  </object>
+  <object id="30" gid="45" x="144" y="306" width="16" height="16">
+   <properties>
+    <property name="object" value="door1"/>
+   </properties>
+  </object>
+  <object id="31" name="door1" gid="46" x="145" y="257" width="16" height="16"/>
+  <object id="33" name="door2" gid="46" x="193" y="258" width="16" height="16"/>
+  <object id="34" gid="45" x="193" y="304" width="16" height="16">
+   <properties>
+    <property name="object" value="door2"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
