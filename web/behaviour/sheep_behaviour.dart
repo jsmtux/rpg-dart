@@ -278,3 +278,25 @@ class GoldSheepBehaviour extends BaseSheepBehaviour
   }
 }
 
+class CoolSheepBehaviour extends BaseSheepBehaviour
+{
+  CoolSheepBehaviour(Vector2 position, GameArea area) : super(position, area)
+  {
+  }
+
+  bool checkWillFollow(PCBehaviour pc)
+  {
+    bool contains_gold = false;
+    Followable tmp_follower = pc;
+
+    while((tmp_follower = tmp_follower.getFollower()) != null)
+    {
+      if (tmp_follower is GoldSheepBehaviour)
+      {
+        contains_gold = true;
+      }
+    }
+    return contains_gold;
+  }
+}
+

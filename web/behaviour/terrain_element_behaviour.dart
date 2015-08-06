@@ -252,16 +252,23 @@ abstract class SpriteBehaviour extends TerrainElementBehaviour
 
   void update()
   {
-    z_accel_ -= 0.01;
-    if (z_accel_ < gravity)
+    if (height_ == null)
     {
-      z_accel_ = gravity;
+      print("Updating SpriteBehaviour with incorrect initialisation");
     }
-    height_ += z_accel_;
-    move(position_);
-    if (cur_state_ != null)
+    else
     {
-      cur_state_.update();
+      z_accel_ -= 0.01;
+      if (z_accel_ < gravity)
+      {
+        z_accel_ = gravity;
+      }
+      height_ += z_accel_;
+      move(position_);
+      if (cur_state_ != null)
+      {
+        cur_state_.update();
+      }
     }
   }
 
