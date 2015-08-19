@@ -93,12 +93,12 @@
  </layer>
  <layer name="models" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJzt19sKhDAMRVFl/v+fhzwUJNikHbzsZs4CUWwfcqj2sm0iIiIiIkK333iJXGWV7yqqk177kXLwVMox856qNxar5yBkmK3hrP/bGczsukUcCzO7tyOOhamUo91HsuzumZKj+acc1LnKy7JE6x8pz0iOX9qeNppjpSxRW/YPEVQZDxOdL7I2kl692XuaXr2fQ7vvT+Wz+GfflyrLQd+fNH4ffFa770+lHDxVcpiV9iORKjlMb/6inD++yHYA0w==
+   eJztVosKAjEM89D//2YRFKRsXZK2O08aGHh21ybrY3e7NRqNRqPRaDQae3G815VxOGt3vOhaxfwHtI49YPrgTC0eT6buq/s+Ep/hVDVDlPgjWwXnKl2ojt1nzMI799nzVXSwXM7W8OFgn1kujA50hivnyMbxfGXqYOb+6H0FVTqUOzha26u4jNYr6LB4mHWY/UyOM2ZnVl2NOKE+7X5VE5IT1hebY+9OnOliZ8XIbutqFnvmz+PrwctVZj4QTqoNja3YRnZUR4WWTB0rLmgPKVB9zvhk5EPJS5V+tqdH84mdlwqUbwHkf3W2KEDntd1z/7LP9qOcIt8A3z7YOPZ3hFOUP+NjpcPezxncUKh5H/Fc1VaFpmgPojqQ91WNGfNA1YH4VWIrqNAx8/0LdbmrxyP4Fx0vrGrgbB1PKf8Bxg==
   </data>
  </layer>
  <layer name="behaviours" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJztz0ERACAMA8HqAfzrQwFPJnTYNXBJFQAAALxjpgccrFB3hLq3dP3TdTcAAAAAwG82dEUA1g==
+   eJzt0rENACAMA8HMA+w/Hy0FFU2UcDfBW3IEAAAA9DeyAx7duitvqdxOLzM74OBfAADAb1Z2AACtbWAGAX4=
   </data>
  </layer>
  <layer name="height" width="50" height="50">
@@ -107,19 +107,19 @@
   </data>
  </layer>
  <objectgroup name="paths">
-  <object id="17" name="wolf1" x="216.845" y="280">
-   <polyline points="-0.844828,-14 146.155,-13"/>
+  <object id="17" name="wolf1" x="304.339" y="280">
+   <polyline points="-0.339081,-14 58.6609,-13"/>
   </object>
   <object id="18" name="wolf2" x="462.78" y="207">
-   <polyline points="12.2195,-43 -154.78,-42"/>
+   <polyline points="-7.7805,347 64.22,347"/>
   </object>
-  <object id="20" name="wolf3" x="762" y="194">
-   <polyline points="0,0 -138,-1 -144,-85 6,-82 -1,-1"/>
+  <object id="20" name="wolf3" x="743.72" y="561">
+   <polyline points="0,0 -52.44,-0.305882 -54.72,-26 2.28,-25.0824 -0.38,-0.305882"/>
   </object>
-  <object id="21" name="wolf4" x="635" y="90">
-   <polyline points="0,0 7,135 66,135 70,-5 1,0"/>
+  <object id="21" name="wolf4" x="452" y="25.6429">
+   <polyline points="-34,26 -11.1,67.3571 70.3429,95.3571 57,-1.64286 -24.5857,2"/>
   </object>
-  <object id="22" name="wolf5" x="534" y="366">
+  <object id="22" name="wolf5" x="127" y="12">
    <polyline points="0,0 3,88 247,86 243,105 -12,105 -12,-2"/>
   </object>
  </objectgroup>

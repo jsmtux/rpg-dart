@@ -33,6 +33,8 @@ class Renderer
   Shader atlas_shader_;
 
   Uint8List last_captured_colour_map_;
+  webgl.Texture fb_texture_;
+  webgl.Renderbuffer render_buffer_;
 
   webgl.Framebuffer picking_buffer_;
 
@@ -40,46 +42,41 @@ class Renderer
 
   Camera camera_;
 
-  Renderer(DivElement div, this.canvas_, this.camera_)
+  Renderer(this.view_, this.canvas_, this.camera_)
   {
-    view_ = div;
-    setSize();
-    window.onResize.listen((event) {
-      setSize();
-    });
-    window.onDeviceOrientation.listen((event) {
-      setSize();
-    });
-
     window.onMouseDown.listen((event){mouse_pos_ = new Vector2(event.client.x *1.0, event.client.y * 1.0);});
-    last_captured_colour_map_ = new Uint8List(view_width_ * view_height_ * 4);
     gl_ = canvas_.getContext('experimental-webgl');
     color_shader_ = createColorShader(gl_);
     texture_shader_ = createTextureShader(gl_);
     light_shader_ = createLightShader(gl_);
     atlas_shader_ = createAtlasShader(gl_);
     m_worldview_ = new Matrix4.identity();
+  }
 
-    picking_buffer_ = gl_.createFramebuffer();
-    gl_.bindFramebuffer(webgl.FRAMEBUFFER, picking_buffer_);
-    var texture = gl_.createTexture();
-    gl_.bindTexture(webgl.TEXTURE_2D, texture);
-    gl_.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MAG_FILTER, webgl.NEAREST);
-    gl_.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.NEAREST);
-    gl_.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, canvas_.width, canvas_.height, 0, webgl.RGBA, webgl.UNSIGNED_BYTE, null);
-    var renderbuffer = gl_.createRenderbuffer();
-    gl_.bindRenderbuffer(webgl.RENDERBUFFER, renderbuffer);
-    gl_.renderbufferStorage(webgl.RENDERBUFFER, webgl.DEPTH_COMPONENT16, canvas_.width, canvas_.height);
-    gl_.framebufferTexture2D(webgl.FRAMEBUFFER, webgl.COLOR_ATTACHMENT0, webgl.TEXTURE_2D, texture, 0);
-    gl_.framebufferRenderbuffer(webgl.FRAMEBUFFER, webgl.DEPTH_ATTACHMENT, webgl.RENDERBUFFER, renderbuffer);
-    gl_.bindTexture(webgl.TEXTURE_2D, null);
-    gl_.bindRenderbuffer(webgl.RENDERBUFFER, null);
-    gl_.bindFramebuffer(webgl.FRAMEBUFFER, null);
+  void init()
+  {
+    setSize();
+    window.onResize.listen((event) {
+      setSize();
+      updateFrameBufferSize();
+    });
+    window.onDeviceOrientation.listen((event) {
+      setSize();
+      updateFrameBufferSize();
+    });
 
     gl_.clearColor(1.0, 1.0, 1.0, 1.0);
     gl_.enable(webgl.RenderingContext.DEPTH_TEST);
     gl_.blendFunc(webgl.RenderingContext.SRC_ALPHA, webgl.RenderingContext.ONE_MINUS_SRC_ALPHA);
     gl_.enable(webgl.RenderingContext.BLEND);
+
+    setupFrameBuffer();
+  }
+
+  void stop()
+  {
+    view_.style.height = '0px';
+    view_.style.width = '0px';
   }
 
   SceneLightsController getLightsController()
@@ -100,6 +97,32 @@ class Renderer
     view_height_ = new_height;
     view_.style.marginTop = (-new_height / 2).toString() + 'px';
     view_.style.marginLeft = (-new_width / 2).toString() + 'px';
+  }
+
+  void setupFrameBuffer()
+  {
+    picking_buffer_ = gl_.createFramebuffer();
+    gl_.bindFramebuffer(webgl.FRAMEBUFFER, picking_buffer_);
+    fb_texture_ = gl_.createTexture();
+    gl_.bindTexture(webgl.TEXTURE_2D, fb_texture_);
+    gl_.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MAG_FILTER, webgl.NEAREST);
+    gl_.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.NEAREST);
+    render_buffer_ = gl_.createRenderbuffer();
+    updateFrameBufferSize();
+  }
+
+  void updateFrameBufferSize()
+  {
+    last_captured_colour_map_ = new Uint8List(view_width_ * view_height_ * 4);
+    gl_.bindTexture(webgl.TEXTURE_2D, fb_texture_);
+    gl_.texImage2DTyped(webgl.TEXTURE_2D, 0, webgl.RGBA, canvas_.width, canvas_.height, 0, webgl.RGBA, webgl.UNSIGNED_BYTE, last_captured_colour_map_);
+    gl_.bindRenderbuffer(webgl.RENDERBUFFER, render_buffer_);
+    gl_.renderbufferStorage(webgl.RENDERBUFFER, webgl.DEPTH_COMPONENT16, canvas_.width, canvas_.height);
+    gl_.framebufferTexture2D(webgl.FRAMEBUFFER, webgl.COLOR_ATTACHMENT0, webgl.TEXTURE_2D, fb_texture_, 0);
+    gl_.framebufferRenderbuffer(webgl.FRAMEBUFFER, webgl.DEPTH_ATTACHMENT, webgl.RENDERBUFFER, render_buffer_);
+    gl_.bindTexture(webgl.TEXTURE_2D, null);
+    gl_.bindRenderbuffer(webgl.RENDERBUFFER, null);
+    gl_.bindFramebuffer(webgl.FRAMEBUFFER, null);
   }
 
   void resize(Event e)

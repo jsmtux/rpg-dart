@@ -10,37 +10,55 @@ import 'sprite_importer.dart';
 import 'dialogue_box.dart';
 import 'input.dart';
 
-void startGame(String map, String sprites)
+class GameManager
 {
-  CanvasElement canvas = querySelector("#game-element");
-  DivElement div = querySelector("#game-area");
-  DivElement div_analog = querySelector('#analog_control_base');
-  GameLoopHtml gameLoop = new GameLoopHtml(canvas);
-  gameLoop.pointerLock.lockOnClick = false;
-  Input input;
+  CanvasElement canvas_;
+  DivElement div_game_area_;
+  DivElement div_analog_controller_;
+  Input input_;
+  GameLoopHtml game_loop_;
+  DialogueBox dialogue_;
+  Camera camera_;
+  Renderer renderer_;
 
-  input = new CombinedInput(canvas, div_analog, gameLoop.keyboard, gameLoop.mouse);
+  GameManager()
+  {
+    canvas_ = querySelector("#game-element");
+    div_game_area_ = querySelector("#game-area");
+    div_analog_controller_ = querySelector('#analog_control_base');
+    game_loop_ = new GameLoopHtml(canvas_);
+    game_loop_.pointerLock.lockOnClick = false;
+    input_ = new CombinedInput(canvas_, div_analog_controller_, game_loop_.keyboard, game_loop_.mouse);
+    dialogue_ = new DialogueBox(querySelector("#dialogue"));
+    camera_ = new Camera();
+    renderer_ = new Renderer(div_game_area_, canvas_, camera_);
+  }
 
-  DialogueBox dialogue = new DialogueBox(querySelector("#dialogue"));
+  void startGame(String map, String sprites)
+  {
+    renderer_.init();
 
-  Camera cur_cam = new Camera();
+    DrawableFactory drawable_factory = new DrawableFactory(renderer_);
+    GameState draw_state = new GameState(renderer_, drawable_factory);
 
-  Renderer renderer = new Renderer(div, canvas, cur_cam);
+    SpriteLoader loader = new SpriteLoader(drawable_factory, input_, camera_, dialogue_);
 
-  DrawableFactory drawable_factory = new DrawableFactory(renderer);
-  GameState draw_state = new GameState(renderer, drawable_factory);
-
-  SpriteLoader loader = new SpriteLoader(drawable_factory, input, cur_cam, dialogue);
-
-  draw_state.loadArea("first", map, sprites, loader)
+    draw_state.loadArea("first", map, sprites, loader)
     .then((bool ret)
-        {
-          gameLoop.state = draw_state;
-          draw_state.setVisible("first", true);
-          querySelector('#pause-button').style.display = 'block';
-        });
+    {
+      game_loop_.state = draw_state;
+      draw_state.setVisible("first", true);
+      querySelector('#pause-button').style.display = 'block';
+    });
 
-  gameLoop.start();
+    game_loop_.start();
+  }
+
+  void stopGame()
+  {
+    renderer_.stop();
+    game_loop_.stop();
+  }
 }
 
 AnchorElement addButton(String text, DivElement menu, String button_class)
@@ -58,6 +76,7 @@ AnchorElement addMenuButton(String text, DivElement menu) => addButton(text, men
 AnchorElement addGridButton(String text, DivElement menu) => addButton(text, menu, "grid-button");
 
 main() {
+  GameManager game_manager = new GameManager();
   DivElement main_window = querySelector("#main-window");
   DivElement level_window = querySelector("#level-modal");
   DivElement options_window = querySelector("#options-modal");
@@ -75,15 +94,15 @@ main() {
 
   AnchorElement close_ingame = ingame_window.querySelector("#Close-ingame");
   close_ingame.onClick.listen((event) => ingame_window.classes.remove("show"));
-  addMenuButton("Main menu", ingame_window);
+  addMenuButton("Main menu", ingame_window).onClick.listen((event) => game_manager.stopGame());
 
   AnchorElement close = level_window.querySelector("#Close");
   close.onClick.listen((event) => level_window.classes.remove("show"));
   DivElement level_menu = level_window.querySelector("#level-menu");
   addGridButton("01", level_menu).onClick.listen(
-      (event){startGame("images/sheep_map.json", "images/map_units_sheep.json"); level_window.classes.remove("show");});
+      (event){game_manager.startGame("images/sheep_map.json", "images/map_units_sheep.json"); level_window.classes.remove("show");});
   addGridButton("02", level_menu).onClick.listen(
-      (event){startGame("images/sheep_2.json", "images/map_units_sheep_2.json"); level_window.classes.remove("show");});
+      (event){game_manager.startGame("images/sheep_2.json", "images/map_units_sheep_2.json"); level_window.classes.remove("show");});
   addGridButton("03", level_menu).onClick.listen(
-      (event){startGame("images/sheep_3.json", "images/map_units_sheep_3.json"); level_window.classes.remove("show");});
+      (event){game_manager.startGame("images/sheep_3.json", "images/map_units_sheep_3.json"); level_window.classes.remove("show");});
 }
