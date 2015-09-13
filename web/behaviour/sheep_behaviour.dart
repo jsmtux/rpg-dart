@@ -142,6 +142,7 @@ class SheepNormalState extends WalkingBehaviourState
 class SheepFollowerState extends WalkingBehaviourState
 {
   Followable follow_;
+  Vector2 vel_ = new Vector2(0.0, 0.0);
 
   SheepFollowerState(SpriteBehaviour element, this.follow_) : super(element, 0.05)
   {
@@ -164,9 +165,13 @@ class SheepFollowerState extends WalkingBehaviourState
 
   void update()
   {
-    if (follow_.squareDistance(element_) > 0.8)
+    double distance = follow_.squareDistance(element_);
+    double limit = 0.8;
+    double weight = 0.2;
+    double soft_limit = 1.5;
+    if (distance > limit)
     {
-      /*if (follow_.squareDistance(element_) > 10)
+      if (follow_.squareDistance(element_) > 10)
       {
         follow_.setFollower(null);
         BaseSheepBehaviour element = element_;
@@ -176,10 +181,22 @@ class SheepFollowerState extends WalkingBehaviourState
         }
         element.setState(new SheepNormalState(element));
       }
-      else*/
+      else
       {
-        Vector2 diff = (follow_.position_ - element_.position_).normalize();
-        walkDir(diff);
+        double slowness = distance - limit;
+        slowness = slowness / soft_limit;
+        if (slowness > 1.0)
+        {
+          slowness = 1.0;
+        }
+        Vector2 desired_vel = (follow_.position_ - element_.position_).normalize()* max_vel_ * slowness;
+        Vector2 steering = desired_vel - vel_;
+        vel_ = vel_ + steering * weight;
+        if (vel_.length > max_vel_)
+        {
+          vel_ = vel_.normalize() * max_vel_;
+        }
+        element_.move(element_.position_ + vel_);
       }
     }
   }

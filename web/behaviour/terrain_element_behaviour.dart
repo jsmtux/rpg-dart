@@ -91,13 +91,13 @@ abstract class BehaviourState
 abstract class WalkingBehaviourState extends BehaviourState
 {
   Directions dir_ = Directions.UP;
-  double vel_;
+  double max_vel_;
 
-  WalkingBehaviourState(SpriteBehaviour element, this.vel_) : super (element);
+  WalkingBehaviourState(SpriteBehaviour element, this.max_vel_) : super (element);
 
   void walkDir(Vector2 dir)
   {
-    Vector2 movement = dir.normalized() * vel_;
+    Vector2 movement = dir.normalized() * max_vel_;
     if(element_.move(element_.position_ + movement))
     {
     }
@@ -139,16 +139,16 @@ abstract class WalkingBehaviourState extends BehaviourState
     switch(dir)
     {
       case Directions.UP:
-        element_.move(element_.position_ + new Vector2(0.0 , vel_));
+        element_.move(element_.position_ + new Vector2(0.0 , max_vel_));
         break;
       case Directions.DOWN:
-        element_.move(element_.position_ + new Vector2(0.0 , -vel_));
+        element_.move(element_.position_ + new Vector2(0.0 , -max_vel_));
         break;
       case Directions.LEFT:
-        element_.move(element_.position_ + new Vector2(-vel_, 0.0));
+        element_.move(element_.position_ + new Vector2(-max_vel_, 0.0));
         break;
       case Directions.RIGHT:
-        element_.move(element_.position_ + new Vector2(vel_, 0.0));
+        element_.move(element_.position_ + new Vector2(max_vel_, 0.0));
         break;
     }
   }
