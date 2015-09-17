@@ -42,6 +42,9 @@ class Renderer
 
   Camera camera_;
 
+  var on_resize_listener_;
+  var on_orientation_listener_;
+
   Renderer(this.view_, this.canvas_, this.camera_)
   {
     window.onMouseDown.listen((event){mouse_pos_ = new Vector2(event.client.x *1.0, event.client.y * 1.0);});
@@ -55,12 +58,13 @@ class Renderer
 
   void init()
   {
+    resetListeners();
     setSize();
-    window.onResize.listen((event) {
+    on_resize_listener_ = window.onResize.listen((event) {
       setSize();
       updateFrameBufferSize();
     });
-    window.onDeviceOrientation.listen((event) {
+    on_orientation_listener_ = window.onDeviceOrientation.listen((event) {
       setSize();
       updateFrameBufferSize();
     });
@@ -73,10 +77,23 @@ class Renderer
     setupFrameBuffer();
   }
 
+  void resetListeners()
+  {
+    if(on_resize_listener_ != null)
+    {
+      on_resize_listener_.cancel();
+    }
+    if(on_orientation_listener_ != null)
+    {
+      on_orientation_listener_.cancel();
+    }
+  }
+
   void stop()
   {
     view_.style.height = '0px';
     view_.style.width = '0px';
+    resetListeners();
   }
 
   SceneLightsController getLightsController()

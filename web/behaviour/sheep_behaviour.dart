@@ -179,6 +179,7 @@ class SheepFollowerState extends WalkingBehaviourState
         {
           element.follower_.stopFollowing();
         }
+        element.follower_ = null;
         element.setState(new SheepNormalState(element));
       }
       else

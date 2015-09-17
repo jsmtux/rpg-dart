@@ -20,6 +20,7 @@ class GameManager
   DialogueBox dialogue_;
   Camera camera_;
   Renderer renderer_;
+  String current_map_, current_sprites_;
 
   GameManager()
   {
@@ -36,6 +37,8 @@ class GameManager
 
   void startGame(String map, String sprites)
   {
+    current_map_ = map;
+    current_sprites_ = sprites;
     renderer_.init();
 
     DrawableFactory drawable_factory = new DrawableFactory(renderer_);
@@ -58,6 +61,12 @@ class GameManager
   {
     renderer_.stop();
     game_loop_.stop();
+  }
+
+  void restartGame()
+  {
+    stopGame();
+    startGame(current_map_, current_sprites_);
   }
 }
 
@@ -94,7 +103,18 @@ main() {
 
   AnchorElement close_ingame = ingame_window.querySelector("#Close-ingame");
   close_ingame.onClick.listen((event) => ingame_window.classes.remove("show"));
-  addMenuButton("Main menu", ingame_window).onClick.listen((event) => game_manager.stopGame());
+
+  addMenuButton("Restart", ingame_window).onClick.listen((event)
+  {
+    game_manager.restartGame();
+    ingame_window.classes.remove("show");
+  });
+  addMenuButton("Main menu", ingame_window).onClick.listen((event)
+  {
+    game_manager.stopGame();
+    ingame_window.classes.remove("show");
+    querySelector('#pause-button').style.display = 'none';
+  });
 
   AnchorElement close = level_window.querySelector("#Close");
   close.onClick.listen((event) => level_window.classes.remove("show"));
