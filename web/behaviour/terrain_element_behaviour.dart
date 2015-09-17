@@ -95,9 +95,8 @@ abstract class WalkingBehaviourState extends BehaviourState
 
   WalkingBehaviourState(SpriteBehaviour element, this.max_vel_) : super (element);
 
-  void walkDir(Vector2 dir)
+  void addPos(Vector2 movement)
   {
-    Vector2 movement = dir.normalized() * max_vel_;
     if(element_.move(element_.position_ + movement))
     {
     }
@@ -109,6 +108,12 @@ abstract class WalkingBehaviourState extends BehaviourState
     {
       element_.move(element_.position_ + new Vector2(0.0, movement.y));
     }
+  }
+
+  void walkDir(Vector2 dir)
+  {
+    Vector2 movement = dir.normalized() * max_vel_;
+    addPos(movement);
 
     double angle = math.atan2(dir.y, dir.x) - math.PI / 4;
     if(angle < 0)
@@ -139,16 +144,16 @@ abstract class WalkingBehaviourState extends BehaviourState
     switch(dir)
     {
       case Directions.UP:
-        element_.move(element_.position_ + new Vector2(0.0 , max_vel_));
+        addPos(new Vector2(0.0 , max_vel_));
         break;
       case Directions.DOWN:
-        element_.move(element_.position_ + new Vector2(0.0 , -max_vel_));
+        addPos(new Vector2(0.0 , -max_vel_));
         break;
       case Directions.LEFT:
-        element_.move(element_.position_ + new Vector2(-max_vel_, 0.0));
+        addPos(new Vector2(-max_vel_, 0.0));
         break;
       case Directions.RIGHT:
-        element_.move(element_.position_ + new Vector2(max_vel_, 0.0));
+        addPos(new Vector2(max_vel_, 0.0));
         break;
     }
   }

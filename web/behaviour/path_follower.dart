@@ -119,43 +119,32 @@ class MapPathFollower implements PathFollower
   Path path_;
   int cur_path_point_ = 0;
   Function callback_;
+  Vector2 vel_ = new Vector2(0.0, 0.0);
+  double acceptable_distance_ = 0.1;
 
   MapPathFollower(this.path_);
 
   void updateWalk(WalkingBehaviourState behaviour)
   {
-    Vector2 position = path_.points[cur_path_point_];
-    int x = position.x.floor();
-    int y = position.y.floor();
+    Vector2 point_position = path_.points[cur_path_point_];
 
-    Vector2 b_pos = new Vector2(behaviour.element_.position_.x.floorToDouble(),
-        behaviour.element_.position_.y.floorToDouble());
+    Vector2 diff = point_position - behaviour.element_.position_;
 
-    if (b_pos.x != x)
+    double distance = diff.length;
+    bool is_last_point = cur_path_point_ >= path_.points.length;
+    if (distance < 0.1)
     {
-      if (b_pos.x > x)
-      {
-        behaviour.walk(Directions.LEFT);
-      }
-      else
-      {
-        behaviour.walk(Directions.RIGHT);
-      }
+      cur_path_point_ ++;
     }
-    else if (b_pos.y != y)
+    else if (distance < acceptable_distance_ && (!is_last_point || callback_ == null))
     {
-      if (b_pos.y > y)
-      {
-        behaviour.walk(Directions.DOWN);
-      }
-      else
-      {
-        behaviour.walk(Directions.UP);
-      }
+      cur_path_point_ ++;
     }
     else
     {
-      cur_path_point_ ++;
+      Vector2 desired = diff.normalize() * behaviour.max_vel_ * 0.1;
+      vel_ = (vel_ + desired).normalize() * behaviour.max_vel_;
+      behaviour.addPos(vel_);
     }
 
     if (cur_path_point_ >= path_.points.length)

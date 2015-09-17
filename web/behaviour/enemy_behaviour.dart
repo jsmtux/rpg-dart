@@ -65,14 +65,28 @@ class EnemyFollowState extends WalkingBehaviourState
   BaseSheepBehaviour follow_;
   Vector2 origin_pos_;
 
-  EnemyFollowState(SpriteBehaviour element, this.follow_, this.origin_pos_) : super(element, 0.045);
+  EnemyFollowState(SpriteBehaviour element, this.follow_, this.origin_pos_) : super(element, 0.05);
   void hit(SpriteBehaviour sprite){}
 
   void update()
   {
     Vector2 diff = (follow_.position_ - element_.position_);
+    for (Behaviour behaviour in element_.area_.behaviours_)
+    {
+      double min_distance = diff.length;
+      if (behaviour is BaseSheepBehaviour && ! behaviour.isDead())
+      {
+        BaseSheepBehaviour sheep_behaviour = behaviour;
+        double dist = (sheep_behaviour.position_ - element_.position_).length;
+        if (dist < min_distance)
+        {
+          min_distance = dist;
+          follow_ = behaviour;
+        }
+      }
+    }
     walkDir(diff);
-    EnemyBehaviour this_element = element_;
+
     if (diff.length2 < 0.1)
     {
       follow_.hit(element_);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" nextobjectid="35">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" nextobjectid="40">
  <tileset firstgid="1" name="models_layer" tilewidth="16" tileheight="16">
   <image source="3d_tiles_template.png" width="80" height="80"/>
   <tile id="0">
@@ -93,7 +93,7 @@
  </layer>
  <layer name="models" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJztVosKAjEM89D//2YRFKRsXZK2O08aGHh21ybrY3e7NRqNRqPRaDQae3G815VxOGt3vOhaxfwHtI49YPrgTC0eT6buq/s+Ep/hVDVDlPgjWwXnKl2ojt1nzMI799nzVXSwXM7W8OFgn1kujA50hivnyMbxfGXqYOb+6H0FVTqUOzha26u4jNYr6LB4mHWY/UyOM2ZnVl2NOKE+7X5VE5IT1hebY+9OnOliZ8XIbutqFnvmz+PrwctVZj4QTqoNja3YRnZUR4WWTB0rLmgPKVB9zvhk5EPJS5V+tqdH84mdlwqUbwHkf3W2KEDntd1z/7LP9qOcIt8A3z7YOPZ3hFOUP+NjpcPezxncUKh5H/Fc1VaFpmgPojqQ91WNGfNA1YH4VWIrqNAx8/0LdbmrxyP4Fx0vrGrgbB1PKf8Bxg==
+   eJztVgkKwzAMa9n+/+Yx2KCYxJYUJz2wILDOqSXVsdttKxQKhUKhUCgU1mL/rTtjd9ZqvtEVcT4B5eN6ONOLd/6Zfp7d9xEiH0qezBmi8LdiMzTP8oX6WP2MWXjPvXd9Fx+slrM9/DXYa1YLO9vQfCw/y+PlyvSBasmoBcvN+kD3sxwIfxRn3qtX9mHxNms3+5kaZ8zOrHPV0oTmtPtVT0hN2Fxsjb13Ys8XOytacXuuety9fJ5eD16tMuuBaFJjKLcSa8VRHzO8ZPqItKA9pEDN2dOTUQ+lLrP8sz3dmk/svFSgfAsg/6uzRQE6r+2e1yHe249qGvkGOOZgeezvEU2j+pkckQ/7fs7QhkKte0tndLZmeBrtQdQHcr/qMWMeqD6QvAq3ghk+ermvcC5X9fgInuLji+gMnO3jAw+/AcU=
   </data>
  </layer>
  <layer name="behaviours" width="50" height="50">
@@ -107,20 +107,14 @@
   </data>
  </layer>
  <objectgroup name="paths">
-  <object id="17" name="wolf1" x="304.339" y="280">
-   <polyline points="-0.339081,-14 58.6609,-13"/>
+  <object id="20" name="wolf3" x="750.64" y="507">
+   <polyline points="0,0 -31.28,-0.223529 -32.64,-19 1.36,-18.3294 -0.226667,-0.223529"/>
   </object>
-  <object id="18" name="wolf2" x="462.78" y="207">
-   <polyline points="-7.7805,347 64.22,347"/>
+  <object id="36" name="wolf1" x="310.5" y="261.75">
+   <polyline points="0,0 -0.25,17 53,18.5 52.25,-1 1.5,-0.25"/>
   </object>
-  <object id="20" name="wolf3" x="743.72" y="561">
-   <polyline points="0,0 -52.44,-0.305882 -54.72,-26 2.28,-25.0824 -0.38,-0.305882"/>
-  </object>
-  <object id="21" name="wolf4" x="452" y="25.6429">
-   <polyline points="-34,26 -11.1,67.3571 70.3429,95.3571 57,-1.64286 -24.5857,2"/>
-  </object>
-  <object id="22" name="wolf5" x="127" y="12">
-   <polyline points="0,0 3,88 247,86 243,105 -12,105 -12,-2"/>
+  <object id="38" name="wolf2" x="457.25" y="549.75">
+   <polyline points="26.5,0 26.75,20 64.5,19.25 63.25,-2 27.25,-0.5"/>
   </object>
  </objectgroup>
 </map>
