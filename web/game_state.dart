@@ -30,16 +30,12 @@ class GameState extends SimpleHtmlState
     lights_controller_.SetDirectionalLight(new DirectionalLight(new Vector3(0.5,-0.3,1.0), new Vector3(0.3,0.3,0.3)));
   }
 
-  Future loadArea(String name, String level_path, String behaviour_path, SpriteLoader loader)
+  void addArea(name, area)
   {
-    Completer ret = new Completer();
-    GameArea toAdd = new GameArea();
-    toAdd.LoadGameArea(level_path, behaviour_path, loader, this).then((bool ok){areas_[name] = toAdd; ret.complete(ok);});
-    areas_[name] = toAdd;
-    return ret.future;
+    areas_[name] = area;
   }
 
-  void unLoadArea(String name)
+  void removeArea(String name)
   {
     visible_areas_.remove(areas_[name]);
     updated_areas_.remove(areas_[name]);

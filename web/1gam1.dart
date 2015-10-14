@@ -1,4 +1,5 @@
 import 'dart:html';
+import 'dart:async';
 
 import 'package:game_loop/game_loop_html.dart';
 
@@ -9,6 +10,9 @@ import 'camera.dart';
 import 'sprite_importer.dart';
 import 'dialogue_box.dart';
 import 'input.dart';
+import 'game_area.dart';
+import 'level_importer.dart';
+import 'level_data.dart';
 
 class GameManager
 {
@@ -46,9 +50,26 @@ class GameManager
 
     SpriteLoader loader = new SpriteLoader(drawable_factory, input_, camera_, dialogue_);
 
-    draw_state.loadArea("first", map, sprites, loader)
-    .then((bool ret)
+    GameArea toAdd = new GameArea();
+
+    LevelImporter level_importer = new LevelImporter();
+    level_importer.RequestFile(map)
+    .then((LevelData data)
     {
+      return data.AddToGameState(toAdd, draw_state, loader);
+    })
+    .then((res)
+    {
+      if(sprites != null) {
+        SpriteImporter sprite_importer = new SpriteImporter(loader, toAdd.offset_);
+        sprite_importer.RequestFile(sprites).then(
+                (sprites)
+            {
+              loader.AddToGameState(sprites, res, toAdd, draw_state);
+            }
+        );
+      }
+      draw_state.addArea("first", toAdd);
       game_loop_.state = draw_state;
       draw_state.setVisible("first", true);
       querySelector('#pause-button').style.display = 'block';
