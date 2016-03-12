@@ -1,0 +1,58 @@
+
+#game-area {
+  position: absolute;
+  left:     50%;
+  top:      50%;
+}
+
+#game-element {
+  width: 100%;
+  height: 100%;
+}
+
+#stats-panel {
+  position: absolute;
+  width: 100%;
+  height: 8%;
+  bottom: 0;
+  opacity: 0.8;
+}
+
+.box {
+  border-image:url(html-images/buttonLong_brown.png) 15 15 repeat;
+  background-color: #97714A;
+  border-width:20px;
+}
+
+#dialogue-close {
+  position: absolute;
+  bottom: -35px;
+  width: 30px;
+  height: 30px;
+}
+
+#dialogue {
+  position:absolute;
+  bottom: 5%;
+  left: 20%;
+  width: 60%;
+  color: white;
+  visibility: hidden;
+  font-size: 2em;
+  text-align: center
+}
+
+#analog_control_base {
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:50px;
+  visibility: hidden;
+}
+
+#analog_control {
+  position:absolute;
+  width:15px;
+  top:17px;
+  left:17px;
+}
