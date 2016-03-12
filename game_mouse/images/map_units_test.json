@@ -1,0 +1,43 @@
+{
+	"pc":
+	{
+		"drawable":
+		{
+			"type":"model",
+	  		"path":"images/robot_cat.model"
+		},
+		"behaviour":
+		{
+	  		"type":"PCBehaviour",
+	  		"posx":22.0,
+	  		"posy":35.0
+		}
+	},
+	"sign_hello":{
+		"drawable":{
+			"type":"model",
+			"path":"images/sign.model"
+	  	},
+		"behaviour":{
+	  		"type":"SignBehaviour",
+	  		"posx":22.0,
+	  		"posy":34.0,
+	  		"text":"Your name is Rockat.<br>You are a robot cat<br>"
+		}
+	},
+	"sign_controls":{
+		"parent":"sign_hello",
+		"behaviour":{
+			"posx":23.0,
+	  		"text":"Like all robot cats you are contolled with<br>arrow keys to move<br>C to jump<br>V to drift<br>space to shoot laser!!"
+		}
+	},
+	"sign_cat":{
+		"parent":"sign_hello",
+		"behaviour":{
+			"posx":24.0,
+	  		"text":"Unlike all robot cats you do not like war<br>So you don't shoot laser!!"
+		}
+	}
+}
+
