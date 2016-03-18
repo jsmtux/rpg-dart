@@ -1,34 +1,66 @@
 <html>
-<head>
-<title>JSMTUX - Dumb RPG</title>
-<link rel="stylesheet" type="text/css" href="style.css">
-</head>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+		<link rel="stylesheet" href="https://code.getmdl.io/1.1.2/material.indigo-pink.min.css">
+		<script defer src="https://code.getmdl.io/1.1.2/material.min.js"></script>
+		<title>JSMTUX - Dumb RPG</title>
+	</head>
 <body>
-<h1>Dumb rpg</h1>
-<div class="row clearfix">
-	<div class="container">
-		<img class="screenshot" src="./images/screenshot_rpg.png" />
-		<p class="description">
-			<h2>source</h2>
-			<a href="https://github.com/jsmtux/rpg-dart/tree/rpg-latest">https://github.com/jsmtux/rpg-dart/tree/rpg-latest</a>
-			<h2>Description</h2>
-			<p>RPG game engine implementation.
-			<h3>Features</h3>
-			<ul>
-			<li>Maps can be edited with <a href="http://www.mapeditor.org/">tiled editor</a></li>
-			<li>Support for basic lighting, directional and point lights.</li>
-			<li>Support and dynamic maps (Try walking to first floor)</li>
-			<li>Enemies will follow you, but can be killed using space bar.</li>
-			</ul></p>
-			<h2>Compatibility</h2>
-			<ul>
-			<li>Desktop: Needs a webgl enabled browser. https://get.webgl.org/</li>
-			<li>Phone/tablet: Some support for touchscreen control. Needs WebGL.</li>
-		</p>
+	<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
+		<header class="mdl-layout__header mdl-layout__header--waterfall mdl-color--blue-grey-900 mdl-color-text--blue-grey-50"">
+			<!-- Top row, always visible -->
+			<div class="mdl-layout__header-row">
+				<!-- Title -->
+				<span class="mdl-layout-title">Jose Manuel Ventoso Picos</span>
+			</div>
+			<!-- Bottom row, not visible on scroll -->
+			<div class="mdl-layout__header-row">
+				<a href="#scroll-tab-1" class="mdl-layout__tab is-active">Tab 1</a>
+				<a href="#scroll-tab-2" class="mdl-layout__tab">Tab 2</a>
+				<a href="#scroll-tab-3" class="mdl-layout__tab">Tab 3</a>
+				<a href="#scroll-tab-4" class="mdl-layout__tab">Tab 4</a>
+				<a href="#scroll-tab-5" class="mdl-layout__tab">Tab 5</a>
+				<a href="#scroll-tab-6" class="mdl-layout__tab">Tab 6</a>
+			</div>
+		</header>
+		<main class="mdl-layout__content mdl-color--grey-100">
+			<div class="mdl-grid portfolio-max-width">
+				<div class="mdl-grid mdl-cell mdl-cell--12-col mdl-cell--4-col-tablet mdl-card mdl-shadow--4dp">
+						<div class="mdl-card__media mdl-cell mdl-cell--12-col-tablet">
+								<img class="article-image" src="images/screenshot_rpg.png" border="0" alt="">
+						</div>
+						<div class="mdl-cell mdl-cell--8-col">
+								<h2 class="mdl-card__title-text">Dumb RPG</h2>
+								<div class="mdl-card__supporting-text no-left-padding">
+										<h2>source</h2>
+										<a href="https://github.com/jsmtux/rpg-dart/tree/rpg-latest">https://github.com/jsmtux/rpg-dart/tree/rpg-latest</a>
+										<h2>Description</h2>
+										<p>RPG game engine implementation.
+										<h3>Features</h3>
+										<ul>
+										<li>Maps can be edited with <a href="http://www.mapeditor.org/">tiled editor</a></li>
+										<li>Support for basic lighting, directional and point lights.</li>
+										<li>Support and dynamic maps (Try walking to first floor)</li>
+										<li>Enemies will follow you, but can be killed using space bar.</li>
+										</ul></p>
+										<h2>Compatibility</h2>
+										<ul>
+										<li>Desktop: Needs a webgl enabled browser. https://get.webgl.org/</li>
+										<li>Phone/tablet: Some support for touchscreen control. Needs WebGL.</li>
+								</div>
+								<div class="mdl-card__actions mdl-card--border">
+									<a href="./game_rpg/1gam1.html" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+										Play the game
+									</a>
+								</div>
+						</div>
+				</div>
+			</div>
+		</main>
 	</div>
-</div>
-<br>
-<h2><a href="./game_rpg/1gam1.html">play the game</a></h2>
 
 </body>
 </html>

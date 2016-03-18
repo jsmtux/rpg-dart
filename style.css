@@ -1,31 +1,9 @@
-.picture{
-    float:left;
-}
-.description{
-    margin-left:275px;
-}
-.clearfix:after {
-    visibility: hidden;
-    display: block;
-    font-size: 0;
-    content: " ";
-    clear: both;
-    height: 0;
-}
-.date{
-    
+.portfolio-max-width {
+  max-width: 1200px;
+  margin: auto;
 }
 
-.row {
-  display: block;
-  /* width: 100%; */
-}
-.container {
-}
-.screenshot {
-    float: left;
-    padding: 25px;
-}
-.description {
-    float: right;
+img.article-image {
+  width: 100%;
+  height: auto;
 }
